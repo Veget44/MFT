@@ -1,0 +1,2699 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+    <meta name="mobile-web-app-capable" content="yes"/>
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <meta name="theme-color" content="#2A2D40"/>
+    <title>My French Teacher</title>
+    <style>*{margin:0;padding:0;box-sizing:border-box}html,body,#root{width:100%;height:100%;height:100dvh;overflow:hidden;background:#F2EDE3}</style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script>
+      // UPDATE with your Railway URL after deployment
+      window.MFT_API_BASE = "https://your-backend.railway.app";
+    </script>
+    <script src="https://unpkg.com/react@18.3.1/umd/react.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js" crossorigin></script>
+    <script>
+const { useState, useRef, useEffect, useCallback } = React;
+
+ function _nullishCoalesce(lhs, rhsFn) { if (lhs != null) { return lhs; } else { return rhsFn(); } } function _optionalChain(ops) { let lastAccessLHS = undefined; let value = ops[0]; let i = 1; while (i < ops.length) { const op = ops[i]; const fn = ops[i + 1]; i += 2; if ((op === 'optionalAccess' || op === 'optionalCall') && value == null) { return undefined; } if (op === 'access' || op === 'optionalAccess') { lastAccessLHS = value; value = fn(value); } else if (op === 'call' || op === 'optionalCall') { value = fn((...args) => value.call(lastAccessLHS, ...args)); lastAccessLHS = undefined; } } return value; }
+
+// -- Backend config -
+// Replace this with your Railway URL once deployed
+const API_BASE = (typeof window !== "undefined" && window.MFT_API_BASE)
+  ? window.MFT_API_BASE
+  : "https://your-backend.railway.app";
+
+// Session ID -- persisted per device
+function getSessionId() {
+  try {
+    let id = localStorage.getItem("mft_session_id");
+    if (!id) {
+      id = "s_" + Math.random().toString(36).slice(2) + Date.now().toString(36);
+      localStorage.setItem("mft_session_id", id);
+    }
+    return id;
+  } catch (e2) { return "anonymous"; }
+}
+const SESSION_ID = getSessionId();
+
+// -- Palette -
+const C = {
+  bg:"#F2EDE3",bgLight:"#F7F3EA",bgCard:"#EDE8DE",bgDeep:"#E6E0D5",
+  blue:"#002395",blueLight:"#E8ECF8",blueMid:"#1C3DB8",
+  red:"#ED2939",redLight:"#FAEAEA",
+  green:"#2D6B2B",greenLight:"#EBF4E8",
+  ink:"#1A1D2E",inkMid:"#2E3248",inkLight:"#4A4E68",
+  gray:"#6B6878",grayMid:"#9896A4",grayLight:"#C4C2CC",
+  rule:"#D8D4DC",ruleWarm:"#CBC7D0",
+  header:"#2A2D40",onHeader:"#EEF0F5",onHeaderDim:"#8A8DA8",
+  star:"#C8A84B",starEmpty:"#D8D4DC",
+};
+
+const FONTS = `@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Serif+Text:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap');`;
+
+// -- CEFR -
+const CEFR = {
+  "0":{label:"0",name:"Absolute beginner",nameFr:"Grand débutant"},
+  A1:{label:"A1",name:"Beginner",nameFr:"Débutant"},
+  A2:{label:"A2",name:"Elementary",nameFr:"Élémentaire"},
+  B1:{label:"B1",name:"Intermediate",nameFr:"Intermédiaire"},
+  B2:{label:"B2",name:"Upper Intermediate",nameFr:"Confirmé"},
+  C1:{label:"C1",name:"Advanced",nameFr:"Avancé"},
+};
+const CEFR_ORDER = ["0","A1","A2","B1","B2","C1"];
+const CEFR_RANK  = {"0":0,A1:1,A2:2,B1:3,B2:4,C1:5};
+
+// -- Progression helpers -
+// How many scenarios must be completed at a level to unlock the next
+const UNLOCK_THRESHOLD = 2;
+
+function getUnlockedLevel(progress, userLevel) {
+  const safeLevel = userLevel || "0";
+  const counts = {};
+  CEFR_ORDER.forEach(l => counts[l] = 0);
+  SCENARIOS.forEach(s => {
+    if (progress[s.id]) counts[s.cefrLevel]++;
+  });
+  let current = _nullishCoalesce(CEFR_RANK[safeLevel], () => ( 0));
+  while (current < CEFR_ORDER.length - 1) {
+    const lvl = CEFR_ORDER[current];
+    if (counts[lvl] >= UNLOCK_THRESHOLD) current++;
+    else break;
+  }
+  return CEFR_ORDER[current];
+}
+
+function scenarioUnlocked(scenario, effectiveLevel) {
+  return CEFR_RANK[scenario.cefrLevel] <= CEFR_RANK[effectiveLevel];
+}
+
+// Stars per scenario: stored as progress[id] = { stars, visits }
+function getStars(progressEntry) {
+  if (!progressEntry) return 0;
+  if (typeof progressEntry === "boolean") return 1; // legacy
+  return progressEntry.stars || 0;
+}
+
+function StarRow({stars, size=14}) {
+  return (
+    React.createElement('div', { style: {display:"flex",gap:2},}
+      , [1,2,3].map(i => (
+        React.createElement('svg', { key: i, width: size, height: size, viewBox: "0 0 14 14"   ,}
+          , React.createElement('path', { d: "M7 1l1.5 3.5L12 5l-2.5 2.4.6 3.6L7 9.3 3.9 11l.6-3.6L2 5l3.5-.5z"         ,
+            fill: i<=stars ? C.star : C.starEmpty,})
+        )
+      ))
+    )
+  );
+}
+
+// -- Skills tagging 
+const SKILLS = {
+  pastTenses:   {label:"Past tenses",   labelFr:"Temps du passé"},
+  subjunctive:  {label:"Subjunctive",   labelFr:"Subjonctif"},
+  politeness:   {label:"Polite register",labelFr:"Registre poli"},
+  negotiation:  {label:"Negotiating",   labelFr:"Négociation"},
+  symptoms:     {label:"Health vocab",  labelFr:"Vocabulaire santé"},
+  conflict:     {label:"Conflict resolution",labelFr:"Résolution de conflits"},
+  transport:    {label:"Transport",     labelFr:"Transport"},
+  restaurant:   {label:"Restaurant",   labelFr:"Restaurant"},
+  professional: {label:"Professional French",labelFr:"Français professionnel"},
+  argumentation:{label:"Argumentation",labelFr:"Argumentation"},
+  nuance:       {label:"Nuance & opinion",labelFr:"Nuance & opinion"},
+  bureaucracy:  {label:"Admin French", labelFr:"Français administratif"},
+};
+
+// -- Scenarios --
+// Pre-A1 scenarios have extra fields: keywords, starter, blanks
+// blanks = sentence template with ___ to fill in
+const SCENARIOS = [
+  {id:101,cefrLevel:"0",place:"Café · France",
+   title:"Bonjour !",titleEn:"Hello!",
+   skills:["politeness"],
+   scene_fr:"Vous entrez dans un café français. Le serveur vous regarde.",
+   scene_en:"You walk into a French café. The waiter looks at you.",
+   goal_fr:"Commandez un café.",
+   goal_en:"Order a coffee.",
+   hint_fr:"Utilisez les mots ci-dessous pour faire votre commande.",
+   hint_en:"Use the words below to place your order.",
+   culture_fr:"En France, on dit toujours 'bonjour' en entrant dans un commerce.",
+   culture_en:"In France, always say 'bonjour' when entering a shop or café.",
+   keywords:["Bonjour","un café","s'il vous plaît","merci","combien ?"],
+   starter:"Bonjour ! Je voudrais ___",
+   blanks:"Bonjour ! Je voudrais ___ s'il vous plaît."},
+  {id:102,cefrLevel:"0",place:"Restaurant · France",
+   title:"J'ai faim !",titleEn:"I'm hungry!",
+   skills:["restaurant","politeness"],
+   scene_fr:"Vous êtes au restaurant. Le serveur arrive.",
+   scene_en:"You're at a restaurant. The waiter comes to your table.",
+   goal_fr:"Demandez la carte et commandez de l'eau.",
+   goal_en:"Ask for the menu and order some water.",
+   hint_fr:"Utilisez les mots ci-dessous.",
+   hint_en:"Use the words below.",
+   culture_fr:"En France, l'eau du robinet est gratuite. Dites 'une carafe d'eau'.",
+   culture_en:"Tap water is free in France. Say 'une carafe d'eau' for a free jug.",
+   keywords:["La carte","s'il vous plaît","de l'eau","merci","une carafe"],
+   starter:"Bonjour ! La carte, ___",
+   blanks:"Bonjour ! La carte, s'il vous plaît. Et ___, merci."},
+  {id:103,cefrLevel:"0",place:"Rue · France",
+   title:"Où est... ?",titleEn:"Where is... ?",
+   skills:["transport","politeness"],
+   scene_fr:"Vous êtes perdu(e) dans la rue. Vous voyez quelqu'un.",
+   scene_en:"You're lost on the street. You see someone nearby.",
+   goal_fr:"Demandez où est la gare.",
+   goal_en:"Ask where the train station is.",
+   hint_fr:"Utilisez les mots ci-dessous.",
+   hint_en:"Use the words below.",
+   culture_fr:"Commencez toujours par 'Excusez-moi' — c'est indispensable en France.",
+   culture_en:"Always start with 'Excusez-moi' — it's essential in France.",
+   keywords:["Excusez-moi","la gare","où est","s'il vous plaît","merci"],
+   starter:"Excusez-moi, où est ___",
+   blanks:"Excusez-moi, où est la gare, s'il vous plaît ?"},
+
+  {id:1,cefrLevel:"A1",place:"Café de Flore · Paris 6e",
+   title:"Du sucre dans mon café",titleEn:"Sugar in my coffee",
+   skills:["pastTenses","politeness"],
+   scene_fr:"Il est 9h au Café de Flore. Vous avez commandé un café sans sucre — mais le serveur vient de poser devant vous un café sucré. Vous y êtes allergique. Il s'éloigne déjà.",
+   scene_en:"9am at Café de Flore. You ordered a black coffee, no sugar — the waiter just placed a sweet one in front of you. You're allergic. He's already walking away.",
+   goal_fr:"Rappelez le serveur et expliquez le problème.",
+   goal_en:"Call the waiter back and explain the problem.",
+   hint_fr:"« Excusez-moi, monsieur — j'ai commandé un café sans sucre et je suis allergique… »",
+   hint_en:"Try: 'Excusez-moi, monsieur — j'ai commandé un café sans sucre et je suis allergique…'",
+   culture_fr:"En France, on dit 'monsieur' ou 'madame' — jamais 'garçon'.",
+   culture_en:"In France: 'monsieur' or 'madame' — never 'garçon', never snap your fingers."},
+  {id:2,cefrLevel:"A1",place:"Boulangerie Poilâne · Paris 6e",
+   title:"La dernière baguette",titleEn:"The last baguette",
+   skills:["politeness","negotiation"],
+   scene_fr:"Il reste une seule baguette. Le boulanger dit qu'elle est réservée pour Madame Leclerc. Vous avez des invités ce soir.",
+   scene_en:"One perfect baguette left. The baker says it's reserved for a regular. You have guests tonight.",
+   goal_fr:"Convainquez le boulanger de vous la vendre.",
+   goal_en:"Convince the baker to sell it to you.",
+   hint_fr:"Soyez charmant(e) — expliquez votre situation avec le sourire.",
+   hint_en:"Be warm and explain your situation — French bakers respond to charm, not pressure.",
+   culture_fr:"Les boulangers apprécient la chaleur bien plus que l'insistance.",
+   culture_en:"A genuine smile and a short story go a long way. Insistence backfires."},
+  {id:3,cefrLevel:"A2",place:"Pharmacie des Halles · Paris 1er",
+   title:"Pas dans son assiette",titleEn:"Under the weather",
+   skills:["symptoms","politeness"],
+   scene_fr:"Vous avez mal à la tête, la gorge irritée et de la fièvre depuis hier soir. Pas de médecin. Le pharmacien est là.",
+   scene_en:"Pounding headache, sore throat, slight fever since last night. No doctor here. The pharmacist is available.",
+   goal_fr:"Décrivez vos symptômes avec précision.",
+   goal_en:"Describe your symptoms precisely — 'I feel bad' won't get you the right medicine.",
+   hint_fr:"« J'ai mal à la tête et à la gorge depuis hier. J'ai aussi un peu de fièvre. »",
+   hint_en:"Try: 'J'ai mal à la tête et à la gorge depuis hier soir. J'ai aussi un peu de fièvre.'",
+   culture_fr:"Les pharmaciens français sont des professionnels de santé qualifiés.",
+   culture_en:"French pharmacists are highly qualified — be precise and they'll take great care of you."},
+  {id:4,cefrLevel:"A2",place:"Résidence Les Lilas · Lyon 3e",
+   title:"La fête du dessus",titleEn:"The midnight party",
+   skills:["conflict","politeness"],
+   scene_fr:"Il est minuit et demi. Entretien à 8h. Les voisins font la fête depuis 22h.",
+   scene_en:"12:30am on a Tuesday. Job interview at 8am. Neighbours have been partying since 10pm.",
+   goal_fr:"Demandez moins de bruit, sans créer de conflit.",
+   goal_en:"Ask them to keep it down — without creating conflict.",
+   hint_fr:"Commencez par vous excuser : « Je suis vraiment désolé(e) de vous déranger… »",
+   hint_en:"Apologise first: 'Je suis vraiment désolé(e) de vous déranger…' then explain.",
+   culture_fr:"S'excuser avant de formuler une demande est presque obligatoire en France.",
+   culture_en:"Apologising before making a request is almost mandatory in France."},
+  {id:5,cefrLevel:"B1",place:"Gare du Nord",
+   title:"Deux minutes de trop",titleEn:"Two minutes too late",
+   skills:["transport","negotiation"],
+   scene_fr:"Votre TGV pour Lyon est parti il y a deux minutes. L'agent au guichet a l'air épuisé.",
+   scene_en:"Your TGV to Lyon left exactly 2 minutes ago. The SNCF agent at the counter looks weary.",
+   goal_fr:"Demandez vos options calmement.",
+   goal_en:"Ask about your options calmly — without sounding aggressive.",
+   hint_fr:"« Bonjour, j'ai raté mon TGV de 14h32 pour Lyon. Est-ce qu'il serait possible… »",
+   hint_en:"Try: 'Bonjour, j'ai raté mon TGV de 14h32. Est-ce qu'il serait possible…'",
+   culture_fr:"Rester calme et orienté solution donne de bien meilleurs résultats.",
+   culture_en:"SNCF agents deal with frustrated travellers all day. Calm and solution-focused works better."},
+  {id:6,cefrLevel:"B1",place:"Restaurant Chez Marie · Bordeaux",
+   title:"Le mauvais plat",titleEn:"The wrong dish",
+   skills:["restaurant","politeness"],
+   scene_fr:"Vous avez commandé le confit de canard. Le serveur pose devant vous du saumon. Vous ne mangez pas de poisson.",
+   scene_en:"You ordered duck confit. Salmon arrives. You don't eat fish. Everyone else is already eating.",
+   goal_fr:"Corrigez l'erreur discrètement.",
+   goal_en:"Correct the mistake discreetly, without spoiling the atmosphere.",
+   hint_fr:"« Excusez-moi, je crois qu'il y a une petite erreur… »",
+   hint_en:"Try: 'Excusez-moi, je crois qu'il y a une petite erreur — j'avais commandé le confit de canard.'",
+   culture_fr:"Signalez une erreur discrètement, avec le sourire.",
+   culture_en:"Flag mistakes quietly with a smile. A light tone shows goodwill."},
+  {id:7,cefrLevel:"B2",place:"Europcar · Aéroport de Nice",
+   title:"La rayure fantôme",titleEn:"The phantom scratch",
+   skills:["argumentation","conflict"],
+   scene_fr:"L'agent repère une rayure au pare-chocs et prétend qu'elle n'était pas là. Vous l'avez photographiée.",
+   scene_en:"The agent spots a scratch and claims it wasn't there at pickup. You photographed it clearly.",
+   goal_fr:"Contestez avec calme et preuves.",
+   goal_en:"Dispute the claim calmly, backed by evidence.",
+   hint_fr:"« Cette rayure était déjà présente lors de la prise en charge. J'en ai la preuve en photo. »",
+   hint_en:"Try: 'Je tiens à préciser que cette rayure était déjà présente — j'en ai la preuve en photo.'",
+   culture_fr:"Factuel, calme, avec des preuves — jamais émotionnel.",
+   culture_en:"Stay factual and calm with evidence. Never emotional, never accusatory."},
+  {id:8,cefrLevel:"B2",place:"Agence Centrale · Lyon Part-Dieu",
+   title:"L'entretien d'embauche",titleEn:"The job interview",
+   skills:["professional","nuance"],
+   scene_fr:"Un recruteur vous demande : « Pourquoi travailler en France plutôt que dans votre pays ? »",
+   scene_en:"You're facing a French recruiter. The hard question arrives: 'Why work in France rather than your own country?'",
+   goal_fr:"Répondez de manière convaincante et personnelle.",
+   goal_en:"Answer convincingly and personally — they want a real answer, not a rehearsed one.",
+   hint_fr:"Allez au-delà de 'J'aime la France'. Parlez de motivations précises.",
+   hint_en:"Go beyond 'I love France'. Talk about something specific: 'Ce qui m'attire particulièrement, c'est…'",
+   culture_fr:"Les recruteurs français valorisent la profondeur intellectuelle.",
+   culture_en:"French interviewers value intellectual substance. A vague answer convinces no one."},
+  {id:9,cefrLevel:"B2",place:"BNP Paribas · Paris 11e",
+   title:"Le document manquant",titleEn:"The missing document",
+   skills:["bureaucracy","negotiation"],
+   scene_fr:"Vous avez tous les documents. Le conseiller dit qu'il en manque un.",
+   scene_en:"You brought every document on the official list. The advisor says one is missing.",
+   goal_fr:"Négociez une solution alternative.",
+   goal_en:"Negotiate an alternative solution with the advisor.",
+   hint_fr:"« Je comprends votre contrainte, mais serait-il possible d'utiliser à la place… »",
+   hint_en:"Try: 'Je comprends votre contrainte, mais serait-il possible d'utiliser à la place…'",
+   culture_fr:"Proposer une alternative légale est plus efficace que la frustration.",
+   culture_en:"French bureaucracy is real but not immovable. A legal alternative beats frustration."},
+  {id:10,cefrLevel:"C1",place:"Dîner chez les Moreau · Montpellier",
+   title:"Le débat de table",titleEn:"The dinner table debate",
+   skills:["nuance","argumentation"],
+   scene_fr:"Quelqu'un vous demande : « Qu'est-ce que vous pensez vraiment de la France ? » Tout le monde se tait.",
+   scene_en:"Someone asks directly: 'What do you really think of France?' Everyone goes quiet.",
+   goal_fr:"Répondez honnêtement et avec nuance.",
+   goal_en:"Give an honest, nuanced, culturally intelligent answer.",
+   hint_fr:"Soyez précis. Mentionnez une surprise. Terminez par une question.",
+   hint_en:"Be specific. Mention one surprise — good or hard. End with a question back.",
+   culture_fr:"Les Français respectent l'honnêteté intellectuelle plus que la politesse de façade.",
+   culture_en:"The French respect intellectual honesty far more than polite flattery."},
+];
+
+// -- Copy -
+const T = (imm) => ({
+  tagline: imm
+    ? ["De vraies conversations.","Des corrections honnêtes.","Juste du français."]
+    : ["Real conversations.","Honest corrections.","Just French."],
+  start: imm?"Commencer":"Get started",
+  builtFor: imm?"Conçu pour ceux qui veulent vraiment parler français"
+    :"Built for people who actually want to speak French",
+  modeTitle: imm?"Comment souhaitez-vous apprendre ?":"How do you want to learn?",
+  modeSubtitle: imm?"Modifiable à tout moment.":"You can change this any time.",
+  modeGuided: imm?"Mode guidé":"Guided mode",
+  modeGuidedSub: imm?"Corrections en anglais. Idéal pour débuter.":"Corrections and hints in English.",
+  modeImm: imm?"Immersion totale":"Full immersion",
+  modeImmSub: imm?"Tout en français. Pour les niveaux B1+.":"Everything in French. For B1+ learners.",
+  modeContinue: imm?"Continuer →":"Continue →",
+  modeChoose: "Choose a mode",
+  testTitle: imm?"Où en êtes-vous ?":"Where are you right now?",
+  testSub: imm?"3 questions + 1 phrase libre. Moins de 60 secondes.":"3 questions + 1 sentence. Under 60 seconds.",
+  testTakeTest: imm?"Passer le test":"Take the test",
+  testKnowLevel: imm?"Choisir mon niveau":"I know my level",
+  testKnowLevelSub: imm?"Sélectionnez votre niveau CECR.":"Select your CEFR level and jump in.",
+  preA1Desc: imm?"Je ne parle pas du tout français":"I don't speak any French yet",
+  testStart: imm?"Démarrer →":"Start →",
+  testSkip: imm?"Passer — commencer en A1":"Skip — start at A1",
+  testOpen1: imm?"1 ou 2 phrases en français.":"1 or 2 sentences in French.",
+  testAnalyse: imm?"Analyser →":"Analyse →",
+  testLoading: imm?"Votre professeur analyse votre français…":"Reading your French…",
+  testYourLevel: imm?"Votre niveau":"Your level",
+  testFocus: imm?"À travailler":"Focus on",
+  testSeeScen: imm?"Voir mes scénarios →":"See my scenarios →",
+  testRecording: imm?"Enregistrement…":"Recording…",
+  writeFr: imm?"Écrivez en français…":"Write in French…",
+  appName: "My French Teacher",
+  completed: imm?"complétés":"completed",
+  sessionsLabel: imm?"sessions cette semaine":"sessions this week",
+  continueLabel: imm?"Reprendre où vous en étiez":"Continue where you left off",
+  comebackMsg: imm?"Ça fait un moment — reprenez avec :":"It's been a while — pick up with:",
+  unlockMsg: imm?"Plus que {n} scénario(s) pour débloquer {level} →":"Complete {n} more scenario(s) to unlock {level} →",
+  tip: imm?"Conseil":"Tip",
+  close: imm?"Fermer":"Close",
+  indice: imm?"Indice":"Hint",
+  respondBelow: imm?"Répondez en français ci-dessous.":"Write or speak your French response below.",
+  yourGoal: imm?"Votre objectif":"Your goal",
+  usefulWords: imm?"Mots utiles":"Useful words",
+  starterSentence: imm?"Commencez avec :":"Start with:",
+  typeYourAnswer: imm?"Complétez et envoyez votre phrase…":"Complete the sentence and send…",
+  bravo: imm?"Bravo.":"Well done.",
+  sceneDone: imm?"Scénario terminé":"Scenario complete",
+  backToChallenges: imm?"Retour aux défis":"Back to challenges",
+  listening: imm?"Je vous écoute…":"Listening…",
+  speakNow: imm?"Parlez maintenant":"Speak now",
+  inputHint: imm?"Tout en français · Entrée pour envoyer":"French only · Enter to send",
+  starExplain: imm?["Complété","Retour sans corrections","Niveau supérieur"]
+    :["Completed","Returned, no corrections","Above your level"],
+  profile: imm?"Mon profil":"My profile",
+  done: "Done", left: "Left",
+  retakeTest: imm?"↻ Repasser le test":"↻ Retake the test",
+  allScenarios: imm?"Tous les scénarios":"All scenarios",
+  skillMap: imm?"Compétences travaillées":"Skills practised",
+  reset: imm?"Réinitialiser la progression":"Reset all progress",
+  switchMode: imm?"Switch to English":"Switch to French immersion",
+  settings: imm?"Réglages":"Settings",
+  ttsLabel: imm?"Voix du professeur":"Teacher speaks",
+  ttsSub: imm?"Lit les corrections en français.":"Reads feedback aloud in French.",
+  apiLabel: "API key",
+  apiSub: imm?"Obtenez votre clé sur console.anthropic.com. Elle reste sur votre appareil."
+    :"Get yours at console.anthropic.com — stays on your device only.",
+  saveKey: imm?"Enregistrer":"Save key",
+  savedKey: imm?"✓ Enregistrée":"✓ Saved",
+  keyNeverLeaves: imm?"Votre clé ne quitte jamais votre navigateur.":"Your API key never leaves your browser.",
+  saveAndStart: imm?"Enregistrer et commencer":"Save and start",
+  skipForNow: imm?"Passer pour l'instant":"Skip for now",
+});
+
+// -- Tutor prompt --
+const TUTOR_PROMPT = (imm, isPreA1=false) => isPreA1
+  ? `You are a warm French teacher. The student is an absolute beginner -- be brief and kind.
+FORMAT: 2 sentences max.
+Sentence 1: Did they attempt the objective? If yes, name exactly what they got right. If no, gently give the correct phrase in quotes.
+Sentence 2 (only if needed): One tiny correction or word of encouragement.
+NEVER: lists, grammar jargon, more than 2 sentences, hollow praise.
+${imm?"Respond in very simple French.":"Respond in English."}`
+  : imm
+  ? `Tu es prof de francais. Direct, precis, chaleureux -- jamais de listes ni de "Excellent travail !".
+FORMAT STRICT -- 2-3 phrases courtes maximum :
+Ph1: L'eleve a-t-il repondu a l'objectif ? Oui -> dis ce qui marche. Non -> redirige avec la phrase correcte entre guillemets.
+Ph2: Si erreur : UNE alternative correcte entre guillemets + regle en 5 mots max. Sinon : passe.
+Ph3 (optionnelle): Micro-question pour relancer ou encouragement bref.
+JAMAIS : listes, points, plus de 3 phrases, "c'est parfait".
+Si anglais : signale-le, donne une amorce en francais.
+Reponds en francais.`
+  : `You are a French teacher. Direct, precise, warm -- no hollow praise, no lists.
+STRICT FORMAT -- 2-3 short sentences max:
+S1: Did the student address the objective? Yes -> name exactly what works. No -> redirect with the correct phrase in quotes.
+S2: If grammar/vocab error: ONE correct alternative in quotes + rule in 5 words. Otherwise: skip.
+S3 (optional): A micro-question to keep them going or brief encouragement.
+NEVER: lists, bullet points, more than 3 sentences, "great job", "well done".
+If they write in English: note it briefly, give a French opener.
+Respond in English.`
+
+const PLACEMENT_PROMPT = (imm) => imm
+  ? `Tu évalues le niveau CECR d'un apprenant. Réponds UNIQUEMENT avec du JSON valide, sans markdown, sans texte avant ou après.
+Format exact : {"level":"A1","explanation":"Phrase courte directe.","focus":"Un conseil actionnable."}
+Niveaux : A1=débutant, A2=élémentaire, B1=intermédiaire, B2=confirmé, C1=avancé.
+Sois généreux -- mieux vaut surestimer légèrement que décourager.`
+  : `Evaluate the CEFR level of a French learner. Reply ONLY with valid JSON, no markdown, no text before or after.
+Exact format: {"level":"A1","explanation":"Short direct sentence.","focus":"One actionable tip."}
+Levels: A1=beginner, A2=elementary, B1=intermediate, B2=upper-intermediate, C1=advanced.
+Be generous -- it's better to slightly overestimate than to discourage.`;
+
+// -- Star analysis prompt 
+// After a return visit, ask the tutor to evaluate if it deserves star 2 or 3
+const STAR_PROMPT = (imm, currentStars) => imm
+  ? `Tu es prof de français. L'élève refait un scénario (actuellement ${currentStars} étoile(s)).
+Donne ton feedback habituel en 2-3 phrases max.
+PUIS sur la toute dernière ligne, écris UNIQUEMENT ce JSON (rien d'autre après) :
+{"stars":1}  ou  {"stars":2}  ou  {"stars":3}
+Critères : 1 = erreurs importantes, 2 = correct et approprié, 3 = naturel et au-dessus du niveau.
+Réponds en français.`
+  : `You are a French teacher. The student is replaying a scenario (currently ${currentStars} star(s)).
+Give your usual feedback in 2-3 sentences max.
+THEN on the very last line write ONLY this JSON (nothing after it):
+{"stars":1}  or  {"stars":2}  or  {"stars":3}
+Criteria: 1 = significant errors, 2 = correct and appropriate, 3 = natural and above level.
+Respond in English.`;
+
+// -- Diagnostic extraction prompt --
+const DIAG_PROMPT = `Analyse a French learner response. Return ONLY valid JSON, no markdown.
+{"errors":["label1","label2"],"strengths":["label1"],"note":"one observation, max 10 words"}
+IMPORTANT -- use ONLY these exact error labels when they match (copy exactly):
+"Passe compose vs imparfait" | "Missing articles (le/la/un/une)" | "Subjonctif not triggered" | "Word order in questions" | "Wrong register (too informal)" | "Polite greetings" | "Natural word order" | "Past tenses" | "Negotiation" | "Argumentation" | "Health vocab" | "Transport" | "Conflict resolution" | "Bureaucracy" | "Professional French" | "Nuance & opinion" | "Restaurant"
+If the error does not match any label above, write a short label in English (3-5 words max) describing the specific issue (e.g. "Missing liaison", "Gender agreement error").
+Max 2 errors, max 2 strengths. note = most actionable observation. Empty arrays [] if nothing to report.`;
+
+// -- Hooks 
+// -- Whisper voice hook -
+// Records audio via MediaRecorder, sends to Whisper API for transcription
+// Falls back to browser SpeechRecognition if no OpenAI key
+function useVoice({onResult,onError,openAiKey}){
+  const mediaRef=useRef(null);
+  const chunksRef=useRef([]);
+  const [listening,setL]=useState(false);
+
+  const startWhisper=useCallback(async()=>{
+    try{
+      const stream=await navigator.mediaDevices.getUserMedia({audio:true});
+      chunksRef.current=[];
+      const mr=new MediaRecorder(stream,{mimeType:'audio/webm'});
+      mr.ondataavailable=e=>{if(e.data.size>0)chunksRef.current.push(e.data);};
+      mr.onstop=async()=>{
+        stream.getTracks().forEach(t=>t.stop());
+        const blob=new Blob(chunksRef.current,{type:'audio/webm'});
+        const fd=new FormData();
+        // Must be named 'audio' to match multer field name on server
+        fd.append('audio',new File([blob],'audio.webm',{type:'audio/webm'}));
+        try{
+          const r=await fetch(API_BASE+'/transcribe',{
+            method:'POST',
+            headers:{'X-Session-ID':SESSION_ID},
+            body:fd
+          });
+          if(!r.ok){onError();return;}
+          const d=await r.json();
+          if(d.text&&d.text.trim()) onResult(d.text.trim());
+          else onError();
+        }catch (e3){onError();}
+        setL(false);
+      };
+      mediaRef.current=mr;
+      mr.start();
+      setL(true);
+    }catch (e4){onError();setL(false);}
+  },[onResult,onError,openAiKey]);
+
+  const startNative=useCallback(()=>{
+    const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+    if(!SR){onError();return;}
+    const r=new SR();r.lang="fr-FR";r.continuous=false;r.interimResults=false;
+    r.onresult=e=>{onResult(e.results[0][0].transcript);setL(false);};
+    r.onerror=()=>{onError();setL(false);};r.onend=()=>setL(false);
+    r.start();setL(true);
+  },[onResult,onError]);
+
+  const start=useCallback(()=>{
+    if(openAiKey&&openAiKey.startsWith('sk-')) startWhisper();
+    else startNative();
+  },[openAiKey,startWhisper,startNative]);
+
+  const stop=useCallback(()=>{
+    if(mediaRef.current&&mediaRef.current.state==='recording'){
+      mediaRef.current.stop();
+    }
+    setL(false);
+  },[]);
+
+  return{listening,start,stop};
+}
+function speakText(t,on){
+  if(!on||!window.speechSynthesis)return;
+  window.speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(t);u.lang="fr-FR";u.rate=0.88;
+  const v=window.speechSynthesis.getVoices().find(x=>x.lang.startsWith("fr"));
+  if(v)u.voice=v;window.speechSynthesis.speak(u);
+}
+
+
+// -- Responsive scale system 
+// Global sz/sp functions -- work everywhere without needing a hook
+// Reads window.innerWidth directly so atom components can use them too
+function isPhone(){ return window.innerWidth < 480; }
+
+function sz(base){
+  if(!isPhone()) return base;
+  if(base<=9)  return 12;
+  if(base<=11) return 14;
+  if(base<=13) return 15;
+  if(base<=15) return 17;
+  if(base<=18) return 20;
+  return base;
+}
+
+function sp(base){
+  if(!isPhone()) return base;
+  if(base<=8)  return base+2;
+  if(base<=16) return base+4;
+  if(base<=24) return base+4;
+  return base;
+}
+
+// useScreenSize -- triggers re-render when screen size changes
+function useScreenSize(){
+  const [,forceUpdate]=useState(0);
+  useEffect(()=>{
+    const handler=()=>forceUpdate(n=>n+1);
+    window.addEventListener('resize',handler);
+    return ()=>window.removeEventListener('resize',handler);
+  },[]);
+}
+
+// makeScale/makeSpace kept for backward compat but now just return the globals
+function makeScale(){ return sz; }
+function makeSpace(){ return sp; }
+
+// -- Session tracking -
+function getWeekKey() {
+  const d=new Date();
+  const day=d.getUTCDay();
+  const mon=new Date(Date.UTC(d.getUTCFullYear(),d.getUTCMonth(),d.getUTCDate()-((day+6)%7)));
+  return mon.toISOString().slice(0,10);
+}
+function useSessionTracker() {
+  const [sessions,setSessions]=useState(()=>{
+    try { return JSON.parse(localStorage.getItem("mft_sessions")||"{}"); } catch (e5){return {};}
+  });
+  const recordSession=useCallback(()=>{
+    const week=getWeekKey();
+    setSessions(prev=>{
+      const updated={...prev,[week]:(prev[week]||0)+1};
+      try{localStorage.setItem("mft_sessions",JSON.stringify(updated));}catch (e6){}
+      return updated;
+    });
+  },[]);
+  const thisWeek=sessions[getWeekKey()]||0;
+  const lastSession=Object.keys(sessions).sort().pop();
+  const daysSince=lastSession
+    ?Math.floor((Date.now()-new Date(lastSession).getTime())/(1000*60*60*24))
+    :null;
+  return{thisWeek,daysSince,recordSession};
+}
+
+const CSS = `
+${FONTS}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes slideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes wave{0%,100%{transform:scaleY(0.3)}50%{transform:scaleY(1.4)}}
+@keyframes blink{0%,80%,100%{opacity:0.1}40%{opacity:0.7}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes starPop{0%{transform:scale(0)}60%{transform:scale(1.3)}100%{transform:scale(1)}}
+*{box-sizing:border-box;margin:0;padding:0;}
+button,textarea,input{font-family:inherit;outline:none;}
+::-webkit-scrollbar{width:3px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:${C.ruleWarm};}
+`;
+
+// -- Atoms 
+function Flag({h=14,w=26}){
+  return(
+    React.createElement('div', { style: {display:"flex",width:w,height:h,flexShrink:0,overflow:"hidden",
+      borderRadius:2,border:"0.5px solid rgba(0,0,0,0.12)"},}
+      , React.createElement('div', { style: {flex:1,background:C.blue},})
+      , React.createElement('div', { style: {flex:1,background:"#FFFFFF"},})
+      , React.createElement('div', { style: {flex:1,background:C.red},})
+    )
+  );
+}
+const Rule=({color=C.ruleWarm,style={}})=>React.createElement('div', { style: {height:"1px",background:color,...style},});
+
+function LevelChip({level}){
+  const c=CEFR[level];if(!c)return null;
+  const isZero=level==="0";
+  return(
+    React.createElement('span', { style: {fontFamily:"'DM Sans',sans-serif",fontWeight:500,fontSize:sz(9),
+      letterSpacing:1.5,color:isZero?C.green:C.blue,textTransform:"uppercase",padding:"2px 7px",
+      border:`1px solid ${isZero?C.greenLight:C.blueLight}`,
+      background:isZero?C.greenLight:C.blueLight},}
+      , isZero?"DÉBUTANT":c.label
+    )
+  );
+}
+function BackBtn({onClick}){
+  return(
+    React.createElement('button', { onClick: onClick, style: {background:"none",border:"none",cursor:"pointer",
+      color:C.onHeaderDim,fontSize:sz(20),display:"flex",alignItems:"center",
+      padding:"4px",lineHeight:1,fontFamily:"'DM Serif Display',serif",opacity:0.75},}, "←")
+  );
+}
+function TypingDots(){
+  return(
+    React.createElement('div', { style: {display:"flex",gap:4,padding:"2px 0"},}
+      , [0,1,2].map(i=>(
+        React.createElement('div', { key: i, style: {width:5,height:5,borderRadius:"50%",
+          background:C.grayLight,animation:`blink 1.4s ${i*0.22}s infinite`},})
+      ))
+    )
+  );
+}
+function MicBtn({listening,onStart,onStop,whisper=false}){
+  return(
+    React.createElement('button', { onClick: listening?onStop:onStart,
+      style: {width:40,height:40,borderRadius:"50%",
+        border:`1px solid ${listening?C.red:C.ruleWarm}`,
+        background:listening?C.redLight:"transparent",
+        display:"flex",alignItems:"center",justifyContent:"center",
+        cursor:"pointer",flexShrink:0,transition:"all 0.2s"},}
+      , listening
+        ?React.createElement('div', { style: {display:"flex",gap:2,alignItems:"center"},}
+            , [0.4,1,1.3,1,0.4].map((h,i)=>(
+              React.createElement('div', { key: i, style: {width:2,height:11*h,borderRadius:2,
+                background:C.red,animation:`wave 0.65s ${i*0.1}s infinite`},})
+            ))
+          )
+        :React.createElement('svg', { width: 16, height: 16, viewBox: "0 0 16 16"   ,}, React.createElement('rect', { x: 6, y: 1, width: 4, height: 8, rx: 2, fill: C.gray,}), React.createElement('path', { d: "M3 8a5 5 0 0010 0"     , stroke: C.gray, strokeWidth: 1.5, fill: "none", strokeLinecap: "round",}), React.createElement('line', { x1: 8, y1: 13, x2: 8, y2: 15, stroke: C.gray, strokeWidth: 1.5, strokeLinecap: "round",}))
+    )
+  );
+}
+
+// -- Progress bar with unlock hint 
+
+function ProgressHeader({progress, effectiveLevel, immersion, t}) {
+  const done = SCENARIOS.filter(s=>getStars(progress[s.id])>0).length;
+  const total = SCENARIOS.length;
+  const pct = Math.round((done/total)*100);
+  const lvlIdx = CEFR_RANK[effectiveLevel];
+  const nextLevel = CEFR_ORDER[Math.min(lvlIdx+1, CEFR_ORDER.length-1)];
+  const atCurrentLevel = SCENARIOS.filter(s=>s.cefrLevel===effectiveLevel&&getStars(progress[s.id])>0).length;
+  const needForUnlock = Math.max(0, UNLOCK_THRESHOLD - atCurrentLevel);
+  const showUnlock = effectiveLevel !== "C1" && needForUnlock > 0;
+
+  // SVG arc progress ring
+  const R = 28, CIRC = 2 * Math.PI * R;
+  const dash = (pct/100) * CIRC;
+
+  return(
+    React.createElement("div", {style:{padding:"16px 24px 14px",display:"flex",alignItems:"center",gap:16,borderTop:"1px solid rgba(238,240,248,0.08)"}},
+      React.createElement("div", {style:{position:"relative",width:64,height:64,flexShrink:0}},
+        React.createElement("svg", {width:64,height:64,viewBox:"0 0 64 64",style:{transform:"rotate(-90deg)"}},
+          React.createElement("circle", {cx:32,cy:32,r:R,fill:"none",stroke:"rgba(238,240,248,0.1)",strokeWidth:4}),
+          React.createElement("circle", {cx:32,cy:32,r:R,fill:"none",stroke:C.onHeader,strokeWidth:4,
+            strokeDasharray:CIRC,strokeDashoffset:CIRC-dash,strokeLinecap:"round",
+            style:{transition:"stroke-dashoffset 0.8s ease"}})
+        ),
+        React.createElement("div", {style:{position:"absolute",inset:0,display:"flex",flexDirection:"column",
+          alignItems:"center",justifyContent:"center"}},
+          React.createElement("div", {style:{fontFamily:"'DM Serif Display',serif",fontSize:sz(14),
+            color:C.onHeader,lineHeight:1}},[done]),
+          React.createElement("div", {style:{fontFamily:"'DM Sans',sans-serif",fontSize:sz(8),
+            color:C.onHeaderDim,letterSpacing:0.5}},["/"+total])
+        )
+      ),
+      React.createElement("div", {style:{flex:1,minWidth:0}},
+        showUnlock
+          ? React.createElement(React.Fragment, null,
+              React.createElement("div", {style:{fontFamily:"'DM Sans',sans-serif",fontWeight:300,fontSize:sz(10),
+                color:C.onHeaderDim,marginBottom:4}},
+                [immersion ? needForUnlock+" de plus pour debloquer "+nextLevel : needForUnlock+" more to unlock "+nextLevel]
+              ),
+              React.createElement("div", {style:{height:3,background:"rgba(238,240,248,0.1)",borderRadius:2,overflow:"hidden"}},
+                React.createElement("div", {style:{height:"100%",background:C.star,
+                  width:Math.round((atCurrentLevel/UNLOCK_THRESHOLD)*100)+"%",
+                  borderRadius:2,transition:"width 0.6s"}})
+              )
+            )
+          : React.createElement("div", {style:{fontFamily:"'DM Serif Text',serif",fontStyle:"italic",
+              fontSize:sz(13),color:C.onHeaderDim}},
+              [immersion ? "Continuez comme ca" : "Keep it up"]
+            )
+      )
+    )
+  );
+}
+
+// -- SPLASH --
+function SplashScreen({onEnter,immersion}){
+  const t=T(immersion);
+  const [entered,setEntered]=useState(false);
+  return(
+    React.createElement('div', { style: {height:"100%",display:"flex",flexDirection:"column",background:C.ink,overflow:"hidden",position:"relative"},}
+      , React.createElement('style', null, CSS)
+
+      /* Background tricolor stripes -- large, decorative */
+      , React.createElement('div', { style: {position:"absolute",inset:0,display:"flex",opacity:0.06,pointerEvents:"none"},}
+        , React.createElement('div', { style: {flex:1,background:C.blue},})
+        , React.createElement('div', { style: {flex:1,background:"#FFFFFF"},})
+        , React.createElement('div', { style: {flex:1,background:C.red},})
+      )
+
+      /* Floating flag top-right */
+      , React.createElement('div', { style: {position:"absolute",top:sp(48),right:sp(36),animation:"fadeIn 0.8s 0.3s both"},}
+        , React.createElement(Flag, { h: 22, w: 38,})
+      )
+
+      /* Main content */
+      , React.createElement('div', { style: {flex:1,display:"flex",flexDirection:"column",justifyContent:"flex-end",
+        padding:sp(48)+"px "+sp(36)+"px "+sp(52)+"px",position:"relative",zIndex:1},}
+
+        /* Eyebrow */
+        , React.createElement('div', { style: {fontFamily:"'DM Sans',sans-serif",fontWeight:300,fontSize:sz(10),
+          letterSpacing:3,color:"rgba(238,240,245,0.4)",textTransform:"uppercase",
+          marginBottom:20,animation:"fadeUp 0.5s 0.1s both"},}
+          , immersion ? "Apprenez le français" : "Learn French"
+        )
+
+        /* Title */
+        , React.createElement('div', { style: {animation:"fadeUp 0.6s 0.2s both",marginBottom:28},}
+          , React.createElement('div', { style: {fontFamily:"'DM Serif Display',serif",fontStyle:"italic",
+            fontSize:58,lineHeight:0.9,color:"rgba(238,240,245,0.95)",letterSpacing:-1.5,marginBottom:6},}, "My French"
+
+          )
+          , React.createElement('div', { style: {fontFamily:"'DM Serif Display',serif",
+            fontSize:58,lineHeight:0.9,color:"#FFFFFF",letterSpacing:-1.5},}, "Teacher"
+
+          )
+        )
+
+        /* Tagline */
+        , React.createElement('div', { style: {animation:"fadeUp 0.6s 0.3s both",marginBottom:44},}
+          , React.createElement('div', { style: {height:1,background:"rgba(238,240,248,0.15)",marginBottom:20,width:56},})
+          , React.createElement('div', { style: {display:"flex",flexDirection:"column",gap:4},}
+            , t.tagline.map((line,i)=>(
+              React.createElement('div', { key: i, style: {fontFamily:"'DM Serif Text',serif",
+                fontStyle:i<2?"italic":"normal",
+                fontSize:i===2?sz(18):sz(16),
+                fontWeight:i===2?500:400,
+                color:i===2?"#FFFFFF":"rgba(238,240,245,0.55)",
+                lineHeight:1.6},}
+                , line
+              )
+            ))
+          )
+        )
+
+        /* CTA */
+        , React.createElement('div', { style: {animation:"fadeUp 0.6s 0.5s both"},}
+          , React.createElement('button', { onClick: onEnter,
+            style: {width:"100%",padding:sp(18)+"px 0",
+              background:"#FFFFFF",color:C.ink,border:"none",
+              fontFamily:"'DM Sans',sans-serif",fontWeight:500,
+              fontSize:sz(12),letterSpacing:2,textTransform:"uppercase",
+              cursor:"pointer",marginBottom:16,
+              boxShadow:"0 0 0 0 rgba(255,255,255,0)"},}
+            , t.start
+          )
+          , React.createElement('div', { style: {fontFamily:"'DM Sans',sans-serif",fontWeight:300,fontSize:sz(10),
+            color:"rgba(238,240,245,0.35)",textAlign:"center",letterSpacing:0.3},}
+            , t.builtFor
+          )
+        )
+      )
+    )
+  );
+}
+
+
+// -- MODE -
+function ModeScreen({onSelect,immersion}){
+  const [sel,setSel]=useState(null);
+  const t=T(immersion);
+  return(
+    React.createElement('div', { style: {height:"100%",display:"flex",flexDirection:"column",background:C.bg},}
+      , React.createElement('div', { style: {background:C.header,padding:"22px 28px 20px"},}
+        , React.createElement('div', { style: {display:"flex",alignItems:"center",gap:sp(12),marginBottom:14},}
+          , React.createElement(Flag, { h: 14, w: 24,})
+          , React.createElement('div', { style: {fontFamily:"'DM Sans',sans-serif",fontWeight:300,fontSize:sz(9),
+            letterSpacing:3,color:C.onHeaderDim,textTransform:"uppercase"},}, "My French Teacher"
+
+          )
+        )
+        , React.createElement('div', { style: {fontFamily:"'DM Serif Display',serif",fontSize:sz(24),
+          color:C.onHeader,lineHeight:1.2,marginBottom:4},}, t.modeTitle)
+        , React.createElement('div', { style: {fontFamily:"'DM Sans',sans-serif",fontWeight:300,fontSize:sz(12),
+          color:C.onHeaderDim},}, t.modeSubtitle)
+      )
+      , React.createElement('div', { style: {flex:1,overflowY:"auto"},}
+        , [{key:"english",label:t.modeGuided,sub:t.modeGuidedSub},
+          {key:"immersion",label:t.modeImm,sub:t.modeImmSub}].map(m=>{
+          const a=sel===m.key;
+          return(
+            React.createElement('button', { key: m.key, onClick: ()=>setSel(m.key),
+              style: {display:"flex",alignItems:"flex-start",gap:16,padding:`${sp(20)}px ${sp(28)}px`,
+                background:a?C.bgCard:C.bg,border:"none",borderBottom:`1px solid ${C.rule}`,
+                cursor:"pointer",textAlign:"left",width:"100%",transition:"background 0.15s"},}
+              , React.createElement('div', { style: {width:18,height:18,borderRadius:"50%",marginTop:3,flexShrink:0,
+                border:`1px solid ${a?C.blue:C.grayLight}`,display:"flex",
+                alignItems:"center",justifyContent:"center",transition:"all 0.15s"},}
+                , a&&React.createElement('div', { style: {width:8,height:8,borderRadius:"50%",background:C.blue},})
+              )
+              , React.createElement('div', null
+                , React.createElement('div', { style: {fontFamily:"'DM Serif Text',serif",fontSize:sz(18),
+                  color:C.ink,marginBottom:5},}, m.label)
+                , React.createElement('div', { style: {fontFamily:"'DM Sans',sans-serif",fontWeight:300,fontSize:sz(13),
+                  color:C.gray,lineHeight:1.65},}, m.sub)
+              )
+            )
+          );
+        })
+      )
+      , React.createElement('div', { style: {padding:"20px 28px 40px",borderTop:`1px solid ${C.rule}`,background:C.bgDeep},}
+        , React.createElement('button', { onClick: ()=>sel&&onSelect(sel==="immersion"), disabled: !sel,
+          style: {width:"100%",padding:`${sp(15)}px`,
+            background:sel?C.ink:"transparent",color:sel?C.bgLight:C.grayLight,
+            border:`1px solid ${sel?C.ink:C.ruleWarm}`,
+            fontFamily:"'DM Sans',sans-serif",fontWeight:500,fontSize:sz(11),
+            letterSpacing:isPhone?1.5:2.5,textTransform:"uppercase",
+            cursor:sel?"pointer":"default",transition:"all 0.2s"},}
+          , sel?t.modeContinue:t.modeChoose
+        )
+      )
+    )
+  );
+}
+
+// -- LEVEL TEST -
+function LevelTestScreen({immersion,apiKey,openAiKey,onComplete}){
+  const [phase,setPhase]=useState("intro");
+  const [qKey,setQKey]=useState("q1");
+  const [chosen,setChosen]=useState(null);
+  const [mcqLvl,setMcqLvl]=useState(null);
+  const [openText,setOpenText]=useState("");
+  const [result,setResult]=useState(null);
+  const [pi]=useState(()=>Math.floor(Math.random()*3));
+  const t=T(immersion);
+  const QTREE = {
+    q1:{step:1,fr:"Hier soir, nous ___ au restaurant avec des amis.",
+      hint_en:"The action happened last night — which past tense?",
+      hint_fr:"L'action s'est passée hier soir — quel temps du passé ?",
+      opts:["allons","sommes allés","irons","allions"],correct:1,nextRight:"q2h",nextWrong:"q2l"},
+    q2l:{step:2,fr:"Quelle phrase est correcte ?",
+      hint_en:"'Avoir' expresses possession in French — not 'être'.",
+      hint_fr:"'Avoir' exprime la possession — pas 'être'.",
+      opts:["Je suis un chat.","J'ai un chat.","Je veux un chat.","Il y a un chat."],correct:1,nextRight:"q3a2",nextWrong:"q3a1"},
+    q2h:{step:2,fr:"Il faut que tu ___ à l'heure demain.",
+      hint_en:"'Il faut que' always triggers the subjunctive.",
+      hint_fr:"'Il faut que' déclenche toujours le subjonctif.",
+      opts:["es","sois","étais","seras"],correct:1,nextRight:"q3c1",nextWrong:"q3b1"},
+    q3a1:{step:3,final:true,fr:"Comment dit-on 'My name is Sophie' ?",
+      hint_en:"'S'appeler' is the verb for giving your name.",
+      hint_fr:"'S'appeler' est le verbe pour dire son prénom.",
+      opts:["Je connais Sophie.","Je suis Sophie.","Je m'appelle Sophie.","J'aime Sophie."],correct:2,result:"A1"},
+    q3a2:{step:3,final:true,fr:"Elle ___ depuis deux heures quand il est arrivé.",
+      hint_en:"An ongoing background action → imparfait.",
+      hint_fr:"Action qui durait en arrière-plan → imparfait.",
+      opts:["attendait","a attendu","attend","avait attendu"],correct:0,result:"A2"},
+    q3b1:{step:3,final:true,fr:"— Tu as l'air fatigué ce matin. — ___",
+      hint_en:"Which response actually fits the situation?",
+      hint_fr:"Laquelle correspond vraiment à la situation ?",
+      opts:["Oui, j'étais très fatigué hier.","Oui, j'ai travaillé jusqu'à minuit.","Non, je ne suis pas ici.","Merci, c'est une bonne idée."],correct:1,result:"B1"},
+    q3c1:{step:3,final:true,fr:"Quelle phrase exprime le mieux un regret passé ?",
+      hint_en:"Past regret → conditionnel passé (aurais + participle).",
+      hint_fr:"Regret passé → conditionnel passé.",
+      opts:["J'aurais dû lui parler avant.","Je dois lui parler avant.","Je lui parlerai demain.","Je lui ai déjà parlé."],correct:0,result:"C1"},
+  };
+  const OPEN_PROMPTS = [
+    {en:"Write 1–2 sentences in French about what you did this morning.",fr:"Décrivez en une ou deux phrases ce que vous avez fait ce matin."},
+    {en:"In French, tell me one thing you enjoy doing on weekends.",fr:"Dites-moi en français une chose que vous aimez faire le week-end."},
+    {en:"Describe in French a dish you enjoy eating.",fr:"Décrivez en français un plat que vous aimez manger."},
+  ];
+  const q=QTREE[qKey];
+  const {listening,start:sv,stop:pv}=useVoice({
+    onResult:txt=>setOpenText(p=>p+(p?" ":"")+txt),onError:()=>{},openAiKey
+  });
+
+  const pick=idx=>{
+    if(chosen!==null)return;
+    setChosen(idx);
+    setTimeout(()=>{
+      if(q.final){setMcqLvl(q.result);setPhase("open");}
+      else{setQKey(idx===q.correct?q.nextRight:q.nextWrong);setChosen(null);}
+    },800);
+  };
+
+  const submit=async()=>{
+    if(!openText.trim())return;
+    setPhase("loading");
+    try{
+      const r=await fetch(API_BASE+"/chat",{method:"POST",
+        headers:{"Content-Type":"application/json","X-Session-ID":SESSION_ID},
+        body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:400,
+          system:PLACEMENT_PROMPT(immersion),
+          messages:[{role:"user",content:`MCQ result: ${mcqLvl||"B1"}\nWriting: "${openText}"`}]})});
+      if(!r.ok){setResult({level:mcqLvl||"A1",explanation:"Level estimated from your MCQ answers.",focus:"Keep practising."});setPhase("result");return;}
+      const d=await r.json();
+      setResult(JSON.parse((_optionalChain([d, 'access', _ => _.content, 'optionalAccess', _2 => _2[0], 'optionalAccess', _3 => _3.text])||"{}").replace(/```json|```/g,"").trim()));
+    }catch (e7){
+      setResult({level:mcqLvl||"A1",explanation:"Level estimated from your answers.",focus:"Keep practising."});
+    }
+    setPhase("result");
+  };
+
+  const Steps=({current})=>(
+    React.createElement('div', { style: {display:"flex",alignItems:"center",marginBottom:28},}
+      , [1,2,3].map(n=>(
+        React.createElement('div', { key: n, style: {display:"flex",alignItems:"center",flex:n<3?1:"auto"},}
+          , React.createElement('div', { style: {width:24,height:24,borderRadius:"50%",flexShrink:0,
+            background:n<=current?C.blue:"transparent",
+            border:`1px solid ${n<=current?C.blue:C.ruleWarm}`,
+            display:"flex",alignItems:"center",justifyContent:"center",transition:"all 0.3s"},}
+            , React.createElement('span', { style: {fontFamily:"'DM Sans',sans-serif",fontSize:sz(10),fontWeight:500,
+              color:n<=current?"#fff":C.grayLight},}, n<current?"✓":n)
+          )
+          , n<3&&React.createElement('div', { style: {flex:1,height:1,margin:"0 4px",
+            background:n<current?C.blue:C.ruleWarm,transition:"background 0.3s"},})
+        )
+      ))
+    )
+  );
+
+  return(
+    React.createElement('div', { style: {height:"100%",display:"flex",flexDirection:"column",background:C.bg},}
+      , React.createElement('div', { style: {background:C.header,padding:"22px 28px 20px"},}
+        , React.createElement('div', { style: {display:"flex",alignItems:"center",gap:sp(12),marginBottom:10},}
+          , React.createElement(Flag, { h: 14, w: 24,})
+          , React.createElement('div', { style: {fontFamily:"'DM Sans',sans-serif",fontWeight:300,fontSize:sz(9),
+            letterSpacing:3,color:C.onHeaderDim,textTransform:"uppercase"},}, "Level test" )
+        )
+        , React.createElement('div', { style: {fontFamily:"'DM Serif Display',serif",fontSize:sz(24),color:C.onHeader},}
+          , t.testTitle
+        )
+      )
+      , React.createElement('div', { style: {flex:1,overflowY:"auto",padding:`${sp(24)}px`},}
+
+        , phase==="intro"&&(
+          React.createElement('div', { style: {animation:"fadeUp 0.4s both",display:"flex",flexDirection:"column",gap:12},}
+            , React.createElement('div', { style: {background:C.bgCard,border:`1px solid ${C.ruleWarm}`,padding:"20px"},}
+              , React.createElement('div', { style: {fontFamily:"'DM Serif Text',serif",fontSize:sz(17),color:C.ink,marginBottom:6},}
+                , t.testTakeTest
+              )
+              , React.createElement('div', { style: {fontFamily:"'DM Sans',sans-serif",fontWeight:300,fontSize:sz(13),
+                color:C.gray,lineHeight:1.65,marginBottom:16},}, t.testSub)
+              , React.createElement('button', { onClick: ()=>setPhase("mcq"),
+                style: {width:"100%",padding:`${sp(13)}px`,background:C.ink,color:C.bgLight,
+                  border:"none",fontFamily:"'DM Sans',sans-serif",fontWeight:500,
+                  fontSize:sz(11),letterSpacing:isPhone?1.5:2.5,textTransform:"uppercase",cursor:"pointer"},}
+                , t.testStart
+              )
+            )
+            , React.createElement('div', { style: {background:C.bgCard,border:`1px solid ${C.ruleWarm}`,padding:"20px"},}
+              , React.createElement('div', { style: {fontFamily:"'DM Serif Text',serif",fontSize:sz(17),color:C.ink,marginBottom:6},}
+                , t.testKnowLevel
+              )
+              , React.createElement('div', { style: {fontFamily:"'DM Sans',sans-serif",fontWeight:300,fontSize:sz(13),
+                color:C.gray,lineHeight:1.65,marginBottom:12},}, t.testKnowLevelSub)
+              , CEFR_ORDER.map(l=>(
+                React.createElement('button', { key: l, onClick: ()=>onComplete(l),
+                  style: {display:"flex",alignItems:"center",gap:14,width:"100%",
+                    padding:"11px 0",background:l==="0"?C.greenLight:"transparent",
+                    border:"none",borderBottom:`1px solid ${C.rule}`,
+                    cursor:"pointer",textAlign:"left",
+                    paddingLeft:l==="0"?8:0,paddingRight:l==="0"?8:0},
+                  onMouseEnter: e=>e.currentTarget.style.opacity="0.7",
+                  onMouseLeave: e=>e.currentTarget.style.opacity="1",}
+                  , React.createElement('span', { style: {fontFamily:"'DM Sans',sans-serif",fontWeight:500,
+                    fontSize:sz(10),letterSpacing:1.5,
+                    color:l==="0"?C.green:C.blue,minWidth:32},}
+                    , l==="0"?"★":l
+                  )
+                  , React.createElement('div', null
+                    , React.createElement('div', { style: {fontFamily:"'DM Serif Text',serif",fontSize:sz(15),
+                      color:l==="0"?C.green:C.ink},}
+                      , immersion?CEFR[l].nameFr:CEFR[l].name
+                    )
+                    , l==="0"&&React.createElement('div', { style: {fontFamily:"'DM Sans',sans-serif",fontWeight:300,
+                      fontSize:sz(11),color:C.green,marginTop:1},}
+                      , immersion?"Je pars de zéro — guided mode":"Starting from scratch — guided mode"
+                    )
+                  )
+                  , React.createElement('span', { style: {marginLeft:"auto",color:C.grayLight,fontSize:sz(16)},}, "›")
+                )
+              ))
+            )
+          )
+        )
+
+        , phase==="mcq"&&q&&(
+          React.createElement('div', { style: {animation:"fadeUp 0.3s both"},}
+            , React.createElement(Steps, { current: q.step,})
+            , React.createElement('div', { style: {fontFamily:"'DM Serif Text',serif",fontSize:sz(20),color:C.ink,
+              lineHeight:1.45,marginBottom:q.step>1?0:6},}, q.fr)
+            , q.step>1&&(
+              React.createElement('div', { style: {borderLeft:`2px solid ${C.red}`,padding:`${sp(10)}px ${sp(14)}px`,
+                background:C.redLight,margin:"12px 0"},}
+                , React.createElement('div', { style: {fontFamily:"'DM Serif Text',serif",fontStyle:"italic",
+                  fontSize:sz(13),color:C.gray,lineHeight:1.65},}
+                  , immersion?q.hint_fr:q.hint_en
+                )
+              )
+            )
+            , React.createElement('div', { style: {display:"flex",flexDirection:"column",gap:sp(8),marginTop:q.step>1?0:16},}
+              , q.opts.map((opt,i)=>{
+                const isCh=chosen===i,isRight=i===q.correct;
+                let bg=C.bgCard,brd=`1px solid ${C.ruleWarm}`,col=C.ink,opacity=1;
+                if(chosen!==null){
+                  if(isRight){bg=C.greenLight;brd=`1px solid ${C.green}`;col=C.green;}
+                  else if(isCh){bg=C.redLight;brd=`1px solid ${C.red}`;col=C.red;}
+                  else opacity=0.3;
+                }
+                return(
+                  React.createElement('button', { key: i, onClick: ()=>pick(i), disabled: chosen!==null,
+                    style: {padding:`${sp(13)}px ${sp(16)}px`,border:brd,background:bg,color:col,
+                      fontFamily:"'DM Serif Text',serif",fontSize:sz(16),
+                      cursor:chosen===null?"pointer":"default",textAlign:"left",
+                      transition:"all 0.2s",display:"flex",alignItems:"center",gap:14,opacity},}
+                    , React.createElement('span', { style: {fontFamily:"'DM Sans',sans-serif",fontSize:sz(9),fontWeight:500,
+                      letterSpacing:1.5,color:C.gray,minWidth:16,textTransform:"uppercase"},}
+                      , chosen!==null&&isRight?"✓":chosen!==null&&isCh?"✗":["A","B","C","D"][i]
+                    )
+                    , opt
+                  )
+                );
+              })
+            )
+          )
+        )
+
+        , phase==="open"&&(
+          React.createElement('div', { style: {animation:"fadeUp 0.3s both"},}
+            , React.createElement(Steps, { current: 3,})
+            , React.createElement('div', { style: {fontFamily:"'DM Serif Text',serif",fontSize:sz(18),color:C.ink,
+              lineHeight:1.5,marginBottom:6},}
+              , immersion?OPEN_PROMPTS[pi].fr:OPEN_PROMPTS[pi].en
+            )
+            , React.createElement('div', { style: {fontFamily:"'DM Sans',sans-serif",fontWeight:300,fontSize:sz(12),
+              color:C.gray,marginBottom:18},}, t.testOpen1)
+            , React.createElement('textarea', { value: openText, onChange: e=>setOpenText(e.target.value),
+              placeholder: t.writeFr, rows: 4,
+              style: {width:"100%",padding:`${sp(14)}px`,border:`1px solid ${C.ruleWarm}`,
+                background:C.bgCard,color:C.ink,fontFamily:"'DM Serif Text',serif",
+                fontStyle:"italic",fontSize:sz(17),resize:"none",lineHeight:1.7,marginBottom:12},})
+            , React.createElement('div', { style: {display:"flex",alignItems:"center",gap:10,marginBottom:16},}
+              , React.createElement(MicBtn, { listening: listening, onStart: sv, onStop: pv, whisper: !!(openAiKey&&openAiKey.startsWith("sk-")),})
+              , listening&&React.createElement('span', { style: {fontFamily:"'DM Sans',sans-serif",fontSize:sz(11),
+                color:C.red,fontWeight:300},}, t.testRecording)
+            )
+            , React.createElement('button', { onClick: submit, disabled: !openText.trim(),
+              style: {width:"100%",padding:`${sp(14)}px`,
+                background:openText.trim()?C.ink:"transparent",
+                color:openText.trim()?C.bgLight:C.grayLight,
+                border:`1px solid ${openText.trim()?C.ink:C.ruleWarm}`,
+                fontFamily:"'DM Sans',sans-serif",fontWeight:500,fontSize:sz(11),
+                letterSpacing:isPhone?1.5:2.5,textTransform:"uppercase",
+                cursor:openText.trim()?"pointer":"default",transition:"all 0.2s"},}
+              , t.testAnalyse
+            )
+          )
+        )
+
+        , phase==="loading"&&(
+          React.createElement('div', { style: {display:"flex",flexDirection:"column",alignItems:"center",
+            justifyContent:"center",minHeight:"44vh",gap:24},}
+            , React.createElement('div', { style: {position:"relative",width:40,height:40},}
+              , React.createElement('div', { style: {position:"absolute",inset:0,borderRadius:"50%",border:`1px solid ${C.ruleWarm}`},})
+              , React.createElement('div', { style: {position:"absolute",inset:0,borderRadius:"50%",
+                border:"1px solid transparent",borderTop:`1px solid ${C.ink}`,
+                animation:"spin 1s linear infinite"},})
+            )
+            , React.createElement('div', { style: {fontFamily:"'DM Serif Text',serif",fontStyle:"italic",
+              fontSize:sz(15),color:C.gray,textAlign:"center"},}, t.testLoading)
+          )
+        )
+
+        , phase==="result"&&result&&(
+          React.createElement('div', { style: {animation:"slideUp 0.5s both"},}
+            , React.createElement('div', { style: {textAlign:"center",padding:"24px 0 20px"},}
+              , React.createElement('div', { style: {display:"flex",justifyContent:"center",marginBottom:18},}, React.createElement(Flag, { h: 20, w: 36,}))
+              , React.createElement('div', { style: {fontFamily:"'DM Sans',sans-serif",fontWeight:300,fontSize:sz(9),
+                letterSpacing:3,color:C.gray,textTransform:"uppercase",marginBottom:12},}
+                , t.testYourLevel
+              )
+              , React.createElement('div', { style: {fontFamily:"'DM Serif Display',serif",fontSize:80,
+                color:C.blue,lineHeight:1,marginBottom:6},}, result.level)
+              , React.createElement('div', { style: {fontFamily:"'DM Serif Text',serif",fontStyle:"italic",
+                fontSize:sz(18),color:C.gray,marginBottom:20},}
+                , immersion?_optionalChain([CEFR, 'access', _4 => _4[result.level], 'optionalAccess', _5 => _5.nameFr]):_optionalChain([CEFR, 'access', _6 => _6[result.level], 'optionalAccess', _7 => _7.name])
+              )
+              , React.createElement(Rule, null)
+            )
+            , React.createElement('div', { style: {fontFamily:"'DM Serif Text',serif",fontStyle:"italic",
+              fontSize:sz(15),color:C.inkLight,lineHeight:1.85,marginBottom:20},}
+              , result.explanation
+            )
+            , React.createElement('div', { style: {borderLeft:`2px solid ${C.red}`,padding:`${sp(10)}px ${sp(14)}px`,
+              background:C.redLight,marginBottom:28},}
+              , React.createElement('div', { style: {fontFamily:"'DM Sans',sans-serif",fontWeight:300,fontSize:sz(9),
+                letterSpacing:2,color:C.red,textTransform:"uppercase",marginBottom:6},}
+                , t.testFocus
+              )
+              , React.createElement('div', { style: {fontFamily:"'DM Sans',sans-serif",fontWeight:300,fontSize:sz(13),
+                color:C.inkLight,lineHeight:1.7},}, result.focus)
+            )
+            , React.createElement('button', { onClick: ()=>onComplete(result.level),
+              style: {width:"100%",padding:`${sp(14)}px`,background:C.ink,color:C.bgLight,border:"none",
+                fontFamily:"'DM Sans',sans-serif",fontWeight:500,fontSize:sz(11),
+                letterSpacing:isPhone?1.5:2.5,textTransform:"uppercase",cursor:"pointer"},}
+              , t.testSeeScen
+            )
+          )
+        )
+      )
+    )
+  );
+}
+
+// -- HOME -
+function HomeScreen({progress,immersion,userLevel,onSelect,onProfile,onToggleMode,sessions,onDiagnostics}){
+  const t=T(immersion);
+  const effectiveLevel=getUnlockedLevel(progress, userLevel);
+  const lastStarted = SCENARIOS.find(s => {
+    const e = progress[s.id];
+    return e && getStars(e) < 3 && scenarioUnlocked(s, effectiveLevel);
+  });
+
+  const groups=CEFR_ORDER.map(lvl=>({
+    lvl,
+    scenarios:SCENARIOS.filter(s=>s.cefrLevel===lvl)
+  })).filter(g=>g.scenarios.length>0);
+
+  // Tiny SVG illustrations per place type
+  const PlaceIllustration = ({cefrLevel, place}) => {
+    const isCafe = place.toLowerCase().includes("caf") || place.toLowerCase().includes("boulang");
+    const isStation = place.toLowerCase().includes("gare") || place.toLowerCase().includes("transport");
+    const isRestaurant = place.toLowerCase().includes("restaurant") || place.toLowerCase().includes("pharmacy") || place.toLowerCase().includes("pharmacie");
+    const isDinner = cefrLevel==="C1";
+    const isOffice = place.toLowerCase().includes("agence") || place.toLowerCase().includes("bnp") || place.toLowerCase().includes("europcar");
+
+    if(isCafe) return(
+      React.createElement('svg', { width: 40, height: 40, viewBox: "0 0 40 40"   ,}
+        , React.createElement('rect', { x: 8, y: 18, width: 18, height: 14, rx: 2, fill: C.blue, opacity: 0.15,})
+        , React.createElement('rect', { x: 10, y: 20, width: 14, height: 10, rx: 1, fill: C.blue, opacity: 0.25,})
+        , React.createElement('path', { d: "M26 22 Q31 22 31 27 Q31 32 26 32"         , stroke: C.blue, strokeWidth: 1.5, fill: "none", opacity: 0.4,})
+        , React.createElement('rect', { x: 6, y: 32, width: 22, height: 2, rx: 1, fill: C.blue, opacity: 0.2,})
+        , React.createElement('path', { d: "M14 18 Q14 12 20 12 Q20 8 17 8"         , stroke: C.blue, strokeWidth: 1.2, fill: "none", opacity: 0.3,})
+      )
+    );
+    if(isStation) return(
+      React.createElement('svg', { width: 40, height: 40, viewBox: "0 0 40 40"   ,}
+        , React.createElement('rect', { x: 4, y: 14, width: 32, height: 16, rx: 2, fill: C.blue, opacity: 0.12,})
+        , React.createElement('rect', { x: 4, y: 14, width: 32, height: 5, rx: 2, fill: C.blue, opacity: 0.2,})
+        , React.createElement('circle', { cx: 12, cy: 33, r: 3, fill: C.blue, opacity: 0.25,})
+        , React.createElement('circle', { cx: 28, cy: 33, r: 3, fill: C.blue, opacity: 0.25,})
+        , React.createElement('rect', { x: 8, y: 20, width: 24, height: 6, rx: 1, fill: C.blue, opacity: 0.1,})
+        , React.createElement('path', { d: "M10 22 L30 22"   , stroke: C.blue, strokeWidth: 1, opacity: 0.3,})
+      )
+    );
+    if(isDinner) return(
+      React.createElement('svg', { width: 40, height: 40, viewBox: "0 0 40 40"   ,}
+        , React.createElement('circle', { cx: 20, cy: 22, r: 10, fill: C.red, opacity: 0.1,})
+        , React.createElement('path', { d: "M14 22 L26 22"   , stroke: C.red, strokeWidth: 1, opacity: 0.3,})
+        , React.createElement('path', { d: "M12 16 Q20 12 28 16"     , stroke: C.red, strokeWidth: 1.2, fill: "none", opacity: 0.25,})
+        , React.createElement('circle', { cx: 20, cy: 22, r: 3, fill: C.red, opacity: 0.2,})
+        , React.createElement('path', { d: "M20 30 L20 36"   , stroke: C.red, strokeWidth: 1.5, opacity: 0.3, strokeLinecap: "round",})
+        , React.createElement('path', { d: "M15 36 L25 36"   , stroke: C.red, strokeWidth: 1.5, opacity: 0.2, strokeLinecap: "round",})
+      )
+    );
+    if(isOffice) return(
+      React.createElement('svg', { width: 40, height: 40, viewBox: "0 0 40 40"   ,}
+        , React.createElement('rect', { x: 6, y: 10, width: 28, height: 24, rx: 2, fill: C.ink, opacity: 0.08,})
+        , React.createElement('rect', { x: 10, y: 14, width: 8, height: 6, rx: 1, fill: C.ink, opacity: 0.12,})
+        , React.createElement('rect', { x: 22, y: 14, width: 8, height: 6, rx: 1, fill: C.ink, opacity: 0.12,})
+        , React.createElement('rect', { x: 10, y: 24, width: 8, height: 6, rx: 1, fill: C.ink, opacity: 0.12,})
+        , React.createElement('rect', { x: 22, y: 24, width: 8, height: 6, rx: 1, fill: C.ink, opacity: 0.12,})
+        , React.createElement('rect', { x: 15, y: 30, width: 10, height: 4, fill: C.ink, opacity: 0.08,})
+      )
+    );
+    // Default: generic location pin
+    return(
+      React.createElement('svg', { width: 40, height: 40, viewBox: "0 0 40 40"   ,}
+        , React.createElement('path', { d: "M20 8 C13 8 8 13 8 19 C8 27 20 36 20 36 C20 36 32 27 32 19 C32 13 27 8 20 8Z"                         , fill: C.blue, opacity: 0.12,})
+        , React.createElement('circle', { cx: 20, cy: 19, r: 5, fill: C.blue, opacity: 0.25,})
+      )
+    );
+  };
+
+  return(
+    React.createElement('div', { style: {height:"100%",display:"flex",flexDirection:"column",background:C.bg},}
+
+      /* Header */
+      , React.createElement('div', { style: {background:C.header,flexShrink:0},}
+        , React.createElement('div', { style: {padding:sp(18)+"px "+sp(24)+"px 0"},}
+          , React.createElement('div', { style: {display:"flex",alignItems:"flex-start",justifyContent:"space-between",marginBottom:4},}
+            , React.createElement('div', null
+              , React.createElement('div', { style: {display:"flex",alignItems:"center",gap:8,marginBottom:6},}
+                , React.createElement(Flag, { h: 12, w: 20,})
+                , React.createElement('div', { style: {fontFamily:"'DM Sans',sans-serif",fontWeight:300,fontSize:sz(9),
+                  letterSpacing:2.5,color:C.onHeaderDim,textTransform:"uppercase"},}, t.appName)
+              )
+              , React.createElement('div', { style: {display:"flex",alignItems:"center",gap:8},}
+                , React.createElement('div', { style: {fontFamily:"'DM Serif Display',serif",fontSize:sz(22),
+                  color:C.onHeader,lineHeight:1},}
+                  , immersion?_optionalChain([CEFR, 'access', _8 => _8[effectiveLevel], 'optionalAccess', _9 => _9.nameFr]):_optionalChain([CEFR, 'access', _10 => _10[effectiveLevel], 'optionalAccess', _11 => _11.name])
+                )
+                , React.createElement(LevelChip, { level: effectiveLevel,})
+              )
+            )
+            , React.createElement('div', { style: {display:"flex",gap:sp(8),alignItems:"center",marginTop:2},}
+              /* Sessions -- 5 dots */
+              , React.createElement('div', { style: {display:"flex",gap:3,padding:"6px 10px",
+                background:"rgba(238,240,248,0.05)",border:"1px solid rgba(238,240,248,0.1)"},}
+                , [0,1,2,3,4].map(i=>(
+                  React.createElement('div', { key: i, style: {width:5,height:5,borderRadius:"50%",
+                    background:i<sessions?"rgba(238,240,245,0.7)":"rgba(238,240,248,0.15)"},})
+                ))
+              )
+              , React.createElement('button', { onClick: onToggleMode,
+                style: {background:"none",border:"1px solid rgba(238,240,248,0.2)",
+                  padding:"5px 10px",cursor:"pointer",fontFamily:"'DM Sans',sans-serif",
+                  fontSize:sz(9),fontWeight:500,letterSpacing:2,color:C.onHeaderDim,textTransform:"uppercase"},}
+                , immersion?"EN":"FR"
+              )
+              , React.createElement('button', { onClick: onProfile,
+                style: {background:"none",border:"1px solid rgba(238,240,248,0.2)",
+                  width:34,height:34,cursor:"pointer",fontSize:sz(18),color:C.onHeaderDim,
+                  display:"flex",alignItems:"center",justifyContent:"center"},}, "≡")
+            )
+          )
+        )
+        , React.createElement(ProgressHeader, { progress: progress, effectiveLevel: effectiveLevel, immersion: immersion, t: t,})
+      )
+
+      /* Scrollable content */
+      , React.createElement('div', { style: {flex:1,overflowY:"auto"},}
+
+        /* My French shortcut */
+        , React.createElement('button', { onClick: onDiagnostics,
+          style: {display:"flex",alignItems:"center",gap:14,width:"100%",
+            background:"linear-gradient(135deg, "+C.blueLight+" 0%, "+C.bgLight+" 100%)",
+            border:"none",borderBottom:"1px solid "+C.rule,
+            padding:sp(14)+"px "+sp(24)+"px",cursor:"pointer",textAlign:"left"},}
+          , React.createElement('div', { style: {width:36,height:36,background:C.blue,borderRadius:"50%",
+            display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0},}
+            , React.createElement('svg', { width: 16, height: 16, viewBox: "0 0 16 16"   ,}
+              , React.createElement('path', { d: "M8 2 L8 7 M8 9 L8 14 M2 8 L7 8 M9 8 L14 8"               ,
+                stroke: "#FFFFFF", strokeWidth: "1.8", strokeLinecap: "round",})
+            )
+          )
+          , React.createElement('div', { style: {flex:1},}
+            , React.createElement('div', { style: {fontFamily:"'DM Serif Text',serif",fontSize:sz(16),color:C.ink,marginBottom:2},}
+              , immersion?"Mon francais & exercices":"My French & exercises"
+            )
+            , React.createElement('div', { style: {fontFamily:"'DM Sans',sans-serif",fontWeight:300,fontSize:sz(11),color:C.gray},}
+              , immersion?"Points faibles · Pratique ciblee":"Weak points · Targeted practice"
+            )
+          )
+          , React.createElement('span', { style: {color:C.blue,fontSize:20,flexShrink:0},}, "›")
+        )
+
+        /* Comeback pull */
+        , lastStarted&&(
+          React.createElement('button', { onClick: ()=>onSelect(lastStarted),
+            style: {display:"flex",alignItems:"center",gap:14,width:"100%",
+              background:C.ink,border:"none",borderBottom:"1px solid rgba(238,240,248,0.08)",
+              padding:sp(14)+"px "+sp(24)+"px",cursor:"pointer",textAlign:"left"},}
+            , React.createElement('div', { style: {flex:1,minWidth:0},}
+              , React.createElement('div', { style: {fontFamily:"'DM Sans',sans-serif",fontWeight:500,fontSize:sz(9),
+                letterSpacing:1.5,color:C.onHeaderDim,textTransform:"uppercase",marginBottom:4},}
+                , t.continueLabel
+              )
+              , React.createElement('div', { style: {fontFamily:"'DM Serif Text',serif",fontSize:sz(16),color:C.onHeader,
+                whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"},}
+                , immersion?lastStarted.title:lastStarted.titleEn
+              )
+            )
+            , React.createElement(StarRow, { stars: getStars(progress[lastStarted.id]), size: 13,})
+            , React.createElement('span', { style: {color:C.onHeaderDim,fontSize:20,flexShrink:0,marginLeft:4},}, "›")
+          )
+        )
+
+        /* Scenario groups as cards */
+        , groups.map(g=>{
+          const groupUnlocked=g.scenarios.some(s=>scenarioUnlocked(s,effectiveLevel));
+          const completedInGroup=g.scenarios.filter(s=>getStars(progress[s.id])>0).length;
+          const needMore=Math.max(0,UNLOCK_THRESHOLD-completedInGroup);
+          const isZero=g.lvl==="0";
+          const cefr=CEFR[g.lvl];
+
+          return(
+            React.createElement('div', { key: g.lvl, style: {margin:"16px 16px 4px"},}
+              /* Group header */
+              , React.createElement('div', { style: {display:"flex",alignItems:"center",gap:8,marginBottom:10,paddingLeft:4},}
+                , React.createElement(LevelChip, { level: g.lvl,})
+                , React.createElement('div', { style: {fontFamily:"'DM Sans',sans-serif",fontWeight:400,fontSize:sz(12),
+                  color:groupUnlocked?C.inkLight:C.grayMid,flex:1},}
+                  , immersion?_optionalChain([cefr, 'optionalAccess', _12 => _12.nameFr]):_optionalChain([cefr, 'optionalAccess', _13 => _13.name])
+                )
+                , !groupUnlocked&&g.lvl!=="0"&&needMore>0&&(
+                  React.createElement('div', { style: {fontFamily:"'DM Sans',sans-serif",fontWeight:300,fontSize:sz(9),
+                    color:C.grayMid},}
+                    , needMore, " " , immersion?"pour debloquer":"to unlock"
+                  )
+                )
+              )
+
+              /* Cards row -- horizontal scroll */
+              , React.createElement('div', { style: {display:"flex",gap:10,overflowX:"auto",paddingBottom:4,
+                scrollbarWidth:"none",msOverflowStyle:"none"},}
+                , g.scenarios.map(s=>{
+                  const stars=getStars(progress[s.id]);
+                  const done=stars>0;
+                  const unlocked=scenarioUnlocked(s,effectiveLevel);
+                  const starsFull=stars===3;
+                  return(
+                    React.createElement('button', { key: s.id, onClick: ()=>unlocked&&onSelect(s),
+                      style: {
+                        flexShrink:0,width:148,
+                        background:starsFull?"#2D6B2B":done?C.bgCard:C.bgLight,
+                        border:"1px solid "+(starsFull?C.green:done?C.ruleWarm:C.rule),
+                        borderRadius:8,padding:"14px 14px 12px",
+                        cursor:unlocked?"pointer":"default",
+                        opacity:unlocked?1:0.28,
+                        textAlign:"left",
+                        position:"relative",overflow:"hidden",
+                        transition:"transform 0.15s",
+                      },}
+                      /* Illustration */
+                      , React.createElement('div', { style: {marginBottom:10,display:"flex",justifyContent:"flex-end",opacity:unlocked?1:0.5},}
+                        , React.createElement(PlaceIllustration, { cefrLevel: s.cefrLevel, place: s.place,})
+                      )
+                      /* Title */
+                      , React.createElement('div', { style: {fontFamily:"'DM Serif Text',serif",fontSize:sz(14),
+                        color:starsFull?"#FFFFFF":done?C.inkMid:C.ink,
+                        lineHeight:1.35,marginBottom:6,
+                        display:"-webkit-box",WebkitLineClamp:2,WebkitBoxOrient:"vertical",
+                        overflow:"hidden"},}
+                        , immersion?s.title:s.titleEn
+                      )
+                      /* Place */
+                      , React.createElement('div', { style: {fontFamily:"'DM Sans',sans-serif",fontWeight:300,
+                        fontSize:sz(9),color:starsFull?"rgba(255,255,255,0.6)":C.grayMid,
+                        letterSpacing:0.3,marginBottom:done?8:0,
+                        whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"},}
+                        , s.place
+                      )
+                      /* Stars or arrow */
+                      , done
+                        ?React.createElement(StarRow, { stars: stars, size: 10,})
+                        :unlocked&&React.createElement('div', { style: {fontFamily:"'DM Sans',sans-serif",fontSize:sz(9),
+                            color:C.grayLight,letterSpacing:1},}, "Start")
+                      
+                      /* Locked overlay */
+                      , !unlocked&&(
+                        React.createElement('div', { style: {position:"absolute",inset:0,display:"flex",
+                          alignItems:"center",justifyContent:"center",
+                          background:"rgba(242,237,227,0.5)"},}
+                          , React.createElement('svg', { width: 18, height: 18, viewBox: "0 0 18 18"   ,}
+                            , React.createElement('rect', { x: 4, y: 8, width: 10, height: 8, rx: 2, fill: C.grayMid,})
+                            , React.createElement('path', { d: "M6 8 V6 A3 3 0 0 1 12 6 V8"          , stroke: C.grayMid, strokeWidth: 1.5, fill: "none",})
+                          )
+                        )
+                      )
+                    )
+                  );
+                })
+              )
+            )
+          );
+        })
+
+        , React.createElement('div', { style: {height:32,display:"flex",alignItems:"center",justifyContent:"center",marginTop:8},}
+          , React.createElement(Flag, { h: 9, w: 16,})
+        )
+      )
+    )
+  );
+}
+
+
+// -- SCENARIO 
+function ScenarioScreen({scenario:s,apiKey,openAiKey,immersion,ttsEnabled,progress,onComplete,onDiag,onBack}){
+  const [messages,setMessages]=useState([]);
+  const [input,setInput]=useState("");
+  const [loading,setLoading]=useState(false);
+  const [done,setDone]=useState(false);
+  const [count,setCount]=useState(0);
+  const [showCulture,setShowCulture]=useState(false);
+  const [earnedStars,setEarnedStars]=useState(null);
+  const [suggestWrap,setSuggestWrap]=useState(false);
+  const [micUnavailable,setMicUnavailable]=useState(false);
+  const bottomRef=useRef(null);
+  const t=T(immersion);
+
+  const currentStars = getStars(progress[s.id]);
+  const isReturn = currentStars > 0;
+
+  useEffect(()=>{_optionalChain([bottomRef, 'access', _14 => _14.current, 'optionalAccess', _15 => _15.scrollIntoView, 'call', _16 => _16({behavior:"smooth"})]);},[messages,loading]);
+  useEffect(()=>()=>{try{_optionalChain([window, 'access', _17 => _17.speechSynthesis, 'optionalAccess', _18 => _18.cancel, 'call', _19 => _19()]);}catch (e8){};},[]);
+  const {listening,start:sv,stop:pv}=useVoice({
+    onResult:txt=>setInput(p=>p+(p?" ":"")+txt),onError:()=>setMicUnavailable(true),openAiKey
+  });
+
+  const title=immersion?s.title:s.titleEn;
+  const scene=immersion?s.scene_fr:s.scene_en;
+  const goal=immersion?s.goal_fr:s.goal_en;
+  const hint=immersion?s.hint_fr:s.hint_en;
+  const culture=immersion?s.culture_fr:s.culture_en;
+
+  const send=async()=>{
+    const msg=input.trim();if(!msg||loading)return;
+    setInput("");
+    const nm=[...messages,{role:"user",content:msg}];
+    setMessages(nm);setLoading(true);
+    try{
+      const isPreA1 = s.cefrLevel === '0';
+      const system = isReturn ? STAR_PROMPT(immersion, currentStars) : TUTOR_PROMPT(immersion, isPreA1);
+      const ctrl=new AbortController();
+      const timer=setTimeout(()=>ctrl.abort(),30000);
+      const r=await fetch(API_BASE+"/chat",{method:"POST",
+        signal:ctrl.signal,
+        headers:{"Content-Type":"application/json","X-Session-ID":SESSION_ID},
+        body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:1000,system,
+          messages:[{role:"user",content:`Scenario: "${title}"\nContext: ${scene}\nObjective: "${goal}"\nStudent response: "${msg}"`}]})});
+      clearTimeout(timer);
+      if(!r.ok){
+        const errBody=await r.json().catch(()=>({}));
+        const status=r.status;
+        const isDailyLimit=errBody.error==="daily_limit_reached";
+        const errMsg=isDailyLimit
+          ?(immersion?"Vous avez utilise tous vos echanges gratuits aujourd'hui. Revenez demain !":"You have used all your free exchanges today. Come back tomorrow!")
+          :status===429||status===529?(immersion?"Trop de requetes -- attendez un moment.":"Too many requests -- wait a moment.")
+          :status===500?(immersion?"Erreur serveur -- reessayez.":"Server error -- try again.")
+          :(immersion?"Erreur de connexion -- reessayez.":"Connection error -- try again.");
+        setMessages([...nm,{role:"assistant",content:errMsg}]);
+        if(isDailyLimit){setDone(true);setEarnedStars(0);}
+        setLoading(false);return;
+      }
+      const d=await r.json();
+      let rawReply=_optionalChain([d, 'access', _20 => _20.content, 'optionalAccess', _21 => _21[0], 'optionalAccess', _22 => _22.text])||"Connection error.";
+
+      // Extract star JSON if present
+      let newStars=currentStars;
+      const jsonMatch=rawReply.match(/\{"stars":\s*([123])\}/);
+      if(jsonMatch){
+        newStars=Math.max(currentStars,parseInt(jsonMatch[1]));
+        rawReply=rawReply.replace(/\n?\{"stars":\s*[123]\}/,"").trim();
+      }
+
+      setMessages([...nm,{role:"assistant",content:rawReply}]);
+      speakText(rawReply,ttsEnabled);
+      const n=count+1;setCount(n);
+      if(n>=5){setDone(true);setEarnedStars(isReturn?newStars:1);}
+      else if(n===3){setSuggestWrap(true);}
+      // Update remaining from server meta
+      if(_optionalChain([d, 'access', _23 => _23._meta, 'optionalAccess', _24 => _24.remaining])===0){
+        setSuggestWrap(true);
+      }
+      // Silent diagnostic -- background, never blocks UI
+      if(apiKey&&msg.trim().length>8){
+        fetch(API_BASE+"/diagnostic",{method:"POST",
+          headers:{"Content-Type":"application/json","X-Session-ID":SESSION_ID},
+          body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:200,system:DIAG_PROMPT,
+            messages:[{role:"user",content:`Scenario: "${title}". Student: "${msg}". Tutor: "${rawReply}"`}]})})
+          .then(r=>r.json()).then(d=>{
+            try{
+              const diag=JSON.parse((_optionalChain([d, 'access', _25 => _25.content, 'optionalAccess', _26 => _26[0], 'optionalAccess', _27 => _27.text])||"{}").replace(/```json|```/g,"").trim());
+              if(diag.errors||diag.strengths) onDiag(s.id,diag);
+            }catch (e9){}
+          }).catch(()=>{});
+      }
+    }catch(err){
+      const isTimeout = _optionalChain([err, 'optionalAccess', _28 => _28.name])==="AbortError";
+      setMessages([...nm,{role:"assistant",content:isTimeout
+        ?(immersion?"Délai dépassé -- vérifiez votre connexion.":"Request timed out -- check your connection.")
+        :(immersion?"Erreur de connexion -- réessayez.":"Connection error -- please try again.")}]);
+    }
+    setLoading(false);
+  };
+
+  return(
+    React.createElement('div', { style: {height:"100%",display:"flex",flexDirection:"column",background:C.bg},}
+      , React.createElement('div', { style: {background:C.header,flexShrink:0},}
+        , React.createElement('div', { style: {padding:`${sp(12)}px ${sp(20)}px 0`,display:"flex",alignItems:"center",gap:12},}
+          , React.createElement(BackBtn, { onClick: onBack,})
+          , React.createElement('div', { style: {flex:1,minWidth:0},}
+            , React.createElement('div', { style: {fontFamily:"'DM Serif Text',serif",fontSize:sz(16),color:C.onHeader,
+              whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"},}, title)
+            , React.createElement('div', { style: {fontFamily:"'DM Sans',sans-serif",fontWeight:300,fontSize:sz(10),
+              color:C.onHeaderDim},}, s.place)
+          )
+          , React.createElement('div', { style: {display:"flex",alignItems:"center",gap:8},}
+            , React.createElement(Flag, { h: 12, w: 20,})
+            , React.createElement(LevelChip, { level: s.cefrLevel,})
+          )
+        )
+        /* Return visit indicator */
+        , isReturn&&(
+          React.createElement('div', { style: {padding:"6px 20px 0",display:"flex",alignItems:"center",gap:8},}
+            , React.createElement('div', { style: {fontFamily:"'DM Sans',sans-serif",fontWeight:300,fontSize:sz(9),
+              color:C.onHeaderDim,letterSpacing:1},}, "Your progress:" )
+            , React.createElement(StarRow, { stars: currentStars, size: 11,})
+          )
+        )
+        , React.createElement('div', { style: {padding:`${sp(12)}px ${sp(20)}px ${sp(14)}px`},}
+          /* Scene -- readable, warm white */
+          , React.createElement('div', { style: {fontFamily:"'DM Serif Text',serif",fontStyle:"italic",fontSize:sz(15),
+            color:"rgba(238,240,245,0.75)",lineHeight:1.75,marginBottom:12},}, scene)
+          , React.createElement('div', { style: {height:"0.5px",background:"rgba(238,240,248,0.15)",marginBottom:12},})
+          /* GOAL -- big, impossible to miss */
+          , React.createElement('div', { style: {background:"rgba(237,41,57,0.12)",border:"1px solid rgba(237,41,57,0.35)",
+            borderRadius:4,padding:`${sp(10)}px ${sp(14)}px`,marginBottom:8},}
+            , React.createElement('div', { style: {fontFamily:"'DM Sans',sans-serif",fontWeight:500,fontSize:sz(11),
+              letterSpacing:1.5,color:"rgba(237,41,57,0.9)",textTransform:"uppercase",marginBottom:6},}
+              , t.yourGoal
+            )
+            , React.createElement('div', { style: {fontFamily:"'DM Serif Text',serif",fontSize:sz(17),
+              color:"#FFFFFF",lineHeight:1.5,fontWeight:500},}, goal)
+          )
+          /* Culture tip */
+          , React.createElement('button', { onClick: ()=>setShowCulture(v=>!v),
+            style: {background:"none",border:"none",cursor:"pointer",
+              fontFamily:"'DM Sans',sans-serif",fontSize:sz(11),fontWeight:500,
+              color:showCulture?C.red:"rgba(238,240,245,0.6)",letterSpacing:1,
+              textTransform:"uppercase",paddingTop:4},}
+            , showCulture?t.close:React.createElement(Flag,{h:11,w:18})+" "+t.tip
+          )
+          , showCulture&&(
+            React.createElement('div', { style: {marginTop:8,borderLeft:`2px solid ${C.red}`,paddingLeft:12},}
+              , React.createElement('div', { style: {fontFamily:"'DM Serif Text',serif",fontStyle:"italic",fontSize:sz(14),
+                color:"rgba(238,240,248,0.65)",lineHeight:1.8},}, culture)
+            )
+          )
+        )
+        , React.createElement('div', { style: {display:"flex",alignItems:"center",gap:4,
+          padding:"8px 20px",borderTop:`1px solid rgba(238,240,248,0.07)`},}
+          , [0,1,2,3,4].map(i=>(
+            React.createElement('div', { key: i, style: {height:3,flex:1,
+              background:i<count?"rgba(238,240,245,0.8)":"rgba(238,240,248,0.18)",
+              transition:"background 0.3s",marginRight:i<4?3:0,borderRadius:2},})
+          ))
+          , React.createElement('div', { style: {fontFamily:"'DM Sans',sans-serif",fontSize:sz(11),
+            color:"rgba(238,240,245,0.6)",letterSpacing:1,marginLeft:8,minWidth:28},}, count, "/5")
+        )
+      )
+
+      , React.createElement('div', { style: {flex:1,overflowY:"auto",padding:"16px 20px 8px",
+        display:"flex",flexDirection:"column",gap:12},}
+        , messages.length===0&&(
+          React.createElement('div', null
+            /* PRE-A1: full guided experience */
+            , s.cefrLevel==="0"?(
+              React.createElement('div', null
+                /* Keywords */
+                , React.createElement('div', { style: {marginBottom:14},}
+                  , React.createElement('div', { style: {fontFamily:"'DM Sans',sans-serif",fontWeight:500,fontSize:sz(9),
+                    letterSpacing:2,color:C.blue,textTransform:"uppercase",marginBottom:8},}
+                    , t.usefulWords
+                  )
+                  , React.createElement('div', { style: {display:"flex",flexWrap:"wrap",gap:6},}
+                    , (s.keywords||[]).map(w=>(
+                      React.createElement('button', { key: w, onClick: ()=>setInput(p=>(p?p+" ":"")+w),
+                        style: {padding:"7px 12px",background:C.blueLight,
+                          border:`1px solid ${C.blue}33`,fontFamily:"'DM Serif Text',serif",
+                          fontSize:sz(15),color:C.blue,cursor:"pointer",borderRadius:4},}
+                        , w
+                      )
+                    ))
+                  )
+                )
+                /* Starter sentence */
+                , s.starter&&(
+                  React.createElement('div', { style: {borderLeft:`2px solid ${C.blue}`,padding:`${sp(10)}px ${sp(14)}px`,
+                    background:C.blueLight,marginBottom:14},}
+                    , React.createElement('div', { style: {fontFamily:"'DM Sans',sans-serif",fontWeight:500,fontSize:sz(9),
+                      letterSpacing:2,color:C.blue,textTransform:"uppercase",marginBottom:5},}
+                      , t.starterSentence
+                    )
+                    , React.createElement('button', { onClick: ()=>setInput(s.starter.replace("___"," ").trimEnd()),
+                      style: {fontFamily:"'DM Serif Text',serif",fontStyle:"italic",
+                        fontSize:sz(16),color:C.ink,background:"none",border:"none",
+                        cursor:"pointer",textAlign:"left",lineHeight:1.6},}
+                      , s.starter, " " , React.createElement('span', { style: {color:C.blue,fontSize:sz(13)},}, "↗ tap to use"   )
+                    )
+                  )
+                )
+                /* Hint */
+                , React.createElement('div', { style: {borderLeft:`2px solid ${C.red}`,padding:`${sp(10)}px ${sp(14)}px`,
+                  background:C.redLight,marginBottom:14},}
+                  , React.createElement('div', { style: {fontFamily:"'DM Sans',sans-serif",fontWeight:500,fontSize:sz(9),
+                    letterSpacing:2,color:C.red,textTransform:"uppercase",marginBottom:5},}
+                    , t.indice
+                  )
+                  , React.createElement('div', { style: {fontFamily:"'DM Serif Text',serif",fontStyle:"italic",
+                    fontSize:sz(14),color:C.inkLight,lineHeight:1.75},}, hint)
+                )
+                , React.createElement('div', { style: {fontFamily:"'DM Serif Text',serif",fontStyle:"italic",
+                  fontSize:sz(13),color:C.grayMid,textAlign:"center",padding:"4px 0"},}
+                  , t.typeYourAnswer
+                )
+              )
+            ):(
+              /* NORMAL: hint card */
+              React.createElement('div', null
+                , React.createElement('div', { style: {borderLeft:`2px solid ${C.red}`,padding:`${sp(10)}px ${sp(14)}px`,
+                  background:C.redLight,marginBottom:16},}
+                  , React.createElement('div', { style: {fontFamily:"'DM Sans',sans-serif",fontWeight:500,fontSize:sz(9),
+                    letterSpacing:2,color:C.red,textTransform:"uppercase",marginBottom:6},}
+                    , t.indice
+                  )
+                  , React.createElement('div', { style: {fontFamily:"'DM Serif Text',serif",fontStyle:"italic",
+                    fontSize:sz(14),color:C.inkLight,lineHeight:1.75},}, hint)
+                )
+                , React.createElement('div', { style: {fontFamily:"'DM Serif Text',serif",fontStyle:"italic",
+                  fontSize:sz(13),color:C.grayMid,textAlign:"center",padding:"8px 0"},}
+                  , t.respondBelow
+                )
+              )
+            )
+          )
+        )
+
+        , messages.map((m,i)=>(
+          React.createElement('div', { key: i, style: {display:"flex",
+            flexDirection:m.role==="user"?"row-reverse":"row",gap:10,alignItems:"flex-start"},}
+            , m.role==="assistant"&&(
+              React.createElement('div', { style: {flexShrink:0,marginTop:2,display:"flex",
+                flexDirection:"column",alignItems:"center",gap:3},}
+                , React.createElement('div', { style: {width:28,height:28,background:C.header,
+                  display:"flex",alignItems:"center",justifyContent:"center"},}
+                  , React.createElement('span', { style: {fontFamily:"'DM Sans',sans-serif",fontSize:sz(7),
+                    fontWeight:500,color:C.onHeader,letterSpacing:1},}, "MFT")
+                )
+                , React.createElement(Flag, { h: 5, w: 12,})
+              )
+            )
+            , React.createElement('div', { style: {maxWidth:"80%",padding:"11px 14px",
+              background:m.role==="user"?C.ink:C.bgCard,
+              border:m.role==="user"?"none":`1px solid ${C.ruleWarm}`,
+              fontFamily:m.role==="user"?"'DM Serif Text',serif":"'DM Sans',sans-serif",
+              fontSize:m.role==="user"?16:13,fontStyle:m.role==="user"?"italic":"normal",
+              fontWeight:m.role==="user"?400:300,color:m.role==="user"?C.bgLight:C.inkMid,
+              lineHeight:1.7},}
+              , m.content
+            )
+          )
+        ))
+
+        , loading&&(
+          React.createElement('div', { style: {display:"flex",gap:10,alignItems:"flex-start"},}
+            , React.createElement('div', { style: {flexShrink:0,marginTop:2,display:"flex",flexDirection:"column",alignItems:"center",gap:3},}
+              , React.createElement('div', { style: {width:28,height:28,background:C.header,display:"flex",alignItems:"center",justifyContent:"center"},}
+                , React.createElement('span', { style: {fontFamily:"'DM Sans',sans-serif",fontSize:sz(7),fontWeight:500,color:C.onHeader,letterSpacing:1},}, "MFT")
+              )
+              , React.createElement(Flag, { h: 5, w: 12,})
+            )
+            , React.createElement('div', { style: {background:C.bgCard,border:`1px solid ${C.ruleWarm}`,padding:"11px 14px"},}
+              , React.createElement(TypingDots, null)
+            )
+          )
+        )
+
+        , done&&!loading&&(
+          React.createElement('div', { style: {background:C.bgCard,border:`1px solid ${C.ruleWarm}`,
+            padding:`${sp(28)}px ${sp(24)}px`,textAlign:"center",animation:"slideUp 0.5s both"},}
+            , React.createElement('div', { style: {display:"flex",justifyContent:"center",marginBottom:16},}
+              , React.createElement(Flag, { h: 18, w: 32,})
+            )
+            , React.createElement('div', { style: {fontFamily:"'DM Serif Display',serif",fontStyle:"italic",
+              fontSize:sz(30),color:C.ink,marginBottom:12},}, t.bravo)
+
+            /* Star earned display */
+            , earnedStars!==null&&(
+              React.createElement('div', { style: {marginBottom:16},}
+                , React.createElement('div', { style: {display:"flex",justifyContent:"center",gap:6,marginBottom:8},}
+                  , [1,2,3].map(i=>(
+                    React.createElement('svg', { key: i, width: 24, height: 24, viewBox: "0 0 14 14"   ,
+                      style: {animation:i<=earnedStars?`starPop 0.4s ${(i-1)*0.15}s ease both`:"none"},}
+                      , React.createElement('path', { d: "M7 1l1.5 3.5L12 5l-2.5 2.4.6 3.6L7 9.3 3.9 11l.6-3.6L2 5l3.5-.5z"         ,
+                        fill: i<=earnedStars?C.star:C.starEmpty,})
+                    )
+                  ))
+                )
+                , React.createElement('div', { style: {fontFamily:"'DM Sans',sans-serif",fontWeight:300,fontSize:sz(11),
+                  color:C.gray,letterSpacing:0.5},}
+                  , t.starExplain[earnedStars-1]
+                  , earnedStars<3&&(
+                    React.createElement('span', { style: {color:C.blue,marginLeft:6},}, "· "
+                       , immersion?"Revenez pour la prochaine étoile →":"Come back for the next star →"
+                    )
+                  )
+                )
+              )
+            )
+
+            , React.createElement(Rule, { style: {marginBottom:20},})
+            , React.createElement('button', { onClick: ()=>onComplete(s.id, earnedStars||1),
+              style: {background:C.ink,color:C.bgLight,border:"none",
+                padding:"13px 36px",fontFamily:"'DM Sans',sans-serif",
+                fontWeight:500,fontSize:sz(10),letterSpacing:isPhone?1.5:2.5,textTransform:"uppercase",cursor:"pointer"},}
+              , t.backToChallenges
+            )
+          )
+        )
+        , suggestWrap&&!done&&(
+          React.createElement('div', { style: {background:C.bgCard,border:`1px solid ${C.ruleWarm}`,
+            padding:`${sp(14)}px ${sp(16)}px`,display:"flex",alignItems:"center",gap:sp(12),
+            animation:"slideUp 0.4s both"},}
+            , React.createElement('div', { style: {flex:1,fontFamily:"'DM Serif Text',serif",fontStyle:"italic",
+              fontSize:sz(14),color:C.ink,lineHeight:1.6},}
+              , immersion?"Bonne progression — continuez ou terminez le scénario."
+                :"Good progress — keep going or wrap up the scenario."
+            )
+            , React.createElement('button', { onClick: ()=>{setDone(true);setEarnedStars(isReturn?1:1);},
+              style: {padding:"8px 14px",background:C.ink,color:C.bgLight,border:"none",
+                fontFamily:"'DM Sans',sans-serif",fontWeight:500,fontSize:sz(9),
+                letterSpacing:1.5,textTransform:"uppercase",cursor:"pointer",flexShrink:0},}
+              , immersion?"Terminer":"Finish"
+            )
+          )
+        )
+        , React.createElement('div', { ref: bottomRef,})
+      )
+
+      , !done&&(
+        React.createElement('div', { style: {padding:"10px 16px 16px",background:C.bgDeep,
+          borderTop:`1px solid ${C.ruleWarm}`,flexShrink:0},}
+          , React.createElement('div', { style: {display:"flex",gap:sp(8),alignItems:"flex-end"},}
+            , React.createElement(MicBtn, { listening: listening, onStart: sv, onStop: pv, whisper: !!(openAiKey&&openAiKey.startsWith("sk-")),})
+            , React.createElement('textarea', { value: input, onChange: e=>setInput(e.target.value),
+              onKeyDown: e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();send();}},
+              placeholder: listening?t.listening:t.writeFr, rows: 2,
+              style: {flex:1,padding:`${sp(10)}px ${sp(12)}px`,border:`1px solid ${listening?C.red:C.ruleWarm}`,
+                background:C.bgCard,fontFamily:"'DM Serif Text',serif",fontStyle:"italic",
+                fontSize:sz(16),resize:"none",color:C.ink,lineHeight:1.6,transition:"border 0.2s"},})
+            , React.createElement('button', { onClick: send, disabled: loading||!input.trim(),
+              style: {width:40,height:40,
+                background:!loading&&input.trim()?C.ink:"transparent",
+                color:!loading&&input.trim()?C.bgLight:C.grayLight,
+                border:`1px solid ${!loading&&input.trim()?C.ink:C.ruleWarm}`,
+                fontSize:sz(18),cursor:!loading&&input.trim()?"pointer":"default",
+                display:"flex",alignItems:"center",justifyContent:"center",
+                flexShrink:0,transition:"all 0.2s",fontFamily:"'DM Serif Display',serif"},}, "↑")
+          )
+          , React.createElement('div', { style: {fontFamily:"'DM Sans',sans-serif",fontSize:sz(9),
+            color:micUnavailable?C.red:listening?C.red:C.grayMid,textAlign:"center",marginTop:6,
+            letterSpacing:1.5,textTransform:"uppercase"},}
+            , micUnavailable?(immersion?"Micro non disponible sur cet appareil":"Mic not available — type your answer")
+              :listening?t.speakNow
+              :messages.length===0?(immersion?"Écrivez votre réponse ci-dessus ↑":"Type your response above and tap ↑")
+              :t.inputHint
+          )
+        )
+      )
+    )
+  );
+}
+
+// -- PROFILE -
+function ProfileScreen({progress,immersion,userLevel,sessions,onBack,onReset,onToggleMode,onSettings,onRetakeTest,onDiagnostics}){
+  const t=T(immersion);
+  const effectiveLevel=getUnlockedLevel(progress, userLevel);
+  const totalStars=SCENARIOS.reduce((sum,s)=>sum+getStars(progress[s.id]),0);
+  const maxStars=SCENARIOS.length*3;
+
+  // Build skill coverage map
+  const skillCoverage={};
+  Object.keys(SKILLS).forEach(k=>skillCoverage[k]=0);
+  SCENARIOS.forEach(s=>{
+    const stars=getStars(progress[s.id]);
+    if(stars>0) s.skills.forEach(sk=>{skillCoverage[sk]=(skillCoverage[sk]||0)+stars;});
+  });
+  const coveredSkills=Object.entries(skillCoverage).filter(([,v])=>v>0).sort((a,b)=>b[1]-a[1]);
+
+  return(
+    React.createElement('div', { style: {height:"100%",display:"flex",flexDirection:"column",background:C.bg},}
+      , React.createElement('div', { style: {background:C.header},}
+        , React.createElement('div', { style: {padding:"18px 24px 0"},}
+          , React.createElement('div', { style: {display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:20},}
+            , React.createElement(BackBtn, { onClick: onBack,})
+            , React.createElement('div', { style: {display:"flex",alignItems:"center",gap:8},}
+              , React.createElement(Flag, { h: 12, w: 20,})
+              , React.createElement('div', { style: {fontFamily:"'DM Sans',sans-serif",fontWeight:300,fontSize:sz(9),
+                letterSpacing:3,color:C.onHeaderDim,textTransform:"uppercase"},}, t.profile)
+            )
+            , React.createElement('button', { onClick: onSettings,
+              style: {background:"none",border:`1px solid rgba(238,240,248,0.2)`,
+                width:32,height:32,cursor:"pointer",color:C.onHeaderDim,fontSize:sz(14),
+                display:"flex",alignItems:"center",justifyContent:"center"},}, "⚙")
+          )
+          , React.createElement('div', { style: {textAlign:"center",paddingBottom:24},}
+            , React.createElement('div', { style: {fontFamily:"'DM Serif Display',serif",fontSize:64,
+              color:C.onHeader,lineHeight:1,marginBottom:4},}, effectiveLevel)
+            , React.createElement('div', { style: {fontFamily:"'DM Serif Text',serif",fontStyle:"italic",
+              fontSize:sz(18),color:C.onHeaderDim,marginBottom:10},}
+              , immersion?_optionalChain([CEFR, 'access', _29 => _29[effectiveLevel], 'optionalAccess', _30 => _30.nameFr]):_optionalChain([CEFR, 'access', _31 => _31[effectiveLevel], 'optionalAccess', _32 => _32.name])
+            )
+            /* Star total */
+            , React.createElement('div', { style: {display:"flex",justifyContent:"center",alignItems:"center",gap:sp(8),marginBottom:10},}
+              , React.createElement(StarRow, { stars: Math.min(3,Math.round(totalStars/Math.max(1,SCENARIOS.filter(s=>getStars(progress[s.id])>0).length))), size: 14,})
+              , React.createElement('div', { style: {fontFamily:"'DM Sans',sans-serif",fontWeight:300,fontSize:sz(9),
+                color:C.onHeaderDim,letterSpacing:1},}, totalStars, "/", maxStars, " stars" )
+            )
+            , React.createElement('div', { style: {marginTop:10},}
+              , React.createElement('button', { onClick: onToggleMode,
+                style: {background:"none",border:`1px solid rgba(238,240,248,0.2)`,
+                  padding:"6px 16px",cursor:"pointer",fontFamily:"'DM Sans',sans-serif",
+                  fontSize:sz(9),fontWeight:500,letterSpacing:1.5,color:C.onHeaderDim,textTransform:"uppercase"},}
+                , t.switchMode
+              )
+            )
+          )
+        )
+      )
+
+      , React.createElement('div', { style: {flex:1,overflowY:"auto",padding:`${sp(20)}px ${sp(24)}px`},}
+        /* Stats */
+        , React.createElement('div', { style: {display:"grid",gridTemplateColumns:"1fr 1fr 1fr",
+          gap:1,background:C.ruleWarm,marginBottom:20},}
+          , [
+            {v:SCENARIOS.filter(s=>getStars(progress[s.id])>0).length,l:t.done},
+            {v:SCENARIOS.length-SCENARIOS.filter(s=>getStars(progress[s.id])>0).length,l:t.left},
+            {v:sessions,l:immersion?"cette semaine":"this week"},
+          ].map(s=>(
+            React.createElement('div', { key: s.l, style: {background:C.bgCard,padding:"16px 12px",textAlign:"center"},}
+              , React.createElement('div', { style: {fontFamily:"'DM Serif Display',serif",fontSize:sz(28),color:C.blue},}, s.v)
+              , React.createElement('div', { style: {fontFamily:"'DM Sans',sans-serif",fontWeight:300,fontSize:sz(9),
+                color:C.gray,marginTop:2,letterSpacing:1,textTransform:"uppercase"},}, s.l)
+            )
+          ))
+        )
+
+        /* Weekly session bar */
+        , React.createElement('div', { style: {background:C.bgCard,border:`1px solid ${C.ruleWarm}`,
+          padding:`${sp(14)}px ${sp(16)}px`,marginBottom:20},}
+          , React.createElement('div', { style: {fontFamily:"'DM Sans',sans-serif",fontWeight:300,fontSize:sz(9),
+            letterSpacing:2,color:C.gray,textTransform:"uppercase",marginBottom:10},}
+            , t.sessionsLabel
+          )
+          , React.createElement('div', { style: {display:"flex",gap:4},}
+            , [0,1,2,3,4].map(i=>(
+              React.createElement('div', { key: i, style: {flex:1,height:28,borderRadius:2,
+                background:i<sessions?C.blue:C.rule,transition:"background 0.3s"},})
+            ))
+          )
+        )
+
+        /* Skill map */
+        , coveredSkills.length>0&&(
+          React.createElement('div', { style: {marginBottom:20},}
+            , React.createElement('div', { style: {fontFamily:"'DM Sans',sans-serif",fontWeight:300,fontSize:sz(9),
+              letterSpacing:3,color:C.gray,textTransform:"uppercase",marginBottom:10},}
+              , t.skillMap
+            )
+            , React.createElement('div', { style: {display:"flex",flexWrap:"wrap",gap:6},}
+              , coveredSkills.map(([key,val])=>(
+                React.createElement('div', { key: key, style: {display:"flex",alignItems:"center",gap:6,
+                  padding:"5px 10px",background:C.blueLight,
+                  border:`1px solid ${C.blue}22`},}
+                  , React.createElement('div', { style: {display:"flex",gap:2},}
+                    , [1,2,3].map(i=>(
+                      React.createElement('div', { key: i, style: {width:4,height:4,borderRadius:"50%",
+                        background:i<=Math.min(3,val)?C.blue:C.rule},})
+                    ))
+                  )
+                  , React.createElement('span', { style: {fontFamily:"'DM Sans',sans-serif",fontWeight:300,fontSize:sz(11),
+                    color:C.blue},}
+                    , immersion?SKILLS[key].labelFr:SKILLS[key].label
+                  )
+                )
+              ))
+              , Object.keys(SKILLS).filter(k=>!skillCoverage[k]).map(key=>(
+                React.createElement('div', { key: key, style: {display:"flex",alignItems:"center",gap:6,
+                  padding:"5px 10px",background:"transparent",border:`1px solid ${C.rule}`},}
+                  , React.createElement('span', { style: {fontFamily:"'DM Sans',sans-serif",fontWeight:300,fontSize:sz(11),
+                    color:C.grayMid},}
+                    , immersion?SKILLS[key].labelFr:SKILLS[key].label
+                  )
+                )
+              ))
+            )
+          )
+        )
+
+        , React.createElement('button', { onClick: onDiagnostics,
+          style: {width:"100%",marginBottom:8,padding:`${sp(14)}px`,
+            background:C.ink,color:C.bgLight,border:"none",
+            fontFamily:"'DM Sans',sans-serif",fontWeight:500,fontSize:sz(11),
+            letterSpacing:isPhone?1.5:2.5,textTransform:"uppercase",cursor:"pointer"},}
+          , immersion?"Mon français →":"My French →"
+        )
+        , React.createElement('button', { onClick: onRetakeTest,
+          style: {width:"100%",marginBottom:20,padding:`${sp(12)}px`,background:"transparent",
+            border:`1px solid ${C.ruleWarm}`,fontFamily:"'DM Sans',sans-serif",
+            fontSize:sz(12),fontWeight:300,color:C.inkLight,cursor:"pointer"},}
+          , t.retakeTest
+        )
+
+        /* All scenarios with stars */
+        , React.createElement('div', { style: {fontFamily:"'DM Sans',sans-serif",fontWeight:300,fontSize:sz(9),
+          letterSpacing:3,color:C.gray,textTransform:"uppercase",marginBottom:10},}
+          , t.allScenarios
+        )
+        , SCENARIOS.map((s,i)=>{
+          const stars=getStars(progress[s.id]);
+          return(
+            React.createElement('div', { key: s.id, style: {display:"flex",alignItems:"center",gap:14,
+              padding:"11px 0",borderBottom:`1px solid ${C.rule}`},}
+              , React.createElement('div', { style: {fontFamily:"'DM Sans',sans-serif",fontWeight:300,fontSize:sz(9),
+                color:C.blue,minWidth:20,opacity:0.6},}, String(i+1).padStart(2,"0"))
+              , React.createElement('div', { style: {flex:1},}
+                , React.createElement('div', { style: {display:"flex",alignItems:"center",gap:sp(8),marginBottom:4},}
+                  , React.createElement('span', { style: {fontFamily:"'DM Serif Text',serif",fontSize:sz(13),color:C.ink},}
+                    , immersion?s.title:s.titleEn
+                  )
+                  , React.createElement(LevelChip, { level: s.cefrLevel,})
+                )
+                , React.createElement('div', { style: {display:"flex",alignItems:"center",gap:8},}
+                  , React.createElement('div', { style: {flex:1,height:1,background:C.rule},}
+                    , React.createElement('div', { style: {height:"100%",background:stars===3?C.star:C.blue,
+                      width:`${(stars/3)*100}%`,transition:"width 0.6s"},})
+                  )
+                  , React.createElement(StarRow, { stars: stars, size: 10,})
+                )
+              )
+            )
+          );
+        })
+
+        , React.createElement('button', { onClick: onReset,
+          style: {marginTop:24,width:"100%",padding:"11px",background:"transparent",
+            border:`1px solid ${C.ruleWarm}`,fontFamily:"'DM Sans',sans-serif",
+            fontSize:sz(11),color:C.gray,cursor:"pointer",fontWeight:300},}
+          , t.reset
+        )
+        , React.createElement('div', { style: {height:24},})
+      )
+    )
+  );
+}
+
+// -- DIAGNOSTICS --
+function DiagnosticsScreen({diagnostics,progress,immersion,apiKey,onBack}){
+  const [activeWeakness,setActiveWeakness]=useState(null);
+  const [exercise,setExercise]=useState(null);
+  const [exerciseAnswer,setExerciseAnswer]=useState("");
+  const [exerciseFeedback,setExerciseFeedback]=useState(null);
+  const [feedbackLoading,setFeedbackLoading]=useState(false);
+
+  const EXERCISE_BANK={
+
+    // -- Grammar --
+    "Passe compose vs imparfait":{
+      type:"gap",
+      tip:"Passé composé = action terminée. Imparfait = état de fond ou action en cours.",
+      instruction:"Choisissez le bon temps pour chaque verbe entre parenthèses.",
+      prompt:"Hier, je _______ (se lever) à 8h. Il _______ (faire) beau dehors. Je _______ (prendre) mon café quand le téléphone _______ (sonner).",
+      example:"me suis levé(e) · faisait · prenais · a sonné"
+    },
+    "Missing articles (le/la/un/une)":{
+      type:"gap",
+      tip:"Défini (le/la/les) = chose spécifique. Indéfini (un/une/des) = chose non-identifiée.",
+      instruction:"Choisissez entre le, la, les, un, une, des pour chaque espace.",
+      prompt:"Je voudrais __ café et __ croissant. __ serveur arrive. Il apporte __ addition.",
+      example:"un · un · Le · l'"
+    },
+    "Subjonctif not triggered":{
+      type:"gap",
+      tip:"Subjonctif après : il faut que, je veux que, bien que, avant que, pour que.",
+      instruction:"Indicatif ou subjonctif ? Complétez avec la bonne forme.",
+      prompt:"Il faut que tu _______ (venir). Je pense qu'il _______ (avoir) raison. Bien qu'elle _______ (être) fatiguée, elle travaille.",
+      example:"viennes · a · soit"
+    },
+    "Word order in questions":{
+      type:"choice",
+      tip:"Pour poser une question : intonation montante / est-ce que / inversion sujet-verbe.",
+      instruction:"Laquelle de ces formulations est correcte pour poser une question en français ?",
+      prompt:"A) Tu parles quand français ?\nB) Est-ce que tu parles français ?\nC) Parles français tu ?",
+      example:"B — 'Est-ce que tu parles français ?' est toujours correct. C est impossible."
+    },
+    "Wrong register (too informal)":{
+      type:"choice",
+      tip:"Registre formel : vous, je voudrais, est-ce que, pourriez-vous. Jamais de contractions comme 't'as'.",
+      instruction:"Vous êtes dans une banque. Laquelle de ces phrases est correcte ?",
+      prompt:"A) T'as une solution pour mon compte ?\nB) Je voudrais des informations sur mon compte, s'il vous plaît.\nC) Mon compte, c'est quoi le problème ?",
+      example:"B — vouvoiement, 'je voudrais', formule de politesse."
+    },
+    "Polite greetings":{
+      type:"choice",
+      tip:"En France : bonjour en entrant, au revoir en partant. Toujours 'monsieur' ou 'madame'.",
+      instruction:"Dans un café, dans quel ordre dites-vous ces phrases ?",
+      prompt:"A) Je voudrais un café — Bonjour madame — Merci, au revoir.\nB) Bonjour madame — Je voudrais un café, s'il vous plaît — Merci, au revoir.\nC) Un café — Merci — Bonjour.",
+      example:"B — on salue d'abord, on commande ensuite, on remercie en partant."
+    },
+    "Natural word order":{
+      type:"gap",
+      tip:"En français, les adverbes de fréquence se placent APRÈS le verbe conjugué.",
+      instruction:"Placez l'adverbe correctement dans chaque phrase.",
+      prompt:"Je mange (toujours) ______ à midi. Il parle (souvent) ______ français. Nous allons (rarement) ______ au cinéma.",
+      example:"Je mange toujours à midi · Il parle souvent français · Nous allons rarement au cinéma"
+    },
+    "Past tenses":{
+      type:"gap",
+      tip:"Passé composé avec avoir ou être. Être : verbes de mouvement (aller, venir, partir...) + tous les pronominaux.",
+      instruction:"Avoir ou être ? Complétez avec le bon auxiliaire.",
+      prompt:"Je _______ mangé au restaurant. Elle _______ allée à Paris. Ils _______ partis tôt. Nous _______ travaillé.",
+      example:"ai · est · sont · avons"
+    },
+    "Negotiation":{
+      type:"choice",
+      tip:"Pour négocier en français : 'serait-il possible de...', 'pourriez-vous...', 'j'aimerais...'",
+      instruction:"Vous voulez changer votre réservation. Laquelle de ces phrases fonctionne le mieux ?",
+      prompt:"A) Changez ma réservation.\nB) Est-ce qu'il serait possible de déplacer ma réservation au lendemain ?\nC) Je veux changer.",
+      example:"B — formule de demande polie avec 'est-ce qu'il serait possible de'."
+    },
+    "Argumentation":{
+      type:"gap",
+      tip:"Connecteurs d'argumentation : d'abord, ensuite, de plus, en revanche, c'est pourquoi.",
+      instruction:"Complétez avec le bon connecteur : d'abord / de plus / c'est pourquoi.",
+      prompt:"_______, j'aime la France pour sa culture. _______, la gastronomie est exceptionnelle. _______, j'ai décidé d'y vivre.",
+      example:"D'abord · De plus · C'est pourquoi"
+    },
+    "Health vocab":{
+      type:"choice",
+      tip:"Pour décrire la douleur : 'j'ai mal à + article + partie du corps'. J'ai mal à la tête / au dos / aux pieds.",
+      instruction:"Comment dit-on 'My throat hurts' en français ?",
+      prompt:"A) J'ai mal la gorge.\nB) Ma gorge fait mal à moi.\nC) J'ai mal à la gorge.",
+      example:"C — 'j'ai mal à la gorge'. Même structure : j'ai mal au dos, j'ai mal aux pieds."
+    },
+    "Transport":{
+      type:"choice",
+      tip:"Rater = to miss. Manquer = to miss (person). Pour un train : 'j'ai raté mon train' ou 'j'ai manqué mon train'.",
+      instruction:"Vous avez raté votre train. Laquelle de ces phrases est correcte au guichet ?",
+      prompt:"A) J'ai perdu mon train de 14h32.\nB) J'ai raté mon train de 14h32, est-ce qu'il serait possible de prendre le suivant ?\nC) Mon train est parti sans moi, c'est votre faute.",
+      example:"B — 'rater' est le verbe correct, et la formulation est calme et solution-oriented."
+    },
+    "Conflict resolution":{
+      type:"gap",
+      tip:"S'excuser avant une demande : 'Je suis désolé(e) de vous déranger, mais...'",
+      instruction:"Complétez cette demande polie à un voisin bruyant.",
+      prompt:"_______ de vous déranger, mais il est minuit et j'ai besoin de dormir. Pourriez-vous _______ le volume, s'il vous plaît ?",
+      example:"Je suis vraiment désolé(e) · baisser"
+    },
+    "Bureaucracy":{
+      type:"choice",
+      tip:"Face à un blocage administratif : proposez une alternative légale plutôt que de montrer votre frustration.",
+      instruction:"Le conseiller dit qu'il manque un document. Quelle est la meilleure réponse ?",
+      prompt:"A) C'est ridicule, j'ai tout apporté !\nB) Je comprends, mais serait-il possible d'utiliser ce document à la place ?\nC) Bon, je reviendrai.",
+      example:"B — proposer une alternative concrète et rester calme."
+    },
+    "Professional French":{
+      type:"gap",
+      tip:"En entretien : 'ce qui m'attire', 'j'ai développé', 'je suis convaincu(e) que'. Évitez les généralités.",
+      instruction:"Complétez ces phrases d'entretien avec les mots corrects.",
+      prompt:"Ce qui m'_______ particulièrement dans ce poste, c'est... J'ai _______ des compétences en... Je suis convaincu(e) que je pourrais _______.",
+      example:"attire · développé · contribuer"
+    },
+    "Nuance & opinion":{
+      type:"gap",
+      tip:"Pour nuancer : 'certes... mais', 'il est vrai que... cependant', 'd'un côté... de l'autre'.",
+      instruction:"Complétez ces phrases avec un connecteur de nuance.",
+      prompt:"_______ la France a une belle culture, _______ le coût de la vie est élevé. _______ côté, les musées sont gratuits le dimanche.",
+      example:"Certes · mais · D'un"
+    },
+    "Restaurant":{
+      type:"choice",
+      tip:"Au restaurant : on appelle le serveur avec 'excusez-moi', pas en levant la main ni en criant.",
+      instruction:"Il y a une erreur dans votre plat. Comment signalez-vous discrètement ?",
+      prompt:"A) Hé ! C'est pas ce que j'ai commandé !\nB) Excusez-moi, je crois qu'il y a une petite erreur — j'avais commandé le confit de canard.\nC) (Vous ne dites rien et mangez quand même.)",
+      example:"B — 'excusez-moi' + 'je crois qu'il y a une petite erreur' = discret et efficace."
+    },
+  };
+
+  const getExercise=(weakness)=>{
+    if(EXERCISE_BANK[weakness]) return EXERCISE_BANK[weakness];
+    return null; // Will be generated by AI
+  };
+
+  const openExercise=async(weakness)=>{
+    setActiveWeakness(weakness);
+    setExerciseAnswer("");
+    setExerciseFeedback(null);
+    const banked=EXERCISE_BANK[weakness];
+    if(banked){ setExercise(banked); return; }
+    // Not in bank -- generate with AI
+    setExercise("loading");
+    try{
+      const r=await fetch(API_BASE+"/chat",{method:"POST",
+        headers:{"Content-Type":"application/json","X-Session-ID":SESSION_ID},
+        body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:300,
+          system:`Create a precise French grammar exercise. Return ONLY valid JSON with no markdown.
+{"type":"gap","tip":"grammar rule in one sentence","instruction":"exactly what to do","prompt":"sentence(s) with ___ for blanks","example":"expected answer(s) separated by middot"}
+OR
+{"type":"choice","tip":"grammar rule in one sentence","instruction":"exactly what to do","prompt":"A) option one B) option two C) option three","example":"A -- brief reason why"}
+Rules:
+- gap: 2-3 blanks max, real French sentences, blanks marked with ___
+- choice: exactly 3 options on ONE line, one clearly correct, two plausible but wrong
+- tip: one sentence stating the grammar rule
+- instruction: imperative, 8 words max
+- All options and sentences must be grammatically well-formed French
+${immersion?"All labels in French.":"Instructions in English, French sentences in the exercise."}`,
+          messages:[{role:"user",content:"Create an exercise targeting this specific weakness: "+weakness}]})});
+      if(!r.ok) throw new Error("API error");
+      const d=await r.json();
+      const ex=JSON.parse((_optionalChain([d, 'access', _33 => _33.content, 'optionalAccess', _34 => _34[0], 'optionalAccess', _35 => _35.text])||"{}").replace(/```json|```/g,"").trim());
+      if(ex.instruction) setExercise(ex);
+      else throw new Error("Bad response");
+    }catch (e10){
+      // Last resort fallback -- still better than nothing
+      setExercise({
+        type:"gap",
+        tip:"Focus on: "+weakness,
+        instruction:immersion?"Completez les phrases avec les mots corrects.":"Fill in the blanks with the correct French words.",
+        prompt:"Bonjour ___, je voudrais ___ s'il vous plait. Merci ___.",
+        example:"monsieur/madame - un cafe/une boulangerie... - beaucoup"
+      });
+    }
+  };
+
+  const submitExercise=async()=>{
+    if(!exerciseAnswer.trim()||!exercise)return;
+    setFeedbackLoading(true);
+    try{
+      const r=await fetch(API_BASE+"/chat",{method:"POST",
+        headers:{"Content-Type":"application/json","X-Session-ID":SESSION_ID},
+        body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:250,
+          system:"You are a French teacher correcting a targeted grammar exercise. Topic: "+activeWeakness+". Exercise type: "+(exercise.type==="choice"?"MULTIPLE CHOICE (student writes A, B, or C)":"GAP-FILL (student writes only the missing words)")+". STRICT FORMAT: Start with 'Correct.' or 'Not quite.' (one word decision). Then in ONE sentence: if wrong, give the exact expected answer and the grammar rule behind it. If correct, name the specific rule they applied correctly. End there. Never more than 2 sentences total. No encouragement phrases. "+(immersion?"Respond in French.":"Respond in English."),
+          messages:[{role:"user",content:"Exercise: " + exercise.prompt + "\nExpected answers: " + (exercise.example||"not provided") + "\nStudent wrote: " + exerciseAnswer}]})});
+      if(!r.ok){setExerciseFeedback(r.status===429||r.status===529?"Too many requests — wait a moment.":r.status===401?"Invalid API key.":"Server error — try again.");setFeedbackLoading(false);return;}
+      const d=await r.json();
+      setExerciseFeedback(_optionalChain([d, 'access', _36 => _36.content, 'optionalAccess', _37 => _37[0], 'optionalAccess', _38 => _38.text])||"Good effort!");
+    }catch (e11){setExerciseFeedback("Connection error — check your API key.");}
+    setFeedbackLoading(false);
+  };
+
+  const errorCount={};
+  const strengthCount={};
+  const notes=[];
+  Object.entries(diagnostics).forEach(([scenId,sessions])=>{
+    sessions.forEach(diag=>{
+      (diag.errors||[]).forEach(e=>{errorCount[e]=(errorCount[e]||0)+1;});
+      (diag.strengths||[]).forEach(s=>{strengthCount[s]=(strengthCount[s]||0)+1;});
+      if(diag.note) notes.push({note:diag.note,scenId:parseInt(scenId)});
+    });
+  });
+  const totalSessions=Object.values(diagnostics).reduce((s,arr)=>s+arr.length,0);
+  const hasRealData=totalSessions>0;
+
+  const MOCK_ERRORS=[
+    ["Passe compose vs imparfait",5],
+    ["Missing articles (le/la/un/une)",3],
+    ["Wrong register (too informal)",3],
+    ["Subjonctif not triggered",2],
+    ["Word order in questions",1],
+  ];
+  const MOCK_STRENGTHS=[
+    ["Polite greetings",4],
+    ["Vocabulary range",3],
+    ["Pronunciation attempts",2],
+  ];
+  const MOCK_NOTES=[
+    {note:"You keep using passe compose for background actions — that's imparfait territory.",scenId:1},
+    {note:"Good instinct to apologise first — very French.",scenId:4},
+    {note:"'Est-ce que' structure is solid, but word order after inversion still trips you up.",scenId:5},
+  ];
+
+  const topErrors=hasRealData?Object.entries(errorCount).sort((a,b)=>b[1]-a[1]).slice(0,6):MOCK_ERRORS;
+  const topStrengths=hasRealData?Object.entries(strengthCount).sort((a,b)=>b[1]-a[1]).slice(0,4):MOCK_STRENGTHS;
+  const recentNotes=hasRealData?notes.slice(-5).reverse():MOCK_NOTES;
+  const totalCount=hasRealData?totalSessions:13;
+
+  if(activeWeakness&&exercise==="loading"){
+    return(
+      React.createElement('div', { style: {height:"100%",display:"flex",flexDirection:"column",background:C.bg},}
+        , React.createElement('div', { style: {background:C.header,padding:sp(18)+"px "+sp(24)+"px "+sp(20)+"px",
+          display:"flex",alignItems:"center",gap:12},}
+          , React.createElement('button', { onClick: ()=>{setActiveWeakness(null);setExercise(null);},
+            style: {background:"none",border:"none",cursor:"pointer",color:C.onHeaderDim,
+              fontSize:20,padding:"4px",fontFamily:"'DM Serif Display',serif",opacity:0.75},}, "←"
+
+          )
+          , React.createElement('div', { style: {fontFamily:"'DM Serif Display',serif",fontSize:sz(18),color:C.onHeader},}
+            , immersion?"Preparation de l'exercice...":"Generating exercise..."
+          )
+        )
+        , React.createElement('div', { style: {flex:1,display:"flex",flexDirection:"column",alignItems:"center",
+          justifyContent:"center",gap:20},}
+          , React.createElement('div', { style: {position:"relative",width:40,height:40},}
+            , React.createElement('div', { style: {position:"absolute",inset:0,borderRadius:"50%",border:"1px solid "+C.ruleWarm},})
+            , React.createElement('div', { style: {position:"absolute",inset:0,borderRadius:"50%",
+              border:"1px solid transparent",borderTop:"1px solid "+C.ink,
+              animation:"spin 1s linear infinite"},})
+          )
+          , React.createElement('div', { style: {fontFamily:"'DM Serif Text',serif",fontStyle:"italic",
+            fontSize:sz(15),color:C.gray,textAlign:"center",maxWidth:240},}
+            , immersion?"Creation d'un exercice personnalise...":"Creating a personalised exercise..."
+          )
+        )
+      )
+    );
+  }
+
+  if(activeWeakness&&exercise&&exercise!=="loading"){
+    return(
+      React.createElement('div', { style: {height:"100%",display:"flex",flexDirection:"column",background:C.bg},}
+        , React.createElement('div', { style: {background:C.header,padding:`${sp(18)}px ${sp(24)}px ${sp(20)}px`,display:"flex",alignItems:"center",gap:12},}
+          , React.createElement('button', { onClick: ()=>{setActiveWeakness(null);setExercise(null);setExerciseFeedback(null);setExerciseAnswer("");},
+            style: {background:"none",border:"none",cursor:"pointer",color:C.onHeaderDim,
+              fontSize:sz(20),fontFamily:"'DM Serif Display',serif",opacity:0.75,padding:"4px"},}
+            , React.createElement('span', null, "←")
+          )
+          , React.createElement('div', { style: {flex:1},}
+            , React.createElement('div', { style: {fontFamily:"'DM Serif Display',serif",fontSize:sz(18),color:C.onHeader},}
+              , immersion?"Exercice cible":"Targeted exercise"
+            )
+            , React.createElement('div', { style: {fontFamily:"'DM Sans',sans-serif",fontWeight:300,fontSize:sz(10),
+              color:C.onHeaderDim,marginTop:1},}, activeWeakness)
+          )
+          , React.createElement(Flag, { h: 13, w: 22,})
+        )
+        , React.createElement('div', { style: {flex:1,overflowY:"auto",padding:`${sp(24)}px`},}
+          , exercise.tip&&(
+            React.createElement('div', { style: {borderLeft:"2px solid "+C.blue,padding:"12px 16px",
+              background:C.blueLight,marginBottom:14},}
+              , React.createElement('div', { style: {fontFamily:"'DM Sans',sans-serif",fontWeight:500,fontSize:sz(9),
+                letterSpacing:2,color:C.blue,textTransform:"uppercase",marginBottom:6},}
+                , immersion?"A savoir":"The rule"
+              )
+              , React.createElement('div', { style: {fontFamily:"'DM Serif Text',serif",fontStyle:"italic",
+                fontSize:sz(15),color:C.ink,lineHeight:1.7},}, exercise.tip)
+            )
+          )
+          /* Instruction -- big and clear, impossible to miss */
+          , React.createElement('div', { style: {background:C.bgCard,border:"1px solid "+C.red+"55",
+            borderLeft:"3px solid "+C.red,padding:`${sp(14)}px ${sp(16)}px`,marginBottom:14},}
+            , React.createElement('div', { style: {fontFamily:"'DM Sans',sans-serif",fontWeight:500,fontSize:sz(9),
+              letterSpacing:2,color:C.red,textTransform:"uppercase",marginBottom:6},}
+              , immersion?"Consigne":"Instructions"
+            )
+            , React.createElement('div', { style: {fontFamily:"'DM Serif Text',serif",fontSize:sz(17),
+              color:C.ink,lineHeight:1.6},}, exercise.instruction)
+          )
+          , React.createElement('div', { style: {background:C.bgCard,border:"1px solid "+C.ruleWarm,padding:`${sp(16)}px`,marginBottom:4},}
+            , React.createElement('div', { style: {fontFamily:"'DM Serif Text',serif",fontStyle:"italic",
+              fontSize:sz(17),color:C.ink,lineHeight:1.75},}, exercise.prompt)
+          )
+          , exercise.example&&(
+            React.createElement('div', { style: {fontFamily:"'DM Sans',sans-serif",fontWeight:300,fontSize:sz(11),
+              color:C.gray,marginBottom:16,paddingLeft:4},}
+              , immersion?"Reponse : ":"Answer: ", React.createElement('em', { style: {color:C.inkLight},}, exercise.example)
+            )
+          )
+          , !exercise.example&&React.createElement('div', { style: {height:16},})
+          , !exerciseFeedback&&(
+            React.createElement(React.Fragment, null
+              , React.createElement('textarea', { value: exerciseAnswer, onChange: e=>setExerciseAnswer(e.target.value),
+                placeholder: immersion?"Votre reponse en francais...":"Your answer in French...", rows: 3,
+                style: {width:"100%",padding:`${sp(13)}px`,border:"1px solid "+C.ruleWarm,
+                  background:C.bgCard,color:C.ink,fontFamily:"'DM Serif Text',serif",
+                  fontStyle:"italic",fontSize:sz(16),resize:"none",lineHeight:1.65,marginBottom:10},})
+              , React.createElement('button', { onClick: submitExercise, disabled: !exerciseAnswer.trim()||feedbackLoading,
+                style: {width:"100%",padding:`${sp(14)}px`,
+                  background:exerciseAnswer.trim()&&!feedbackLoading?C.ink:"transparent",
+                  color:exerciseAnswer.trim()&&!feedbackLoading?C.bgLight:C.grayLight,
+                  border:"1px solid "+(exerciseAnswer.trim()&&!feedbackLoading?C.ink:C.ruleWarm),
+                  fontFamily:"'DM Sans',sans-serif",fontWeight:500,fontSize:sz(11),
+                  letterSpacing:isPhone?1.5:2.5,textTransform:"uppercase",
+                  cursor:exerciseAnswer.trim()&&!feedbackLoading?"pointer":"default",transition:"all 0.2s"},}
+                , feedbackLoading?(immersion?"Correction...":"Correcting..."):(immersion?"Soumettre ->":"Submit ->")
+              )
+            )
+          )
+          , exerciseFeedback&&(
+            React.createElement('div', { style: {animation:"slideUp 0.4s both"},}
+              , (()=>{
+                const isCorrect=/^(correct|right|yes|exactement|parfait|bravo|oui|c'est ca|c'est juste|tres bien)/i.test(exerciseFeedback.trim());
+                const borderColor=isCorrect?C.green:C.red;
+                const bgColor=isCorrect?C.greenLight:C.redLight;
+                const labelColor=isCorrect?C.green:C.red;
+                const label=isCorrect?(immersion?"Correct !":"Correct!"):(immersion?"Correction":"Feedback");
+                return(
+                  React.createElement('div', { style: {borderLeft:"2px solid "+borderColor,padding:`${sp(12)}px ${sp(14)}px`,
+                    background:bgColor,marginBottom:14},}
+                    , React.createElement('div', { style: {fontFamily:"'DM Sans',sans-serif",fontWeight:500,fontSize:sz(9),
+                      letterSpacing:2,color:labelColor,textTransform:"uppercase",marginBottom:6},}
+                      , label
+                    )
+                    , React.createElement('div', { style: {fontFamily:"'DM Sans',sans-serif",fontWeight:300,fontSize:sz(13),
+                      color:C.inkMid,lineHeight:1.75},}, exerciseFeedback)
+                  )
+                );
+              })()
+              , React.createElement('div', { style: {display:"flex",flexDirection:"column",gap:8},}
+                , React.createElement('button', { onClick: ()=>{setExerciseAnswer("");setExerciseFeedback(null);},
+                  style: {width:"100%",padding:`${sp(13)}px`,background:C.ink,color:C.bgLight,
+                    border:"none",fontFamily:"'DM Sans',sans-serif",fontWeight:500,
+                    fontSize:sz(11),letterSpacing:2,textTransform:"uppercase",cursor:"pointer"},}
+                  , immersion?"Reessayer ->":"Try again ->"
+                )
+                , React.createElement('button', { onClick: ()=>{setActiveWeakness(null);setExercise(null);setExerciseFeedback(null);setExerciseAnswer("");},
+                  style: {width:"100%",padding:`${sp(12)}px`,background:"transparent",
+                    border:"1px solid "+C.ruleWarm,fontFamily:"'DM Sans',sans-serif",
+                    fontWeight:300,fontSize:sz(12),color:C.inkLight,cursor:"pointer"},}
+                  , immersion?"<- Retour au diagnostic":"<- Back to diagnostic"
+                )
+              )
+            )
+          )
+        )
+      )
+    );
+  }
+
+  return(
+    React.createElement('div', { style: {height:"100%",display:"flex",flexDirection:"column",background:C.bg},}
+      , React.createElement('div', { style: {background:C.header,padding:`${sp(18)}px ${sp(24)}px ${sp(20)}px`,display:"flex",alignItems:"center",gap:12},}
+        , React.createElement(BackBtn, { onClick: onBack,})
+        , React.createElement('div', { style: {flex:1},}
+          , React.createElement('div', { style: {fontFamily:"'DM Serif Display',serif",fontSize:sz(20),color:C.onHeader},}
+            , immersion?"Mon francais":"My French"
+          )
+          , React.createElement('div', { style: {fontFamily:"'DM Sans',sans-serif",fontWeight:300,fontSize:sz(10),
+            color:C.onHeaderDim,marginTop:2},}
+            , hasRealData
+              ?(immersion?"Base sur "+totalCount+" echange(s)":"Based on "+totalCount+" exchanges")
+              :(immersion?"Apercu — donnees illustratives":"Preview — illustrative data")
+          )
+        )
+        , React.createElement(Flag, { h: 13, w: 22,})
+      )
+
+      , React.createElement('div', { style: {flex:1,overflowY:"auto",padding:`${sp(20)}px ${sp(24)}px`},}
+        , !hasRealData&&(
+          React.createElement('div', { style: {borderLeft:"2px solid "+C.star,padding:`${sp(10)}px ${sp(14)}px`,
+            background:"rgba(200,168,75,0.06)",marginBottom:20},}
+            , React.createElement('div', { style: {fontFamily:"'DM Sans',sans-serif",fontWeight:300,fontSize:sz(12),
+              color:C.gray,lineHeight:1.65},}
+              , immersion
+                ?"Voici a quoi ressemble votre diagnostic apres quelques scenarios. Les donnees ci-dessous sont illustratives."
+                :"This is what your diagnostic looks like after a few scenarios. Data below is illustrative."
+            )
+          )
+        )
+
+        , React.createElement('div', { style: {marginBottom:24},}
+          , React.createElement('div', { style: {marginBottom:12},}
+            , React.createElement('div', { style: {fontFamily:"'DM Sans',sans-serif",fontWeight:500,fontSize:sz(9),
+              letterSpacing:2,color:C.red,textTransform:"uppercase",marginBottom:4},}
+              , immersion?"A travailler":"Needs work"
+            )
+            , React.createElement('div', { style: {fontFamily:"'DM Sans',sans-serif",fontWeight:300,fontSize:sz(12),
+              color:C.gray,lineHeight:1.5},}
+              , immersion
+                ?"Erreurs qui reviennent le plus souvent. Appuyez sur 'Exercice' pour pratiquer."
+                :"Errors that keep coming up. Tap 'Practice' on any to drill it specifically."
+            )
+          )
+          , React.createElement('div', { style: {display:"flex",flexDirection:"column",gap:8},}
+            , topErrors.map(([label,count],i)=>{
+              const pct=Math.min(100,Math.round((count/Math.max(1,totalCount))*100));
+              const isTop=i===0;
+              return(
+                React.createElement('div', { key: label, style: {background:C.bgCard,
+                  border:"1px solid "+(isTop?C.red+"55":C.ruleWarm),padding:`${sp(12)}px ${sp(14)}px`},}
+                  , React.createElement('div', { style: {display:"flex",justifyContent:"space-between",
+                    alignItems:"center",marginBottom:6},}
+                    , React.createElement('span', { style: {fontFamily:"'DM Serif Text',serif",fontSize:sz(15),
+                      color:isTop?C.red:C.ink,flex:1,minWidth:0},}, label)
+                    , React.createElement('div', { style: {display:"flex",alignItems:"center",gap:sp(8),flexShrink:0,marginLeft:8},}
+                      , React.createElement('span', { style: {fontFamily:"'DM Sans',sans-serif",fontWeight:300,
+                        fontSize:sz(10),color:C.gray},}, count, "x")
+                      , React.createElement('button', { onClick: ()=>openExercise(label),
+                        style: {padding:"4px 10px",background:"transparent",
+                          border:"1px solid "+(isTop?C.red+"66":C.ruleWarm),
+                          fontFamily:"'DM Sans',sans-serif",fontWeight:500,fontSize:sz(9),
+                          letterSpacing:1,textTransform:"uppercase",
+                          color:isTop?C.red:C.blue,cursor:"pointer",whiteSpace:"nowrap"},}
+                        , immersion?"Exercice":"Practice"
+                      )
+                    )
+                  )
+                  , React.createElement('div', { style: {height:3,background:C.rule,borderRadius:1},}
+                    , React.createElement('div', { style: {height:"100%",borderRadius:1,
+                      background:isTop?C.red:count>2?C.blue:C.grayMid,
+                      width:pct+"%",transition:"width 0.6s"},})
+                  )
+                )
+              );
+            })
+          )
+        )
+
+        , React.createElement('div', { style: {marginBottom:24},}
+          , React.createElement('div', { style: {marginBottom:12},}
+            , React.createElement('div', { style: {fontFamily:"'DM Sans',sans-serif",fontWeight:500,fontSize:sz(9),
+              letterSpacing:2,color:C.green,textTransform:"uppercase",marginBottom:4},}
+              , immersion?"Ce qui marche":"What's working"
+            )
+            , React.createElement('div', { style: {fontFamily:"'DM Sans',sans-serif",fontWeight:300,fontSize:sz(12),
+              color:C.gray,lineHeight:1.5},}
+              , immersion
+                ?"Points que le professeur a notes comme reussis."
+                :"Things your tutor has flagged as genuinely good."
+            )
+          )
+          , React.createElement('div', { style: {display:"flex",flexWrap:"wrap",gap:8},}
+            , topStrengths.map(([label,count])=>(
+              React.createElement('div', { key: label, style: {display:"flex",alignItems:"center",gap:6,
+                padding:"8px 12px",background:C.greenLight,border:"1px solid "+C.green+"33"},}
+                , React.createElement('svg', { width: 10, height: 10, viewBox: "0 0 10 10"   ,}
+                  , React.createElement('path', { d: "M2 5l2.5 2.5L8 2"   , stroke: C.green, strokeWidth: "1.5",
+                    strokeLinecap: "round", strokeLinejoin: "round", fill: "none",})
+                )
+                , React.createElement('span', { style: {fontFamily:"'DM Serif Text',serif",fontSize:sz(14),color:C.green},}
+                  , label
+                )
+                , count>1&&React.createElement('span', { style: {fontFamily:"'DM Sans',sans-serif",fontSize:sz(10),
+                  color:C.green,opacity:0.6},}, count, "x")
+              )
+            ))
+          )
+        )
+
+        , React.createElement('div', { style: {background:C.bgCard,border:"1px solid "+C.ruleWarm,
+          padding:`${sp(14)}px ${sp(16)}px`,marginBottom:24},}
+          , React.createElement('div', { style: {fontFamily:"'DM Sans',sans-serif",fontWeight:300,fontSize:sz(9),
+            letterSpacing:2,color:C.gray,textTransform:"uppercase",marginBottom:6},}
+            , immersion?"Bilan":"Overall"
+          )
+          , React.createElement('div', { style: {fontFamily:"'DM Sans',sans-serif",fontWeight:300,fontSize:sz(11),
+            color:C.gray,marginBottom:10,lineHeight:1.5},}
+            , immersion
+              ?"Proportion entre points forts et erreurs sur l'ensemble de vos sessions."
+              :"Ratio of strengths to errors across all your exchanges."
+          )
+          , React.createElement('div', { style: {display:"flex",height:8,overflow:"hidden",borderRadius:1},}
+            , React.createElement('div', { style: {flex:Math.max(1,topStrengths.reduce((s,[,v])=>s+v,0)),background:C.green},})
+            , React.createElement('div', { style: {flex:Math.max(1,topErrors.reduce((s,[,v])=>s+v,0)),background:C.red},})
+          )
+          , React.createElement('div', { style: {display:"flex",justifyContent:"space-between",marginTop:6},}
+            , React.createElement('span', { style: {fontFamily:"'DM Sans',sans-serif",fontWeight:300,fontSize:sz(10),color:C.green},}
+              , topStrengths.reduce((s,[,v])=>s+v,0), " " , immersion?"points forts":"strengths"
+            )
+            , React.createElement('span', { style: {fontFamily:"'DM Sans',sans-serif",fontWeight:300,fontSize:sz(10),color:C.red},}
+              , topErrors.reduce((s,[,v])=>s+v,0), " " , immersion?"erreurs notees":"errors flagged"
+            )
+          )
+        )
+
+        , React.createElement('div', { style: {marginBottom:24},}
+          , React.createElement('div', { style: {marginBottom:12},}
+            , React.createElement('div', { style: {fontFamily:"'DM Sans',sans-serif",fontWeight:500,fontSize:sz(9),
+              letterSpacing:2,color:C.gray,textTransform:"uppercase",marginBottom:4},}
+              , immersion?"Dernieres notes du prof":"Recent tutor notes"
+            )
+            , React.createElement('div', { style: {fontFamily:"'DM Sans',sans-serif",fontWeight:300,fontSize:sz(12),
+              color:C.gray,lineHeight:1.5},}
+              , immersion
+                ?"Les observations les plus recentes de votre professeur."
+                :"The most specific observations from your actual sessions."
+            )
+          )
+          , React.createElement('div', { style: {display:"flex",flexDirection:"column",gap:8},}
+            , recentNotes.map((n,i)=>{
+              const sc=SCENARIOS.find(s=>s.id===n.scenId);
+              return(
+                React.createElement('div', { key: i, style: {borderLeft:"2px solid "+C.blue,
+                  padding:`${sp(10)}px ${sp(14)}px`,background:C.blueLight},}
+                  , React.createElement('div', { style: {fontFamily:"'DM Serif Text',serif",fontStyle:"italic",
+                    fontSize:sz(14),color:C.ink,lineHeight:1.65,marginBottom:4},}, n.note)
+                  , sc&&React.createElement('div', { style: {fontFamily:"'DM Sans',sans-serif",fontWeight:300,
+                    fontSize:sz(10),color:C.blue},}, immersion?sc.title:sc.titleEn)
+                )
+              );
+            })
+          )
+        )
+        , React.createElement('div', { style: {height:24},})
+      )
+    )
+  );
+}
+
+
+// -- SETTINGS 
+function SettingsScreen({ttsEnabled,onToggleTTS,apiKey,onSaveKey,openAiKey,onSaveOpenAiKey,onBack,immersion}){
+  const [key,setKey]=useState(apiKey||"");
+  const [saved,setSaved]=useState(false);
+  const [oaKey,setOaKey]=useState(openAiKey||"");
+  const [oaSaved,setOaSaved]=useState(false);
+  const valid=key.startsWith("sk-");
+  const oaValid=oaKey.startsWith("sk-");
+  const t=T(immersion);
+  return(
+    React.createElement('div', { style: {height:"100%",display:"flex",flexDirection:"column",background:C.bg},}
+      , React.createElement('div', { style: {background:C.header,padding:`${sp(18)}px ${sp(24)}px ${sp(20)}px`,display:"flex",alignItems:"center",gap:12},}
+        , React.createElement(BackBtn, { onClick: onBack,})
+        , React.createElement('div', { style: {fontFamily:"'DM Serif Display',serif",fontSize:sz(20),color:C.onHeader},}, t.settings)
+      )
+      , React.createElement('div', { style: {flex:1,overflowY:"auto",padding:`${sp(24)}px`},}
+        , React.createElement('div', { style: {display:"flex",justifyContent:"space-between",alignItems:"center",
+          padding:`${sp(16)}px 0`,borderBottom:`1px solid ${C.rule}`},}
+          , React.createElement('div', null
+            , React.createElement('div', { style: {fontFamily:"'DM Serif Text',serif",fontSize:sz(15),color:C.ink,marginBottom:3},}, t.ttsLabel)
+            , React.createElement('div', { style: {fontFamily:"'DM Sans',sans-serif",fontWeight:300,fontSize:sz(12),color:C.gray},}, t.ttsSub)
+          )
+          , React.createElement('button', { onClick: onToggleTTS,
+            style: {width:44,height:24,borderRadius:12,border:"none",
+              background:ttsEnabled?C.blue:C.ruleWarm,cursor:"pointer",
+              position:"relative",transition:"background 0.2s",flexShrink:0,marginLeft:16},}
+            , React.createElement('div', { style: {position:"absolute",top:3,left:ttsEnabled?22:3,
+              width:18,height:18,borderRadius:"50%",background:C.bgLight,transition:"left 0.2s"},})
+          )
+        )
+        , React.createElement('div', { style: {padding:"20px 0"},}
+          , React.createElement('div', { style: {fontFamily:"'DM Serif Text',serif",fontSize:sz(15),color:C.ink,marginBottom:4},}, t.apiLabel)
+          , React.createElement('div', { style: {fontFamily:"'DM Sans',sans-serif",fontWeight:300,fontSize:sz(12),color:C.gray,marginBottom:16,lineHeight:1.6},}, t.apiSub)
+          , React.createElement('input', { type: "password", value: key, onChange: e=>{setKey(e.target.value);setSaved(false);},
+            placeholder: "sk-ant-api03-...",
+            style: {width:"100%",padding:`${sp(11)}px ${sp(13)}px`,border:`1px solid ${valid?C.blue:C.ruleWarm}`,
+              background:C.bgCard,color:C.ink,fontSize:sz(16),marginBottom:10,
+              fontFamily:"'DM Sans',sans-serif",fontWeight:300,transition:"border 0.2s"},})
+          , React.createElement('button', { onClick: ()=>{onSaveKey(key);setSaved(true);}, disabled: !valid,
+            style: {width:"100%",padding:`${sp(12)}px`,background:valid?C.ink:"transparent",
+              color:valid?C.bgLight:C.grayLight,border:`1px solid ${valid?C.ink:C.ruleWarm}`,
+              fontFamily:"'DM Sans',sans-serif",fontWeight:500,fontSize:sz(11),
+              cursor:valid?"pointer":"default",transition:"all 0.2s",letterSpacing:2,textTransform:"uppercase"},}
+            , saved?t.savedKey:t.saveKey
+          )
+        )
+        /* OpenAI key for Whisper voice recognition */
+        , React.createElement('div', { style: {padding:"20px 0",borderTop:`1px solid ${C.rule}`},}
+          , React.createElement('div', { style: {display:"flex",alignItems:"center",gap:10,marginBottom:4},}
+            , React.createElement('div', { style: {fontFamily:"'DM Serif Text',serif",fontSize:sz(15),color:C.ink},}
+              , immersion?"Clé OpenAI (Whisper)":"OpenAI key (Whisper voice)"
+            )
+            , oaValid&&React.createElement('div', { style: {fontFamily:"'DM Sans',sans-serif",fontSize:sz(9),
+              color:C.green,letterSpacing:1,textTransform:"uppercase",
+              padding:"2px 8px",background:C.greenLight,border:`1px solid ${C.green}33`},}
+              , immersion?"Actif":"Active"
+            )
+          )
+          , React.createElement('div', { style: {fontFamily:"'DM Sans',sans-serif",fontWeight:300,fontSize:sz(12),
+            color:C.gray,marginBottom:16,lineHeight:1.6},}
+            , immersion
+              ?"Obtenez votre clé sur platform.openai.com — active la reconnaissance vocale Whisper."
+              :"Get yours at platform.openai.com — enables Whisper voice recognition."
+          )
+          , React.createElement('input', { type: "password", value: oaKey,
+            onChange: e=>{setOaKey(e.target.value);setOaSaved(false);},
+            placeholder: "sk-...",
+            style: {width:"100%",padding:`${sp(11)}px ${sp(13)}px`,
+              border:`1px solid ${oaValid?C.green:C.ruleWarm}`,
+              background:C.bgCard,color:C.ink,fontSize:sz(16),marginBottom:10,
+              fontFamily:"'DM Sans',sans-serif",fontWeight:300,transition:"border 0.2s"},})
+          , React.createElement('button', { onClick: ()=>{onSaveOpenAiKey(oaKey);setOaSaved(true);}, disabled: !oaValid,
+            style: {width:"100%",padding:`${sp(12)}px`,
+              background:oaValid?C.green:"transparent",
+              color:oaValid?C.bgLight:C.grayLight,
+              border:`1px solid ${oaValid?C.green:C.ruleWarm}`,
+              fontFamily:"'DM Sans',sans-serif",fontWeight:500,fontSize:sz(11),
+              cursor:oaValid?"pointer":"default",transition:"all 0.2s",
+              letterSpacing:2,textTransform:"uppercase"},}
+            , oaSaved?(immersion?"✓ Enregistrée":"✓ Saved"):(immersion?"Enregistrer":"Save key")
+          )
+        )
+        , React.createElement('div', { style: {fontFamily:"'DM Serif Text',serif",fontStyle:"italic",fontSize:sz(13),
+          color:C.grayMid,textAlign:"center",lineHeight:1.75},}, t.keyNeverLeaves)
+      )
+    )
+  );
+}
+
+// -- API KEY -
+function ApiKeyScreen({onSave,onSkip,immersion}){
+  const [key,setKey]=useState("");
+  const valid=key.startsWith("sk-");
+  const t=T(immersion);
+  return(
+    React.createElement('div', { style: {height:"100%",display:"flex",flexDirection:"column",
+      justifyContent:"center",background:C.bg,padding:"48px 36px"},}
+      , React.createElement('div', { style: {display:"flex",alignItems:"center",gap:sp(12),marginBottom:20},}
+        , React.createElement(Flag, { h: 16, w: 28,}), React.createElement(Rule, { style: {flex:1},})
+      )
+      , React.createElement('div', { style: {fontFamily:"'DM Sans',sans-serif",fontWeight:300,fontSize:sz(9),
+        letterSpacing:isPhone?2:3.5,color:C.gray,textTransform:"uppercase",marginBottom:14},}, t.apiLabel)
+      , React.createElement('div', { style: {fontFamily:"'DM Serif Display',serif",fontSize:sz(34),color:C.ink,marginBottom:8,lineHeight:1.1},}, "API key" )
+      , React.createElement('div', { style: {fontFamily:"'DM Serif Text',serif",fontStyle:"italic",fontSize:sz(15),color:C.gray,lineHeight:1.85,marginBottom:28},}, "Get yours at"
+          , React.createElement('br', null)
+        , React.createElement('span', { style: {color:C.inkLight,fontStyle:"normal"},}, "console.anthropic.com"), React.createElement('br', null), "It stays on your device."
+
+      )
+      , React.createElement('input', { type: "password", value: key, onChange: e=>setKey(e.target.value), placeholder: "sk-ant-api03-...",
+        style: {width:"100%",padding:`${sp(13)}px`,border:`1px solid ${valid?C.blue:C.ruleWarm}`,
+          background:C.bgCard,color:C.ink,fontSize:sz(14),marginBottom:10,
+          fontFamily:"'DM Sans',sans-serif",fontWeight:300,transition:"border 0.2s"},})
+      , React.createElement('button', { onClick: ()=>onSave(key), disabled: !valid,
+        style: {width:"100%",padding:`${sp(14)}px`,background:valid?C.ink:"transparent",
+          color:valid?C.bgLight:C.grayLight,border:`1px solid ${valid?C.ink:C.ruleWarm}`,
+          fontFamily:"'DM Sans',sans-serif",fontWeight:500,fontSize:sz(11),cursor:valid?"pointer":"default",
+          marginBottom:12,letterSpacing:isPhone?1.5:2.5,textTransform:"uppercase",transition:"all 0.2s"},}
+        , t.saveAndStart
+      )
+      , React.createElement('button', { onClick: onSkip,
+        style: {background:"none",border:"none",color:C.grayMid,fontFamily:"'DM Sans',sans-serif",
+          fontSize:sz(12),cursor:"pointer",fontWeight:300,textAlign:"center"},}, t.skipForNow)
+    )
+  );
+}
+
+// -- ROOT -
+function App(){
+  const [screen,setScreen]=useState("splash");
+  const [scenario,setScenario]=useState(null);
+  const [progress,setProgress]=useState(()=>{
+    try{return JSON.parse(localStorage.getItem("mft_progress")||"{}");}catch (e12){return{};}
+  });
+  const [apiKey,setApiKey]=useState(()=>localStorage.getItem("mft_apikey")||"");
+  const [openAiKey,setOpenAiKey]=useState(()=>localStorage.getItem("mft_openai_key")||"");
+  const [diagnostics,setDiagnostics]=useState(()=>{
+    try{return JSON.parse(localStorage.getItem("mft_diag")||"{}")}catch (e13){return{};}
+  });
+  const [immersion,setImmersion]=useState(()=>{
+    try{return localStorage.getItem("mft_immersion")==="true";}catch (e14){return false;}
+  });
+  const [userLevel,setUserLevel]=useState(()=>{
+    try{return localStorage.getItem("mft_level")||null;}catch (e15){return null;}
+  });
+  const [ttsEnabled,setTtsEnabled]=useState(false);
+  const {thisWeek,recordSession}=useSessionTracker();
+  const go=s=>setScreen(s);
+
+  const saveProgress=(newP)=>{
+    setProgress(newP);
+    try{localStorage.setItem("mft_progress",JSON.stringify(newP));}catch (e16){}
+  };
+  const saveKey=(k)=>{
+    setApiKey(k);
+    try{localStorage.setItem("mft_apikey",k);}catch (e17){}
+  };
+  const saveOpenAiKey=(k)=>{
+    setOpenAiKey(k);
+    try{localStorage.setItem("mft_openai_key",k);}catch (e18){}
+  };
+  const saveDiag=(scenId,diag)=>{
+    setDiagnostics(prev=>{
+      const updated={...prev,[scenId]:[...(prev[scenId]||[]),diag].slice(-10)};
+      try{localStorage.setItem("mft_diag",JSON.stringify(updated));}catch (e19){}
+      return updated;
+    });
+  };
+
+  return(
+    React.createElement('div', { style: {width:"100%",height:"100%",fontFamily:"'DM Sans',sans-serif",display:"flex",flexDirection:"column"},}
+      , React.createElement('style', null, CSS)
+      , React.createElement('div', { style: {flex:1,overflow:"hidden"},}
+        , screen==="splash"&&React.createElement(SplashScreen, { onEnter: ()=>go("mode"), immersion: immersion,})
+        , screen==="mode"&&React.createElement(ModeScreen, { immersion: immersion, onSelect: isImm=>{setImmersion(isImm);try{localStorage.setItem("mft_immersion",isImm);}catch (e20){}go("leveltest");},})
+        , screen==="leveltest"&&React.createElement(LevelTestScreen, { immersion: immersion, apiKey: apiKey, openAiKey: openAiKey,
+          onComplete: lvl=>{setUserLevel(lvl);try{localStorage.setItem("mft_level",lvl);}catch (e21){}go(apiKey?"home":"apikey");},})
+        , screen==="apikey"&&React.createElement(ApiKeyScreen, { immersion: immersion,
+          onSave: k=>{saveKey(k);go("home");}, onSkip: ()=>go("home"),})
+        , screen==="home"&&React.createElement(HomeScreen, { progress: progress, immersion: immersion,
+          userLevel: userLevel||"B1", sessions: thisWeek,
+          onSelect: s=>{setScenario(s);recordSession();go("scenario");},
+          onProfile: ()=>go("profile"), onDiagnostics: ()=>go("diagnostics"), onToggleMode: ()=>setImmersion(m=>{const n=!m;try{localStorage.setItem("mft_immersion",n);}catch (e22){}return n;}),})
+        , screen==="scenario"&&scenario&&React.createElement(ScenarioScreen, { key: scenario.id, scenario: scenario, apiKey: apiKey, openAiKey: openAiKey,
+          immersion: immersion, ttsEnabled: ttsEnabled, progress: progress,
+          onComplete: (id,stars)=>{
+            saveProgress({...progress,[id]:{stars:Math.max(getStars(progress[id]),stars||1),visits:(_optionalChain([progress, 'access', _39 => _39[id], 'optionalAccess', _40 => _40.visits])||0)+1}});
+            go("home");
+          },
+          onDiag: saveDiag,
+          onBack: ()=>{try{_optionalChain([window, 'access', _41 => _41.speechSynthesis, 'optionalAccess', _42 => _42.cancel, 'call', _43 => _43()]);}catch (e23){}go("home");},})
+        , screen==="profile"&&React.createElement(ProfileScreen, { progress: progress, immersion: immersion,
+          userLevel: userLevel||"B1", sessions: thisWeek,
+          onBack: ()=>go("home"), onReset: ()=>{saveProgress({});setDiagnostics({});try{localStorage.removeItem("mft_diag");localStorage.removeItem("mft_level");localStorage.removeItem("mft_sessions");}catch (e24){}setUserLevel(null);}, onDiagnostics: ()=>go("diagnostics"),
+          onToggleMode: ()=>setImmersion(m=>{const n=!m;try{localStorage.setItem("mft_immersion",n);}catch (e25){}return n;}), onSettings: ()=>go("settings"),
+          onRetakeTest: ()=>go("leveltest"),})
+        , screen==="diagnostics"&&React.createElement(DiagnosticsScreen, { diagnostics: diagnostics, progress: progress, immersion: immersion, apiKey: apiKey, onBack: ()=>go("profile"),}) 
+        , screen==="settings"&&React.createElement(SettingsScreen, { ttsEnabled: ttsEnabled,
+          onToggleTTS: ()=>setTtsEnabled(t=>!t), apiKey: apiKey,
+          onSaveKey: saveKey, openAiKey: openAiKey, onSaveOpenAiKey: saveOpenAiKey,
+          onBack: ()=>go("profile"), immersion: immersion,})
+      )
+    )
+  );
+}
+
+const root=ReactDOM.createRoot(document.getElementById('root'));
+root.render(React.createElement(App));
+    </script>
+  </body>
+</html>
