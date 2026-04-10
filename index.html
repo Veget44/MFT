@@ -11,9 +11,7 @@
   </head>
   <body>
     <div id="root"></div>
-    <script>
-      window.MFT_API_BASE = "https://mftbackend-production.up.railway.app";
-    </script>
+    <script>window.MFT_API_BASE="https://mftbackend-production.up.railway.app";</script>
     <script src="https://unpkg.com/react@18.3.1/umd/react.production.min.js" crossorigin></script>
     <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js" crossorigin></script>
     <script>
@@ -131,161 +129,177 @@ const SKILLS = {
 // Pre-A1 scenarios have extra fields: keywords, starter, blanks
 // blanks = sentence template with ___ to fill in
 const SCENARIOS = [
-  {id:101,cefrLevel:"0",place:"Café · France",
+  // -- Pre-A1: Guided mode (keywords + starter sentence) --
+  {id:101,cefrLevel:"0",place:"Cafe · France",
    title:"Bonjour !",titleEn:"Hello!",
-   skills:["politeness"],
-   scene_fr:"Vous entrez dans un café français. Le serveur vous regarde.",
-   scene_en:"You walk into a French café. The waiter looks at you.",
-   goal_fr:"Commandez un café.",
+   skills:["greetings","ordering"],
+   scene_fr:"Il est 9h du matin. Vous entrez dans un cafe parisien. Le serveur vous regarde et attend. Il y a du bruit autour de vous. C'est votre premier jour en France.",
+   scene_en:"9am. You walk into a Parisian cafe for the first time. The waiter looks at you and waits. It's noisy around you. This is your first day in France.",
+   goal_fr:"Commandez un cafe.",
    goal_en:"Order a coffee.",
    hint_fr:"Utilisez les mots ci-dessous pour faire votre commande.",
    hint_en:"Use the words below to place your order.",
-   culture_fr:"En France, on dit toujours 'bonjour' en entrant dans un commerce.",
-   culture_en:"In France, always say 'bonjour' when entering a shop or café.",
-   keywords:["Bonjour","un café","s'il vous plaît","merci","combien ?"],
-   starter:"Bonjour ! Je voudrais ___",
-   blanks:"Bonjour ! Je voudrais ___ s'il vous plaît."},
+   culture_fr:"En France, on dit toujours 'bonjour' avant de commander. C'est une rgle absolue.",
+   culture_en:"In France, always say 'bonjour' before ordering anything. It's an absolute rule.",
+   keywords:[{fr:"bonjour",en:"hello"},{fr:"un cafe",en:"a coffee"},{fr:"s'il vous plait",en:"please"},{fr:"merci",en:"thank you"},{fr:"au revoir",en:"goodbye"}],
+   starter:"Je voudrais ___, s'il vous plait.",
+   blanks:["un cafe","un the","un jus d'orange"]},
+
   {id:102,cefrLevel:"0",place:"Restaurant · France",
    title:"J'ai faim !",titleEn:"I'm hungry!",
-   skills:["restaurant","politeness"],
-   scene_fr:"Vous êtes au restaurant. Le serveur arrive.",
-   scene_en:"You're at a restaurant. The waiter comes to your table.",
-   goal_fr:"Demandez la carte et commandez de l'eau.",
-   goal_en:"Ask for the menu and order some water.",
+   skills:["restaurant","asking"],
+   scene_fr:"Vous etes assis(e) dans un restaurant. C'est l'heure du dejeuner. Un serveur s'approche de votre table avec un sourire. Vous n'avez pas encore vu la carte.",
+   scene_en:"You're sitting in a restaurant at lunchtime. A waiter approaches your table with a smile. You haven't seen the menu yet.",
+   goal_fr:"Demandez la carte et une carafe d'eau.",
+   goal_en:"Ask for the menu and a jug of water.",
    hint_fr:"Utilisez les mots ci-dessous.",
    hint_en:"Use the words below.",
-   culture_fr:"En France, l'eau du robinet est gratuite. Dites 'une carafe d'eau'.",
-   culture_en:"Tap water is free in France. Say 'une carafe d'eau' for a free jug.",
-   keywords:["La carte","s'il vous plaît","de l'eau","merci","une carafe"],
-   starter:"Bonjour ! La carte, ___",
-   blanks:"Bonjour ! La carte, s'il vous plaît. Et ___, merci."},
+   culture_fr:"L'eau du robinet est gratuite dans les restaurants francais. Demandez 'une carafe d'eau'.",
+   culture_en:"Tap water is free in French restaurants. Ask for 'une carafe d'eau'.",
+   keywords:[{fr:"la carte",en:"the menu"},{fr:"une carafe d'eau",en:"a jug of water"},{fr:"s'il vous plait",en:"please"},{fr:"merci",en:"thank you"},{fr:"excusez-moi",en:"excuse me"}],
+   starter:"Excusez-moi, je voudrais ___, s'il vous plait.",
+   blanks:["la carte","une carafe d'eau","l'addition"]},
+
   {id:103,cefrLevel:"0",place:"Rue · France",
-   title:"Où est... ?",titleEn:"Where is... ?",
-   skills:["transport","politeness"],
-   scene_fr:"Vous êtes perdu(e) dans la rue. Vous voyez quelqu'un.",
-   scene_en:"You're lost on the street. You see someone nearby.",
-   goal_fr:"Demandez où est la gare.",
+   title:"Ou est... ?",titleEn:"Where is... ?",
+   skills:["directions","asking"],
+   scene_fr:"Vous etes perdu(e) dans une rue. Vous cherchez la gare. Vous voyez quelqu'un qui marche vers vous. Il faut oser parler !",
+   scene_en:"You're lost on a street looking for the train station. Someone is walking towards you. Time to speak up!",
+   goal_fr:"Demandez ou est la gare.",
    goal_en:"Ask where the train station is.",
    hint_fr:"Utilisez les mots ci-dessous.",
    hint_en:"Use the words below.",
-   culture_fr:"Commencez toujours par 'Excusez-moi' — c'est indispensable en France.",
-   culture_en:"Always start with 'Excusez-moi' — it's essential in France.",
-   keywords:["Excusez-moi","la gare","où est","s'il vous plaît","merci"],
-   starter:"Excusez-moi, où est ___",
-   blanks:"Excusez-moi, où est la gare, s'il vous plaît ?"},
+   culture_fr:"Commencez toujours par 'Excusez-moi' avant de poser une question a un inconnu.",
+   culture_en:"Always start with 'Excusez-moi' before asking a stranger anything.",
+   keywords:[{fr:"excusez-moi",en:"excuse me"},{fr:"ou est",en:"where is"},{fr:"la gare",en:"the train station"},{fr:"merci beaucoup",en:"thank you very much"},{fr:"s'il vous plait",en:"please"}],
+   starter:"Excusez-moi, ou est ___, s'il vous plait ?",
+   blanks:["la gare","la pharmacie","le metro"]},
 
-  {id:1,cefrLevel:"A1",place:"Café de Flore · Paris 6e",
-   title:"Du sucre dans mon café",titleEn:"Sugar in my coffee",
-   skills:["pastTenses","politeness"],
-   scene_fr:"Il est 9h au Café de Flore. Vous avez commandé un café sans sucre — mais le serveur vient de poser devant vous un café sucré. Vous y êtes allergique. Il s'éloigne déjà.",
-   scene_en:"9am at Café de Flore. You ordered a black coffee, no sugar — the waiter just placed a sweet one in front of you. You're allergic. He's already walking away.",
-   goal_fr:"Rappelez le serveur et expliquez le problème.",
-   goal_en:"Call the waiter back and explain the problem.",
-   hint_fr:"« Excusez-moi, monsieur — j'ai commandé un café sans sucre et je suis allergique… »",
-   hint_en:"Try: 'Excusez-moi, monsieur — j'ai commandé un café sans sucre et je suis allergique…'",
-   culture_fr:"En France, on dit 'monsieur' ou 'madame' — jamais 'garçon'.",
-   culture_en:"In France: 'monsieur' or 'madame' — never 'garçon', never snap your fingers."},
-  {id:2,cefrLevel:"A1",place:"Boulangerie Poilâne · Paris 6e",
-   title:"La dernière baguette",titleEn:"The last baguette",
-   skills:["politeness","negotiation"],
-   scene_fr:"Il reste une seule baguette. Le boulanger dit qu'elle est réservée pour Madame Leclerc. Vous avez des invités ce soir.",
-   scene_en:"One perfect baguette left. The baker says it's reserved for a regular. You have guests tonight.",
+  // -- A1 --
+  {id:1,cefrLevel:"A1",place:"Cafe de Flore · Paris 6e",
+   title:"Du sucre dans mon cafe",titleEn:"Sugar in my coffee",
+   skills:["polite complaints","cafe vocabulary"],
+   scene_fr:"Il est 9h au Cafe de Flore, l'un des cafes les plus celebres de Paris. Vous avez commande un cafe noir sans sucre -- vous etes allergique. Le serveur vient de poser devant vous un cafe avec du sucre et s'eloigne deja. Les autres clients vous regardent.",
+   scene_en:"9am at Cafe de Flore, one of Paris's most famous cafes. You ordered a black coffee, no sugar -- you're allergic. The waiter just placed a sweetened one in front of you and is already walking away. Other customers are watching.",
+   goal_fr:"Rappelez le serveur et expliquez le probleme poliment.",
+   goal_en:"Call the waiter back and explain the problem politely.",
+   hint_fr:"Essayez : 'Excusez-moi, monsieur -- j'ai commande un cafe sans sucre et je suis allergique au sucre.'",
+   hint_en:"Try: 'Excusez-moi, monsieur -- j'ai commande un cafe sans sucre et je suis allergique au sucre.'",
+   culture_fr:"En France, on dit 'monsieur' ou 'madame' -- jamais 'garcon'. Ne claquez jamais des doigts.",
+   culture_en:"In France, say 'monsieur' or 'madame' -- never 'garcon'. Never snap your fingers to get attention."},
+
+  {id:2,cefrLevel:"A1",place:"Boulangerie Poilane · Paris 6e",
+   title:"La derniere baguette",titleEn:"The last baguette",
+   skills:["persuasion","bakery vocabulary"],
+   scene_fr:"Il est 18h30 a la boulangerie Poilane, l'une des meilleures boulangeries de Paris. Il reste une seule baguette parfaite. Le boulanger dit qu'elle est reservee pour un client habitue. Mais vous avez des invites ce soir pour diner et vous n'avez rien d'autre.",
+   scene_en:"6:30pm at Poilane bakery, one of Paris's best. One perfect baguette left. The baker says it's reserved for a regular customer. But you have dinner guests tonight and nothing else to serve.",
    goal_fr:"Convainquez le boulanger de vous la vendre.",
    goal_en:"Convince the baker to sell it to you.",
-   hint_fr:"Soyez charmant(e) — expliquez votre situation avec le sourire.",
-   hint_en:"Be warm and explain your situation — French bakers respond to charm, not pressure.",
-   culture_fr:"Les boulangers apprécient la chaleur bien plus que l'insistance.",
-   culture_en:"A genuine smile and a short story go a long way. Insistence backfires."},
+   hint_fr:"Soyez chaleureux(se) et expliquez votre situation. Les boulangers francais repondent a la sympathie, pas a la pression.",
+   hint_en:"Be warm and explain your situation honestly. French bakers respond to charm and sympathy, not pressure.",
+   culture_fr:"Un sourire sincere et une petite histoire personnelle font beaucoup. L'insistance agressive fait l'effet inverse.",
+   culture_en:"A genuine smile and a short personal story go a long way. Aggressive insistence backfires every time."},
+
+  // -- A2 --
   {id:3,cefrLevel:"A2",place:"Pharmacie des Halles · Paris 1er",
-   title:"Pas dans son assiette",titleEn:"Under the weather",
-   skills:["symptoms","politeness"],
-   scene_fr:"Vous avez mal à la tête, la gorge irritée et de la fièvre depuis hier soir. Pas de médecin. Le pharmacien est là.",
-   scene_en:"Pounding headache, sore throat, slight fever since last night. No doctor here. The pharmacist is available.",
-   goal_fr:"Décrivez vos symptômes avec précision.",
-   goal_en:"Describe your symptoms precisely — 'I feel bad' won't get you the right medicine.",
-   hint_fr:"« J'ai mal à la tête et à la gorge depuis hier. J'ai aussi un peu de fièvre. »",
-   hint_en:"Try: 'J'ai mal à la tête et à la gorge depuis hier soir. J'ai aussi un peu de fièvre.'",
-   culture_fr:"Les pharmaciens français sont des professionnels de santé qualifiés.",
-   culture_en:"French pharmacists are highly qualified — be precise and they'll take great care of you."},
-  {id:4,cefrLevel:"A2",place:"Résidence Les Lilas · Lyon 3e",
-   title:"La fête du dessus",titleEn:"The midnight party",
-   skills:["conflict","politeness"],
-   scene_fr:"Il est minuit et demi. Entretien à 8h. Les voisins font la fête depuis 22h.",
-   scene_en:"12:30am on a Tuesday. Job interview at 8am. Neighbours have been partying since 10pm.",
-   goal_fr:"Demandez moins de bruit, sans créer de conflit.",
-   goal_en:"Ask them to keep it down — without creating conflict.",
-   hint_fr:"Commencez par vous excuser : « Je suis vraiment désolé(e) de vous déranger… »",
-   hint_en:"Apologise first: 'Je suis vraiment désolé(e) de vous déranger…' then explain.",
-   culture_fr:"S'excuser avant de formuler une demande est presque obligatoire en France.",
-   culture_en:"Apologising before making a request is almost mandatory in France."},
-  {id:5,cefrLevel:"B1",place:"Gare du Nord",
+   title:"Pas dans mon assiette",titleEn:"Under the weather",
+   skills:["health vocabulary","describing symptoms"],
+   scene_fr:"Il est 10h du matin. Vous avez mal a la tete et a la gorge depuis hier soir. Vous avez aussi un peu de fievre -- 38.2. Vous etes en voyage a Paris, vous n'avez pas de medecin. La pharmacienne est disponible et vous regarde avec bienveillance. En France, les pharmaciens sont tres qualifies et peuvent vous orienter.",
+   scene_en:"10am. You've had a headache and sore throat since last night, and a slight fever -- 38.2. You're travelling in Paris with no doctor. The pharmacist is available and looks at you kindly. French pharmacists are highly trained and can give real medical guidance.",
+   goal_fr:"Decrivez vos symptomes precisement pour obtenir le bon traitement.",
+   goal_en:"Describe your symptoms precisely to get the right treatment.",
+   hint_fr:"Essayez : 'J'ai mal a la tete et a la gorge depuis hier soir. J'ai aussi un peu de fievre -- 38 degres.'",
+   hint_en:"Try: 'J'ai mal a la tete et a la gorge depuis hier soir. J'ai aussi un peu de fievre -- 38 degres.'",
+   culture_fr:"Les pharmaciens francais sont d'excellents diagnosticiens de premiere ligne. Soyez precis(e) et ils prendront tres soin de vous.",
+   culture_en:"French pharmacists are excellent first-line diagnosticians. Be specific and they'll take excellent care of you."},
+
+  {id:4,cefrLevel:"A2",place:"Residence Les Lilas · Lyon 3e",
+   title:"La fete de minuit",titleEn:"The midnight party",
+   skills:["polite requests","conflict resolution"],
+   scene_fr:"Il est 0h30 un mardi soir. Vous avez un entretien d'embauche important demain a 8h. Vos voisins font la fete depuis 22h -- musique forte, eclats de rire. Vous avez frappe au mur. Rien. Il faut aller frapper a leur porte. Vous ne les connaissez pas vraiment.",
+   scene_en:"12:30am on a Tuesday night. You have an important job interview tomorrow at 8am. Your neighbours have been partying since 10pm -- loud music, laughter. You knocked on the wall. Nothing. You need to knock on their door. You barely know them.",
+   goal_fr:"Demandez-leur poliment de baisser le son -- sans creer de conflit.",
+   goal_en:"Ask them politely to keep it down -- without creating conflict.",
+   hint_fr:"Commencez par vous excuser de deranger : 'Je suis vraiment desole(e) de vous deranger...' puis expliquez.",
+   hint_en:"Start by apologising for disturbing them: 'Je suis vraiment desole(e) de vous deranger...' then explain.",
+   culture_fr:"En France, s'excuser AVANT de faire une demande est presque obligatoire. Ca adoucit tout.",
+   culture_en:"In France, apologising BEFORE making a request is almost mandatory. It softens everything."},
+
+  // -- B1 --
+  {id:5,cefrLevel:"B1",place:"Gare du Nord · Paris",
    title:"Deux minutes de trop",titleEn:"Two minutes too late",
-   skills:["transport","negotiation"],
-   scene_fr:"Votre TGV pour Lyon est parti il y a deux minutes. L'agent au guichet a l'air épuisé.",
-   scene_en:"Your TGV to Lyon left exactly 2 minutes ago. The SNCF agent at the counter looks weary.",
-   goal_fr:"Demandez vos options calmement.",
-   goal_en:"Ask about your options calmly — without sounding aggressive.",
-   hint_fr:"« Bonjour, j'ai raté mon TGV de 14h32 pour Lyon. Est-ce qu'il serait possible… »",
-   hint_en:"Try: 'Bonjour, j'ai raté mon TGV de 14h32. Est-ce qu'il serait possible…'",
-   culture_fr:"Rester calme et orienté solution donne de bien meilleurs résultats.",
-   culture_en:"SNCF agents deal with frustrated travellers all day. Calm and solution-focused works better."},
+   skills:["transport","negotiation","staying calm"],
+   scene_fr:"Votre TGV pour Lyon est parti il y a exactement 2 minutes. Vous avez couru. La file d'attente au guichet SNCF est longue. L'agent qui vous recoit a l'air fatigue -- il en a vu d'autres. Vous avez un billet non echangeable non remboursable. Votre reunion a Lyon est dans 3 heures.",
+   scene_en:"Your TGV to Lyon left exactly 2 minutes ago. You ran. The SNCF counter queue is long. The agent who serves you looks tired -- he's seen it all before. Your ticket is non-exchangeable, non-refundable. Your meeting in Lyon is in 3 hours.",
+   goal_fr:"Renseignez-vous sur vos options calmement -- sans vous montrer agressif(ve).",
+   goal_en:"Ask about your options calmly -- without sounding aggressive or desperate.",
+   hint_fr:"Essayez : 'Bonjour, j'ai rate mon TGV de 14h32 pour Lyon. Est-ce qu'il serait possible d'echanger mon billet ou de prendre le prochain train ?'",
+   hint_en:"Try: 'Bonjour, j'ai rate mon TGV de 14h32 pour Lyon. Est-ce qu'il serait possible d'echanger mon billet ou de prendre le prochain train ?'",
+   culture_fr:"Les agents SNCF gèrent des voyageurs frustres toute la journee. Etre calme et solution-oriented fonctionne beaucoup mieux que l'agressivite.",
+   culture_en:"SNCF agents deal with frustrated travellers all day. Staying calm and solution-focused works far better than showing frustration."},
+
   {id:6,cefrLevel:"B1",place:"Restaurant Chez Marie · Bordeaux",
    title:"Le mauvais plat",titleEn:"The wrong dish",
-   skills:["restaurant","politeness"],
-   scene_fr:"Vous avez commandé le confit de canard. Le serveur pose devant vous du saumon. Vous ne mangez pas de poisson.",
-   scene_en:"You ordered duck confit. Salmon arrives. You don't eat fish. Everyone else is already eating.",
-   goal_fr:"Corrigez l'erreur discrètement.",
-   goal_en:"Correct the mistake discreetly, without spoiling the atmosphere.",
-   hint_fr:"« Excusez-moi, je crois qu'il y a une petite erreur… »",
-   hint_en:"Try: 'Excusez-moi, je crois qu'il y a une petite erreur — j'avais commandé le confit de canard.'",
-   culture_fr:"Signalez une erreur discrètement, avec le sourire.",
-   culture_en:"Flag mistakes quietly with a smile. A light tone shows goodwill."},
-  {id:7,cefrLevel:"B2",place:"Europcar · Aéroport de Nice",
-   title:"La rayure fantôme",titleEn:"The phantom scratch",
-   skills:["argumentation","conflict"],
-   scene_fr:"L'agent repère une rayure au pare-chocs et prétend qu'elle n'était pas là. Vous l'avez photographiée.",
-   scene_en:"The agent spots a scratch and claims it wasn't there at pickup. You photographed it clearly.",
-   goal_fr:"Contestez avec calme et preuves.",
-   goal_en:"Dispute the claim calmly, backed by evidence.",
-   hint_fr:"« Cette rayure était déjà présente lors de la prise en charge. J'en ai la preuve en photo. »",
-   hint_en:"Try: 'Je tiens à préciser que cette rayure était déjà présente — j'en ai la preuve en photo.'",
-   culture_fr:"Factuel, calme, avec des preuves — jamais émotionnel.",
-   culture_en:"Stay factual and calm with evidence. Never emotional, never accusatory."},
+   skills:["restaurant","discreet correction"],
+   scene_fr:"Vous avez commande un confit de canard -- c'est la specialite de la maison. Le serveur apporte... du saumon. Vous ne mangez pas de poisson -- allergie. Tout le monde a votre table a deja commence a manger. Le restaurant est plein et bruyant. Le serveur est deja loin.",
+   scene_en:"You ordered duck confit -- the house speciality. The waiter brings... salmon. You don't eat fish -- allergy. Everyone at your table has already started eating. The restaurant is packed and noisy. The waiter is already gone.",
+   goal_fr:"Signalez l'erreur discretement, sans gacher l'ambiance de la table.",
+   goal_en:"Correct the mistake discreetly, without spoiling the atmosphere for the whole table.",
+   hint_fr:"Essayez : 'Excusez-moi, je crois qu'il y a une petite erreur -- j'avais commande le confit de canard.'",
+   hint_en:"Try: 'Excusez-moi, je crois qu'il y a une petite erreur -- j'avais commande le confit de canard.'",
+   culture_fr:"En France, signalez les erreurs discretement avec un sourire. Un ton leger montre votre bonne volonte et donne envie au serveur de vous aider.",
+   culture_en:"In France, flag mistakes quietly with a light tone and a smile. This shows goodwill and makes the waiter want to help you."},
+
+  // -- B2 --
+  {id:7,cefrLevel:"B2",place:"Europcar · Aeroport de Nice",
+   title:"La rayure fantome",titleEn:"The phantom scratch",
+   skills:["dispute","evidence","formal register"],
+   scene_fr:"Vous rendez une voiture de location a l'aeroport de Nice. L'agent inspecte le vehicule et designe une rayure sur l'aile avant droite en affirmant qu'elle n'etait pas la lors de la prise en charge. Vous etes certain(e) qu'elle etait deja la -- vous l'aviez photographiee au depart avec horodatage.",
+   scene_en:"You're returning a rental car at Nice airport. The agent spots a scratch on the front right wing and claims it wasn't there at pickup. You're certain it was already there -- you photographed it at departure with a timestamp.",
+   goal_fr:"Contestez la reclamation calmement, en vous appuyant sur vos preuves.",
+   goal_en:"Dispute the claim calmly and professionally, backed by your photographic evidence.",
+   hint_fr:"Essayez : 'Je tiens a preciser que cette rayure etait deja presente lors de la prise en charge -- j'en ai la preuve photographique avec horodatage.'",
+   hint_en:"Try: 'Je tiens a preciser que cette rayure etait deja presente lors de la prise en charge -- j'en ai la preuve photographique avec horodatage.'",
+   culture_fr:"Restez factuel(le) et calme. En France, la preuve documentaire est tres respectee. Ne montrez jamais d'emotion -- ca affaiblit votre position.",
+   culture_en:"Stay factual and calm. In France, documentary evidence is highly respected. Never show emotion -- it weakens your position."},
+
   {id:8,cefrLevel:"B2",place:"Agence Centrale · Lyon Part-Dieu",
-   title:"L'entretien d'embauche",titleEn:"The job interview",
-   skills:["professional","nuance"],
-   scene_fr:"Un recruteur vous demande : « Pourquoi travailler en France plutôt que dans votre pays ? »",
-   scene_en:"You're facing a French recruiter. The hard question arrives: 'Why work in France rather than your own country?'",
-   goal_fr:"Répondez de manière convaincante et personnelle.",
-   goal_en:"Answer convincingly and personally — they want a real answer, not a rehearsed one.",
-   hint_fr:"Allez au-delà de 'J'aime la France'. Parlez de motivations précises.",
-   hint_en:"Go beyond 'I love France'. Talk about something specific: 'Ce qui m'attire particulièrement, c'est…'",
-   culture_fr:"Les recruteurs français valorisent la profondeur intellectuelle.",
-   culture_en:"French interviewers value intellectual substance. A vague answer convinces no one."},
+   title:"L'entretien difficile",titleEn:"The tough interview",
+   skills:["professional French","argumentation","self-presentation"],
+   scene_fr:"Vous passez un entretien pour un poste dans une entreprise francaise. Le recruteur est direct et serieux -- il a lu votre CV avec attention. Apres quelques questions standard, il vous pose LA question difficile : 'Pourquoi vouloir travailler en France plutot que dans votre pays d'origine ?'",
+   scene_en:"You're interviewing for a position at a French company. The recruiter is direct and serious -- she has read your CV carefully. After some standard questions, she asks the hard one: 'Why do you want to work in France rather than your home country?'",
+   goal_fr:"Repondez de facon convaincante et personnelle -- pas une reponse apprise par coeur.",
+   goal_en:"Answer convincingly and personally -- not a rehearsed speech about loving France.",
+   hint_fr:"Allez au-dela de 'j'aime la France'. Parlez de quelque chose de specifique et personnel : 'Ce qui m'attire particulierement, c'est...'",
+   hint_en:"Go beyond 'I love France'. Talk about something specific and personal: 'Ce qui m'attire particulierement, c'est...'",
+   culture_fr:"Les recruteurs francais valorisent la substance intellectuelle et l'authenticite. Une reponse vague ne convainc personne.",
+   culture_en:"French recruiters value intellectual substance and authenticity above all. A vague or overly enthusiastic answer convinces no one."},
+
   {id:9,cefrLevel:"B2",place:"BNP Paribas · Paris 11e",
    title:"Le document manquant",titleEn:"The missing document",
-   skills:["bureaucracy","negotiation"],
-   scene_fr:"Vous avez tous les documents. Le conseiller dit qu'il en manque un.",
-   scene_en:"You brought every document on the official list. The advisor says one is missing.",
-   goal_fr:"Négociez une solution alternative.",
-   goal_en:"Negotiate an alternative solution with the advisor.",
-   hint_fr:"« Je comprends votre contrainte, mais serait-il possible d'utiliser à la place… »",
-   hint_en:"Try: 'Je comprends votre contrainte, mais serait-il possible d'utiliser à la place…'",
-   culture_fr:"Proposer une alternative légale est plus efficace que la frustration.",
-   culture_en:"French bureaucracy is real but not immovable. A legal alternative beats frustration."},
-  {id:10,cefrLevel:"C1",place:"Dîner chez les Moreau · Montpellier",
-   title:"Le débat de table",titleEn:"The dinner table debate",
-   skills:["nuance","argumentation"],
-   scene_fr:"Quelqu'un vous demande : « Qu'est-ce que vous pensez vraiment de la France ? » Tout le monde se tait.",
-   scene_en:"Someone asks directly: 'What do you really think of France?' Everyone goes quiet.",
-   goal_fr:"Répondez honnêtement et avec nuance.",
-   goal_en:"Give an honest, nuanced, culturally intelligent answer.",
-   hint_fr:"Soyez précis. Mentionnez une surprise. Terminez par une question.",
-   hint_en:"Be specific. Mention one surprise — good or hard. End with a question back.",
-   culture_fr:"Les Français respectent l'honnêteté intellectuelle plus que la politesse de façade.",
-   culture_en:"The French respect intellectual honesty far more than polite flattery."},
-];
+   skills:["bureaucracy","negotiation","formal register"],
+   scene_fr:"Vous avez rendez-vous a la BNP Paribas pour ouvrir un compte bancaire. Vous avez apporte tous les documents de la liste officielle. Le conseiller examine vos papiers, fronce les sourcils et vous annonce qu'il manque un justificatif de domicile 'recent' -- moins de 3 mois. Le votre date de 4 mois. Vous ne pouvez pas en obtenir un autre rapidement.",
+   scene_en:"You have an appointment at BNP Paribas to open a bank account. You brought every document on the official checklist. The advisor examines your papers, frowns, and tells you one proof of address is not 'recent' enough -- less than 3 months. Yours is 4 months old. You can't get another one quickly.",
+   goal_fr:"Negociez une solution alternative avec le conseiller -- sans perdre patience.",
+   goal_en:"Negotiate an alternative solution with the advisor -- without losing patience.",
+   hint_fr:"Essayez : 'Je comprends votre contrainte. Serait-il possible d'utiliser ce document a la place, ou existe-t-il une procedure exceptionnelle ?'",
+   hint_en:"Try: 'Je comprends votre contrainte. Serait-il possible d'utiliser ce document a la place, ou existe-t-il une procedure exceptionnelle ?'",
+   culture_fr:"La bureaucratie francaise est reelle mais pas infranchissable. Proposer une alternative legale est plus efficace que de se plaindre.",
+   culture_en:"French bureaucracy is real but not immovable. Proposing a concrete legal alternative beats frustration every time."},
 
+  // -- C1 --
+  {id:10,cefrLevel:"C1",place:"Diner chez les Moreau · Montpellier",
+   title:"Le debat de table",titleEn:"The dinner table debate",
+   skills:["nuance","argumentation","cultural intelligence"],
+   scene_fr:"Vous etes invite(e) a diner chez une famille francaise -- les Moreau. La soiree est agreable, le vin est bon. Puis Monsieur Moreau vous regarde dans les yeux et pose la question que tout le monde attendait : 'Alors, qu'est-ce que vous pensez vraiment de la France ?' Silence. Tout le monde attend votre reponse.",
+   scene_en:"You're invited to dinner at a French family's home -- the Moreaus. The evening is pleasant, the wine is good. Then Monsieur Moreau looks you in the eye and asks the question everyone was waiting for: 'So, what do you really think of France?' Silence. Everyone is waiting.",
+   goal_fr:"Donnez une reponse honnete, nuancee et culturellement intelligente.",
+   goal_en:"Give an honest, nuanced, culturally intelligent answer -- not a polite non-answer.",
+   hint_fr:"Soyez precis(e). Mentionnez une vraie surprise -- bonne ou difficile. Terminez par une question pour relancer la conversation.",
+   hint_en:"Be specific. Mention one real surprise -- good or difficult. End with a question to keep the conversation going.",
+   culture_fr:"Les Francais respectent infiniment plus l'honnetete intellectuelle que la politesse de facade. Une reponse nuancee vous fait gagner leur respect.",
+   culture_en:"The French respect intellectual honesty far more than polite flattery. A nuanced, specific answer earns their genuine respect."},
+];
 // -- Copy -
 const T = (imm) => ({
   tagline: imm
@@ -360,30 +374,50 @@ const T = (imm) => ({
 });
 
 // -- Tutor prompt --
-const TUTOR_PROMPT = (imm, isPreA1=false) => isPreA1
-  ? `You are a warm French teacher. The student is an absolute beginner -- be brief and kind.
+const LEVEL_CONTEXT = {
+  "0": {en:"The student is an ABSOLUTE BEGINNER. They can barely write 3 words in French. Celebrate any attempt. Never correct more than one thing. Give the full correct phrase as a model.",
+        fr:"L'eleve est GRAND DEBUTANT. Il sait a peine 10 mots. Felicitez toute tentative. Ne corrigez jamais plus d'une chose. Donnez la phrase correcte complete comme modele."},
+  "A1": {en:"The student is a BEGINNER (A1). They know basic greetings, simple orders, numbers. Expect simple present tense and basic vocabulary. Gently correct gender and basic verb forms.",
+         fr:"L'eleve est DEBUTANT (A1). Il connait les salutations, commandes simples, chiffres. Attendez-vous au present simple. Corrigez doucement le genre et les verbes de base."},
+  "A2": {en:"The student is ELEMENTARY (A2). They can form simple sentences and handle routine situations. Expect present, some past tense attempts. Correct verb conjugation and missing articles.",
+         fr:"L'eleve est ELEMENTAIRE (A2). Il forme des phrases simples et gere les situations courantes. Attendez present et tentatives de passe. Corrigez la conjugaison et les articles manquants."},
+  "B1": {en:"The student is INTERMEDIATE (B1). They can handle most everyday situations. Expect correct past tenses, some subjunctive errors. Correct register, complex sentence structure.",
+         fr:"L'eleve est INTERMEDIAIRE (B1). Il gere la plupart des situations quotidiennes. Attendez les temps du passe, quelques erreurs de subjonctif. Corrigez le registre et la structure."},
+  "B2": {en:"The student is UPPER-INTERMEDIATE (B2). They should produce fluid, accurate French. Expect nuanced vocabulary, complex grammar. Correct precision, register, idiomatic expression.",
+         fr:"L'eleve est CONFIRME (B2). Il doit produire un francais fluide et precis. Attendez vocabulaire nuance, grammaire complexe. Corrigez precision, registre, expressions idiomatiques."},
+  "C1": {en:"The student is ADVANCED (C1). Expect near-native fluency, cultural intelligence, complex argumentation. Only comment on subtle register issues, idiomatic gaps, or cultural nuance.",
+         fr:"L'eleve est AVANCE (C1). Attendez une quasi-fluidite native, intelligence culturelle, argumentation complexe. Ne commentez que les registres subtils, lacunes idiomatiques ou nuances culturelles."},
+};
+
+const TUTOR_PROMPT = (imm, cefrLevel="A1") => {
+  const isPreA1 = cefrLevel === "0";
+  const lvlCtx = LEVEL_CONTEXT[cefrLevel] || LEVEL_CONTEXT["A1"];
+  if(isPreA1) return `You are a warm French teacher. ${lvlCtx.en}
 FORMAT: 2 sentences max.
 Sentence 1: Did they attempt the objective? If yes, name exactly what they got right. If no, gently give the correct phrase in quotes.
-Sentence 2 (only if needed): One tiny correction or word of encouragement.
+Sentence 2 (only if needed): One tiny correction.
 NEVER: lists, grammar jargon, more than 2 sentences, hollow praise.
-${imm?"Respond in very simple French.":"Respond in English."}`
-  : imm
+${imm?"Respond in very simple French.":"Respond in English."}`;
+  return imm
   ? `Tu es prof de francais. Direct, precis, chaleureux -- jamais de listes ni de "Excellent travail !".
-FORMAT STRICT -- 2-3 phrases courtes maximum :
-Ph1: L'eleve a-t-il repondu a l'objectif ? Oui -> dis ce qui marche. Non -> redirige avec la phrase correcte entre guillemets.
-Ph2: Si erreur : UNE alternative correcte entre guillemets + regle en 5 mots max. Sinon : passe.
-Ph3 (optionnelle): Micro-question pour relancer ou encouragement bref.
+CONTEXTE NIVEAU : ${lvlCtx.fr}
+FORMAT STRICT -- 2-3 phrases courtes :
+Ph1: L'eleve a-t-il repondu a l'objectif ? Oui -> dis ce qui marche en fonction de son niveau. Non -> redirige avec la phrase correcte entre guillemets.
+Ph2: Si erreur inadequate pour son niveau : UNE correction entre guillemets + regle en 5 mots. Sinon passe.
+Ph3 (optionnelle): Question pour relancer ou micro-encouragement adapte au niveau.
 JAMAIS : listes, points, plus de 3 phrases, "c'est parfait".
-Si anglais : signale-le, donne une amorce en francais.
+Si l'eleve ecrit en anglais : signale-le, donne une amorce en francais.
 Reponds en francais.`
   : `You are a French teacher. Direct, precise, warm -- no hollow praise, no lists.
-STRICT FORMAT -- 2-3 short sentences max:
-S1: Did the student address the objective? Yes -> name exactly what works. No -> redirect with the correct phrase in quotes.
-S2: If grammar/vocab error: ONE correct alternative in quotes + rule in 5 words. Otherwise: skip.
-S3 (optional): A micro-question to keep them going or brief encouragement.
+LEVEL CONTEXT: ${lvlCtx.en}
+STRICT FORMAT -- 2-3 short sentences:
+S1: Did the student address the objective? Yes -> name what works, calibrated to their level. No -> redirect with the correct phrase in quotes.
+S2: If error inappropriate for their level: ONE correct alternative in quotes + rule in 5 words. Otherwise skip.
+S3 (optional): A micro-question or brief level-appropriate encouragement.
 NEVER: lists, bullet points, more than 3 sentences, "great job", "well done".
 If they write in English: note it briefly, give a French opener.
-Respond in English.`
+Respond in English.`;
+}
 
 const PLACEMENT_PROMPT = (imm) => imm
   ? `Tu évalues le niveau CECR d'un apprenant. Réponds UNIQUEMENT avec du JSON valide, sans markdown, sans texte avant ou après.
@@ -397,19 +431,24 @@ Be generous -- it's better to slightly overestimate than to discourage.`;
 
 // -- Star analysis prompt 
 // After a return visit, ask the tutor to evaluate if it deserves star 2 or 3
-const STAR_PROMPT = (imm, currentStars) => imm
-  ? `Tu es prof de français. L'élève refait un scénario (actuellement ${currentStars} étoile(s)).
-Donne ton feedback habituel en 2-3 phrases max.
-PUIS sur la toute dernière ligne, écris UNIQUEMENT ce JSON (rien d'autre après) :
+const STAR_PROMPT = (imm, currentStars, cefrLevel="A1") => {
+  const lvlCtx = LEVEL_CONTEXT[cefrLevel] || LEVEL_CONTEXT["A1"];
+  return imm
+  ? `Tu es prof de francais. L'eleve refait un scenario (actuellement ${currentStars} etoile(s)).
+CONTEXTE NIVEAU : ${lvlCtx.fr}
+Donne ton feedback en 2-3 phrases max, adapte a son niveau.
+PUIS sur la toute derniere ligne, ecris UNIQUEMENT ce JSON :
 {"stars":1}  ou  {"stars":2}  ou  {"stars":3}
-Critères : 1 = erreurs importantes, 2 = correct et approprié, 3 = naturel et au-dessus du niveau.
-Réponds en français.`
+Criteres adaptes au niveau : 1 = erreurs notables pour ce niveau, 2 = correct et approprie, 3 = au-dessus du niveau attendu et naturel.
+Reponds en francais.`
   : `You are a French teacher. The student is replaying a scenario (currently ${currentStars} star(s)).
-Give your usual feedback in 2-3 sentences max.
-THEN on the very last line write ONLY this JSON (nothing after it):
+LEVEL CONTEXT: ${lvlCtx.en}
+Give your feedback in 2-3 sentences max, calibrated to their level.
+THEN on the very last line write ONLY this JSON:
 {"stars":1}  or  {"stars":2}  or  {"stars":3}
-Criteria: 1 = significant errors, 2 = correct and appropriate, 3 = natural and above level.
+Level-calibrated criteria: 1 = notable errors for this level, 2 = correct and appropriate, 3 = above expected level and natural.
 Respond in English.`;
+}
 
 // -- Diagnostic extraction prompt --
 const DIAG_PROMPT = `Analyse a French learner response. Return ONLY valid JSON, no markdown.
@@ -1132,57 +1171,166 @@ function HomeScreen({progress,immersion,userLevel,onSelect,onProfile,onToggleMod
   })).filter(g=>g.scenarios.length>0);
 
   // Tiny SVG illustrations per place type
-  const PlaceIllustration = ({cefrLevel, place}) => {
-    const isCafe = place.toLowerCase().includes("caf") || place.toLowerCase().includes("boulang");
-    const isStation = place.toLowerCase().includes("gare") || place.toLowerCase().includes("transport");
-    const isRestaurant = place.toLowerCase().includes("restaurant") || place.toLowerCase().includes("pharmacy") || place.toLowerCase().includes("pharmacie");
-    const isDinner = cefrLevel==="C1";
-    const isOffice = place.toLowerCase().includes("agence") || place.toLowerCase().includes("bnp") || place.toLowerCase().includes("europcar");
+  // Unique SVG illustration per scenario ID
+  const PlaceIllustration = ({scenarioId, cefrLevel}) => {
+    const illustrations = {
+      // 101 - Cafe bonjour: steaming espresso cup
+      101: React.createElement('svg', { width: 44, height: 44, viewBox: "0 0 44 44"   ,}
+        , React.createElement('ellipse', { cx: 20, cy: 32, rx: 14, ry: 3, fill: C.blue, opacity: 0.08,})
+        , React.createElement('rect', { x: 8, y: 20, width: 20, height: 14, rx: 3, fill: C.bgLight, stroke: C.blue, strokeWidth: 1.2, opacity: 0.9,})
+        , React.createElement('rect', { x: 11, y: 23, width: 14, height: 8, rx: 2, fill: C.blueLight, opacity: 0.8,})
+        , React.createElement('path', { d: "M28 24 Q34 24 34 30 Q34 36 28 36"         , stroke: C.blue, strokeWidth: 1.5, fill: "none", strokeLinecap: "round",})
+        , React.createElement('rect', { x: 6, y: 34, width: 24, height: 2, rx: 1, fill: C.blue, opacity: 0.15,})
+        , React.createElement('path', { d: "M15 20 Q15 14 18 12"     , stroke: C.blue, strokeWidth: 1, fill: "none", opacity: 0.4, strokeLinecap: "round",})
+        , React.createElement('path', { d: "M20 20 Q20 13 23 10"     , stroke: C.blue, strokeWidth: 1, fill: "none", opacity: 0.3, strokeLinecap: "round",})
+      ),
 
-    if(isCafe) return(
-      React.createElement('svg', { width: 40, height: 40, viewBox: "0 0 40 40"   ,}
-        , React.createElement('rect', { x: 8, y: 18, width: 18, height: 14, rx: 2, fill: C.blue, opacity: 0.15,})
-        , React.createElement('rect', { x: 10, y: 20, width: 14, height: 10, rx: 1, fill: C.blue, opacity: 0.25,})
-        , React.createElement('path', { d: "M26 22 Q31 22 31 27 Q31 32 26 32"         , stroke: C.blue, strokeWidth: 1.5, fill: "none", opacity: 0.4,})
-        , React.createElement('rect', { x: 6, y: 32, width: 22, height: 2, rx: 1, fill: C.blue, opacity: 0.2,})
-        , React.createElement('path', { d: "M14 18 Q14 12 20 12 Q20 8 17 8"         , stroke: C.blue, strokeWidth: 1.2, fill: "none", opacity: 0.3,})
-      )
-    );
-    if(isStation) return(
-      React.createElement('svg', { width: 40, height: 40, viewBox: "0 0 40 40"   ,}
-        , React.createElement('rect', { x: 4, y: 14, width: 32, height: 16, rx: 2, fill: C.blue, opacity: 0.12,})
-        , React.createElement('rect', { x: 4, y: 14, width: 32, height: 5, rx: 2, fill: C.blue, opacity: 0.2,})
-        , React.createElement('circle', { cx: 12, cy: 33, r: 3, fill: C.blue, opacity: 0.25,})
-        , React.createElement('circle', { cx: 28, cy: 33, r: 3, fill: C.blue, opacity: 0.25,})
-        , React.createElement('rect', { x: 8, y: 20, width: 24, height: 6, rx: 1, fill: C.blue, opacity: 0.1,})
-        , React.createElement('path', { d: "M10 22 L30 22"   , stroke: C.blue, strokeWidth: 1, opacity: 0.3,})
-      )
-    );
-    if(isDinner) return(
-      React.createElement('svg', { width: 40, height: 40, viewBox: "0 0 40 40"   ,}
-        , React.createElement('circle', { cx: 20, cy: 22, r: 10, fill: C.red, opacity: 0.1,})
-        , React.createElement('path', { d: "M14 22 L26 22"   , stroke: C.red, strokeWidth: 1, opacity: 0.3,})
-        , React.createElement('path', { d: "M12 16 Q20 12 28 16"     , stroke: C.red, strokeWidth: 1.2, fill: "none", opacity: 0.25,})
-        , React.createElement('circle', { cx: 20, cy: 22, r: 3, fill: C.red, opacity: 0.2,})
-        , React.createElement('path', { d: "M20 30 L20 36"   , stroke: C.red, strokeWidth: 1.5, opacity: 0.3, strokeLinecap: "round",})
-        , React.createElement('path', { d: "M15 36 L25 36"   , stroke: C.red, strokeWidth: 1.5, opacity: 0.2, strokeLinecap: "round",})
-      )
-    );
-    if(isOffice) return(
-      React.createElement('svg', { width: 40, height: 40, viewBox: "0 0 40 40"   ,}
-        , React.createElement('rect', { x: 6, y: 10, width: 28, height: 24, rx: 2, fill: C.ink, opacity: 0.08,})
-        , React.createElement('rect', { x: 10, y: 14, width: 8, height: 6, rx: 1, fill: C.ink, opacity: 0.12,})
-        , React.createElement('rect', { x: 22, y: 14, width: 8, height: 6, rx: 1, fill: C.ink, opacity: 0.12,})
-        , React.createElement('rect', { x: 10, y: 24, width: 8, height: 6, rx: 1, fill: C.ink, opacity: 0.12,})
-        , React.createElement('rect', { x: 22, y: 24, width: 8, height: 6, rx: 1, fill: C.ink, opacity: 0.12,})
-        , React.createElement('rect', { x: 15, y: 30, width: 10, height: 4, fill: C.ink, opacity: 0.08,})
-      )
-    );
-    // Default: generic location pin
-    return(
-      React.createElement('svg', { width: 40, height: 40, viewBox: "0 0 40 40"   ,}
-        , React.createElement('path', { d: "M20 8 C13 8 8 13 8 19 C8 27 20 36 20 36 C20 36 32 27 32 19 C32 13 27 8 20 8Z"                         , fill: C.blue, opacity: 0.12,})
-        , React.createElement('circle', { cx: 20, cy: 19, r: 5, fill: C.blue, opacity: 0.25,})
+      // 102 - Restaurant menu
+      102: React.createElement('svg', { width: 44, height: 44, viewBox: "0 0 44 44"   ,}
+        , React.createElement('rect', { x: 10, y: 6, width: 18, height: 28, rx: 2, fill: C.bgLight, stroke: C.ruleWarm, strokeWidth: 1.2,})
+        , React.createElement('rect', { x: 13, y: 10, width: 12, height: 1.5, rx: 0.75, fill: C.blue, opacity: 0.4,})
+        , React.createElement('rect', { x: 13, y: 14, width: 9, height: 1, rx: 0.5, fill: C.grayLight, opacity: 0.6,})
+        , React.createElement('rect', { x: 13, y: 17, width: 11, height: 1, rx: 0.5, fill: C.grayLight, opacity: 0.6,})
+        , React.createElement('rect', { x: 13, y: 20, width: 8, height: 1, rx: 0.5, fill: C.grayLight, opacity: 0.6,})
+        , React.createElement('rect', { x: 13, y: 25, width: 10, height: 1, rx: 0.5, fill: C.blue, opacity: 0.3,})
+        , React.createElement('rect', { x: 13, y: 28, width: 7, height: 1, rx: 0.5, fill: C.grayLight, opacity: 0.5,})
+        , React.createElement('path', { d: "M30 18 L30 36"   , stroke: C.red, strokeWidth: 1.2, opacity: 0.5, strokeLinecap: "round",})
+        , React.createElement('path', { d: "M34 18 L34 36"   , stroke: C.red, strokeWidth: 1.2, opacity: 0.5, strokeLinecap: "round",})
+        , React.createElement('path', { d: "M30 18 Q32 14 34 18"     , stroke: C.red, strokeWidth: 1.2, fill: "none", opacity: 0.5,})
+      ),
+
+      // 103 - Street directions: map pin + arrow
+      103: React.createElement('svg', { width: 44, height: 44, viewBox: "0 0 44 44"   ,}
+        , React.createElement('path', { d: "M22 6 C16 6 10 11 10 17 C10 25 22 38 22 38 C22 38 34 25 34 17 C34 11 28 6 22 6Z"                         , fill: C.blue, opacity: 0.12, stroke: C.blue, strokeWidth: 1, opacity: 0.3,})
+        , React.createElement('circle', { cx: 22, cy: 17, r: 4, fill: C.blue, opacity: 0.35,})
+        , React.createElement('path', { d: "M8 30 L16 26 L22 30 L30 24 L36 28"         , stroke: C.red, strokeWidth: 1.5, fill: "none", strokeLinecap: "round", strokeLinejoin: "round", opacity: 0.5,})
+      ),
+
+      // 1 - Coffee complaint: cup with X
+      1: React.createElement('svg', { width: 44, height: 44, viewBox: "0 0 44 44"   ,}
+        , React.createElement('ellipse', { cx: 20, cy: 33, rx: 13, ry: 2.5, fill: C.blue, opacity: 0.08,})
+        , React.createElement('rect', { x: 8, y: 20, width: 20, height: 14, rx: 3, fill: C.bgLight, stroke: C.blue, strokeWidth: 1.2,})
+        , React.createElement('rect', { x: 11, y: 23, width: 14, height: 8, rx: 2, fill: C.blueLight, opacity: 0.7,})
+        , React.createElement('path', { d: "M28 23 Q33 23 33 29 Q33 35 28 35"         , stroke: C.blue, strokeWidth: 1.5, fill: "none", strokeLinecap: "round",})
+        , React.createElement('rect', { x: 6, y: 34, width: 24, height: 2, rx: 1, fill: C.blue, opacity: 0.15,})
+        , React.createElement('circle', { cx: 34, cy: 12, r: 7, fill: C.red, opacity: 0.15, stroke: C.red, strokeWidth: 1, opacity: 0.4,})
+        , React.createElement('path', { d: "M31 9 L37 15 M37 9 L31 15"       , stroke: C.red, strokeWidth: 1.5, strokeLinecap: "round", opacity: 0.7,})
+      ),
+
+      // 2 - Baguette: bread loaf
+      2: React.createElement('svg', { width: 44, height: 44, viewBox: "0 0 44 44"   ,}
+        , React.createElement('ellipse', { cx: 22, cy: 38, rx: 15, ry: 2, fill: C.ink, opacity: 0.06,})
+        , React.createElement('path', { d: "M6 24 Q6 16 22 14 Q38 16 38 24 Q38 32 22 34 Q6 32 6 24Z"                 , fill: "#E8C98A", opacity: 0.9,})
+        , React.createElement('path', { d: "M8 22 Q22 20 36 22"     , stroke: "#C4955A", strokeWidth: 1, fill: "none", opacity: 0.6,})
+        , React.createElement('path', { d: "M10 26 Q22 24 34 26"     , stroke: "#C4955A", strokeWidth: 1, fill: "none", opacity: 0.4,})
+        , React.createElement('path', { d: "M14 19 L14 29"   , stroke: "#B8844A", strokeWidth: 0.8, opacity: 0.4,})
+        , React.createElement('path', { d: "M20 18 L20 30"   , stroke: "#B8844A", strokeWidth: 0.8, opacity: 0.4,})
+        , React.createElement('path', { d: "M26 18 L26 30"   , stroke: "#B8844A", strokeWidth: 0.8, opacity: 0.4,})
+        , React.createElement('path', { d: "M32 19 L32 29"   , stroke: "#B8844A", strokeWidth: 0.8, opacity: 0.4,})
+      ),
+
+      // 3 - Pharmacie: cross + pills
+      3: React.createElement('svg', { width: 44, height: 44, viewBox: "0 0 44 44"   ,}
+        , React.createElement('rect', { x: 8, y: 8, width: 28, height: 28, rx: 4, fill: "#2D6B2B", opacity: 0.1, stroke: "#2D6B2B", strokeWidth: 1, opacity: 0.3,})
+        , React.createElement('rect', { x: 19, y: 12, width: 6, height: 20, rx: 3, fill: "#2D6B2B", opacity: 0.5,})
+        , React.createElement('rect', { x: 12, y: 19, width: 20, height: 6, rx: 3, fill: "#2D6B2B", opacity: 0.5,})
+        , React.createElement('ellipse', { cx: 34, cy: 34, rx: 6, ry: 4, fill: "#E8C98A", opacity: 0.8, stroke: "#C4955A", strokeWidth: 0.8,})
+        , React.createElement('line', { x1: 34, y1: 30, x2: 34, y2: 38, stroke: "#C4955A", strokeWidth: 0.8, opacity: 0.6,})
+      ),
+
+      // 4 - Midnight noise: speaker + moon
+      4: React.createElement('svg', { width: 44, height: 44, viewBox: "0 0 44 44"   ,}
+        , React.createElement('path', { d: "M28 6 A16 16 0 0 1 28 38 A12 12 0 0 0 28 6Z"               , fill: C.ink, opacity: 0.15,})
+        , React.createElement('path', { d: "M10 30 Q14 22 10 14 L18 18 L18 26 Z"          , fill: C.blue, opacity: 0.4,})
+        , React.createElement('rect', { x: 18, y: 18, width: 4, height: 8, rx: 1, fill: C.blue, opacity: 0.4,})
+        , React.createElement('path', { d: "M24 16 Q28 22 24 28"     , stroke: C.blue, strokeWidth: 1.5, fill: "none", strokeLinecap: "round", opacity: 0.5,})
+        , React.createElement('path', { d: "M27 13 Q33 22 27 31"     , stroke: C.blue, strokeWidth: 1.2, fill: "none", strokeLinecap: "round", opacity: 0.3,})
+        , React.createElement('path', { d: "M30 10 Q38 22 30 34"     , stroke: C.blue, strokeWidth: 1, fill: "none", strokeLinecap: "round", opacity: 0.2,})
+      ),
+
+      // 5 - Train station: TGV profile
+      5: React.createElement('svg', { width: 44, height: 44, viewBox: "0 0 44 44"   ,}
+        , React.createElement('rect', { x: 2, y: 26, width: 40, height: 3, rx: 1, fill: C.ink, opacity: 0.1,})
+        , React.createElement('circle', { cx: 10, cy: 29, r: 3, fill: C.ink, opacity: 0.2,})
+        , React.createElement('circle', { cx: 30, cy: 29, r: 3, fill: C.ink, opacity: 0.2,})
+        , React.createElement('path', { d: "M4 24 Q8 14 20 13 L38 14 Q42 14 42 20 L42 26 L4 26Z"               , fill: C.blue, opacity: 0.2, stroke: C.blue, strokeWidth: 1, opacity: 0.4,})
+        , React.createElement('path', { d: "M4 24 Q8 14 20 13 L28 13"       , stroke: C.blue, strokeWidth: 2, fill: "none", opacity: 0.6, strokeLinecap: "round",})
+        , React.createElement('rect', { x: 12, y: 17, width: 6, height: 5, rx: 1, fill: "white", opacity: 0.6,})
+        , React.createElement('rect', { x: 22, y: 17, width: 6, height: 5, rx: 1, fill: "white", opacity: 0.6,})
+        , React.createElement('rect', { x: 32, y: 17, width: 5, height: 5, rx: 1, fill: "white", opacity: 0.6,})
+        , React.createElement('path', { d: "M2 26 L42 26"   , stroke: C.blue, strokeWidth: 0.5, opacity: 0.3,})
+      ),
+
+      // 6 - Restaurant wrong dish: plate with X
+      6: React.createElement('svg', { width: 44, height: 44, viewBox: "0 0 44 44"   ,}
+        , React.createElement('ellipse', { cx: 22, cy: 38, rx: 14, ry: 2, fill: C.ink, opacity: 0.06,})
+        , React.createElement('circle', { cx: 22, cy: 22, r: 14, fill: C.bgLight, stroke: C.ruleWarm, strokeWidth: 1.2,})
+        , React.createElement('circle', { cx: 22, cy: 22, r: 10, fill: C.bgCard, opacity: 0.8,})
+        , React.createElement('path', { d: "M17 17 L27 27 M27 17 L17 27"       , stroke: C.red, strokeWidth: 2, strokeLinecap: "round", opacity: 0.6,})
+        , React.createElement('rect', { x: 16, y: 35, width: 12, height: 2, rx: 1, fill: C.ruleWarm,})
+        , React.createElement('rect', { x: 20, y: 35, width: 4, height: 4, rx: 0.5, fill: C.ruleWarm,})
+      ),
+
+      // 7 - Car rental: car with scratch mark
+      7: React.createElement('svg', { width: 44, height: 44, viewBox: "0 0 44 44"   ,}
+        , React.createElement('ellipse', { cx: 22, cy: 38, rx: 16, ry: 2, fill: C.ink, opacity: 0.06,})
+        , React.createElement('path', { d: "M4 28 L4 22 Q4 18 8 18 L12 12 Q14 8 20 8 L28 8 Q34 8 36 12 L40 18 Q44 18 44 22 L44 28 Q44 32 40 32 L8 32 Q4 32 4 28Z"                                     , fill: C.bgCard, stroke: C.ruleWarm, strokeWidth: 1.2,})
+        , React.createElement('rect', { x: 8, y: 22, width: 8, height: 6, rx: 1, fill: C.blueLight, opacity: 0.8,})
+        , React.createElement('rect', { x: 28, y: 22, width: 8, height: 6, rx: 1, fill: C.blueLight, opacity: 0.8,})
+        , React.createElement('circle', { cx: 12, cy: 33, r: 4, fill: C.ink, opacity: 0.15, stroke: C.ink, strokeWidth: 1,})
+        , React.createElement('circle', { cx: 12, cy: 33, r: 2, fill: C.ink, opacity: 0.2,})
+        , React.createElement('circle', { cx: 32, cy: 33, r: 4, fill: C.ink, opacity: 0.15, stroke: C.ink, strokeWidth: 1,})
+        , React.createElement('circle', { cx: 32, cy: 33, r: 2, fill: C.ink, opacity: 0.2,})
+        , React.createElement('path', { d: "M30 12 L36 20"   , stroke: C.red, strokeWidth: 2.5, strokeLinecap: "round", opacity: 0.7,})
+        , React.createElement('path', { d: "M33 10 L38 18"   , stroke: C.red, strokeWidth: 1.5, strokeLinecap: "round", opacity: 0.4,})
+      ),
+
+      // 8 - Job interview: tie + building
+      8: React.createElement('svg', { width: 44, height: 44, viewBox: "0 0 44 44"   ,}
+        , React.createElement('rect', { x: 6, y: 14, width: 32, height: 24, rx: 2, fill: C.bgLight, stroke: C.ruleWarm, strokeWidth: 1,})
+        , React.createElement('rect', { x: 6, y: 14, width: 32, height: 6, rx: 2, fill: C.blue, opacity: 0.15,})
+        , React.createElement('rect', { x: 10, y: 24, width: 6, height: 5, rx: 1, fill: C.blueLight,})
+        , React.createElement('rect', { x: 20, y: 24, width: 6, height: 5, rx: 1, fill: C.blueLight,})
+        , React.createElement('rect', { x: 30, y: 24, width: 6, height: 5, rx: 1, fill: C.blueLight,})
+        , React.createElement('rect', { x: 10, y: 32, width: 6, height: 4, rx: 1, fill: C.blueLight,})
+        , React.createElement('rect', { x: 20, y: 32, width: 6, height: 4, rx: 1, fill: C.blueLight,})
+        , React.createElement('rect', { x: 30, y: 32, width: 6, height: 4, rx: 1, fill: C.blueLight,})
+        , React.createElement('path', { d: "M22 6 L20 14 L22 12 L24 14 Z"        , fill: C.blue, opacity: 0.5,})
+        , React.createElement('path', { d: "M20 14 L19 18 L22 16 L25 18 L24 14"         , fill: C.blue, opacity: 0.3,})
+      ),
+
+      // 9 - Bank: columns + document
+      9: React.createElement('svg', { width: 44, height: 44, viewBox: "0 0 44 44"   ,}
+        , React.createElement('rect', { x: 4, y: 34, width: 36, height: 3, rx: 1, fill: C.ink, opacity: 0.12,})
+        , React.createElement('rect', { x: 4, y: 14, width: 36, height: 4, rx: 1, fill: C.ink, opacity: 0.12,})
+        , React.createElement('rect', { x: 10, y: 18, width: 4, height: 16, rx: 1, fill: C.ink, opacity: 0.1,})
+        , React.createElement('rect', { x: 18, y: 18, width: 4, height: 16, rx: 1, fill: C.ink, opacity: 0.1,})
+        , React.createElement('rect', { x: 26, y: 18, width: 4, height: 16, rx: 1, fill: C.ink, opacity: 0.1,})
+        , React.createElement('rect', { x: 34, y: 18, width: 4, height: 16, rx: 1, fill: C.ink, opacity: 0.1,})
+        , React.createElement('path', { d: "M4 14 L22 6 L40 14"     , fill: C.ink, opacity: 0.1,})
+        , React.createElement('rect', { x: 26, y: 26, width: 12, height: 14, rx: 1, fill: C.bgLight, stroke: C.red, strokeWidth: 1, opacity: 0.8,})
+        , React.createElement('path', { d: "M28 30 L36 30 M28 33 L34 33"       , stroke: C.red, strokeWidth: 1, opacity: 0.6, strokeLinecap: "round",})
+        , React.createElement('circle', { cx: 38, cy: 26, r: 5, fill: C.red, opacity: 0.2, stroke: C.red, strokeWidth: 1, opacity: 0.5,})
+        , React.createElement('path', { d: "M36 26 L38 24 L40 26 M38 24 L38 28"         , stroke: C.red, strokeWidth: 1.2, strokeLinecap: "round", opacity: 0.7,})
+      ),
+
+      // 10 - Dinner table debate: wine glasses + speech bubble
+      10: React.createElement('svg', { width: 44, height: 44, viewBox: "0 0 44 44"   ,}
+        , React.createElement('ellipse', { cx: 22, cy: 38, rx: 16, ry: 2, fill: C.ink, opacity: 0.06,})
+        , React.createElement('path', { d: "M14 12 Q14 22 18 26 L14 26 L14 28 L20 28 L20 26 L18 26"               , stroke: C.red, strokeWidth: 1.2, fill: "none", opacity: 0.6, strokeLinecap: "round",})
+        , React.createElement('path', { d: "M14 12 L20 12"   , stroke: C.red, strokeWidth: 1.2, opacity: 0.6, strokeLinecap: "round",})
+        , React.createElement('path', { d: "M30 12 Q30 22 26 26 L30 26 L30 28 L24 28 L24 26 L26 26"               , stroke: C.red, strokeWidth: 1.2, fill: "none", opacity: 0.6, strokeLinecap: "round",})
+        , React.createElement('path', { d: "M24 12 L30 12"   , stroke: C.red, strokeWidth: 1.2, opacity: 0.6, strokeLinecap: "round",})
+        , React.createElement('path', { d: "M8 36 L36 36"   , stroke: C.ruleWarm, strokeWidth: 1.5, strokeLinecap: "round", opacity: 0.5,})
+        , React.createElement('path', { d: "M28 8 Q38 8 38 16 Q38 22 32 23 L30 28 L27 23 Q22 22 22 16 Q22 8 28 8Z"                     , fill: C.blue, opacity: 0.12, stroke: C.blue, strokeWidth: 1, opacity: 0.4,})
+        , React.createElement('path', { d: "M26 14 L34 14 M26 18 L31 18"       , stroke: C.blue, strokeWidth: 1, opacity: 0.5, strokeLinecap: "round",})
+      ),
+    };
+
+    return illustrations[scenarioId] || (
+      React.createElement('svg', { width: 44, height: 44, viewBox: "0 0 44 44"   ,}
+        , React.createElement('path', { d: "M22 6 C15 6 8 12 8 19 C8 28 22 40 22 40 C22 40 36 28 36 19 C36 12 29 6 22 6Z"                         , fill: C.blue, opacity: 0.15, stroke: C.blue, strokeWidth: 1, opacity: 0.3,})
+        , React.createElement('circle', { cx: 22, cy: 19, r: 5, fill: C.blue, opacity: 0.3,})
       )
     );
   };
@@ -1329,7 +1477,7 @@ function HomeScreen({progress,immersion,userLevel,onSelect,onProfile,onToggleMod
                       },}
                       /* Illustration */
                       , React.createElement('div', { style: {marginBottom:10,display:"flex",justifyContent:"flex-end",opacity:unlocked?1:0.5},}
-                        , React.createElement(PlaceIllustration, { cefrLevel: s.cefrLevel, place: s.place,})
+                        , React.createElement(PlaceIllustration, { scenarioId: s.id, cefrLevel: s.cefrLevel,})
                       )
                       /* Title */
                       , React.createElement('div', { style: {fontFamily:"'DM Serif Text',serif",fontSize:sz(14),
@@ -1415,8 +1563,7 @@ function ScenarioScreen({scenario:s,immersion,ttsEnabled,progress,onComplete,onD
     const nm=[...messages,{role:"user",content:msg}];
     setMessages(nm);setLoading(true);
     try{
-      const isPreA1 = s.cefrLevel === '0';
-      const system = isReturn ? STAR_PROMPT(immersion, currentStars) : TUTOR_PROMPT(immersion, isPreA1);
+      const system = isReturn ? STAR_PROMPT(immersion, currentStars, s.cefrLevel) : TUTOR_PROMPT(immersion, s.cefrLevel);
       const ctrl=new AbortController();
       const timer=setTimeout(()=>ctrl.abort(),30000);
       const r=await fetch(API_BASE+"/chat",{method:"POST",
@@ -2126,7 +2273,7 @@ ${immersion?"All labels in French.":"Instructions in English, French sentences i
       const r=await fetch(API_BASE+"/chat",{method:"POST",
         headers:{"Content-Type":"application/json","X-Session-ID":SESSION_ID},
         body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:250,
-          system:"You are a French teacher correcting a targeted grammar exercise. Topic: "+activeWeakness+". Exercise type: "+(exercise.type==="choice"?"MULTIPLE CHOICE (student writes A, B, or C)":"GAP-FILL (student writes only the missing words)")+". STRICT FORMAT: Start with 'Correct.' or 'Not quite.' (one word decision). Then in ONE sentence: if wrong, give the exact expected answer and the grammar rule behind it. If correct, name the specific rule they applied correctly. End there. Never more than 2 sentences total. No encouragement phrases. "+(immersion?"Respond in French.":"Respond in English."),
+          system:"You are a French teacher correcting a French grammar exercise. Topic: "+activeWeakness+". Exercise type: "+(exercise.type==="choice"?"MULTIPLE CHOICE -- student picks A, B or C":"GAP-FILL -- student writes only the missing words, not full sentences")+". STRICT FORMAT: Line 1 must start with exactly 'Correct!' if right or 'Not quite.' if wrong -- nothing before it. Line 2: if wrong, give the exact expected answer in quotes and the grammar rule in 5 words. If correct, name the exact rule they applied. Max 2 sentences. "+(immersion?"Respond in French. Start with 'Correct !' or 'Pas tout a fait.'":"Respond in English. Start with 'Correct!' or 'Not quite.'"),
           messages:[{role:"user",content:"Exercise: " + exercise.prompt + "\nExpected answers: " + (exercise.example||"not provided") + "\nStudent wrote: " + exerciseAnswer}]})});
       if(!r.ok){setExerciseFeedback(r.status===429||r.status===529?"Too many requests — wait a moment.":r.status===401?"Invalid API key.":"Server error — try again.");setFeedbackLoading(false);return;}
       const d=await r.json();
@@ -2275,7 +2422,7 @@ ${immersion?"All labels in French.":"Instructions in English, French sentences i
           , exerciseFeedback&&(
             React.createElement('div', { style: {animation:"slideUp 0.4s both"},}
               , (()=>{
-                const isCorrect=/^(correct|right|yes|exactement|parfait|bravo|oui|c'est ca|c'est juste|tres bien)/i.test(exerciseFeedback.trim());
+                const isCorrect=/^(correct[.!\s]|right[.!]|yes[.!]|exactement|parfait|bravo|oui[.!]|c'est (ca|juste|correct)|tres bien)/i.test(exerciseFeedback.trim());
                 const borderColor=isCorrect?C.green:C.red;
                 const bgColor=isCorrect?C.greenLight:C.redLight;
                 const labelColor=isCorrect?C.green:C.red;
