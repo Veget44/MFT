@@ -7,16 +7,11 @@
   <meta name="apple-mobile-web-app-capable" content="yes"/>
   <meta name="theme-color" content="#2A2D40"/>
   <title>My French Teacher</title>
-  <style>
-    *{margin:0;padding:0;box-sizing:border-box}
-    html,body,#root{width:100%;height:100%;height:100dvh;overflow:hidden;background:#F2EDE3}
-  </style>
+  <style>*{margin:0;padding:0;box-sizing:border-box}html,body,#root{width:100%;height:100%;height:100dvh;overflow:hidden;background:#F2EDE3}</style>
 </head>
 <body>
   <div id="root"></div>
-  <script>
-    window.MFT_API_BASE = "https://mftbackend-production.up.railway.app";
-  </script>
+  <script>window.MFT_API_BASE="https://mftbackend-production.up.railway.app";</script>
   <script src="https://unpkg.com/react@18.3.1/umd/react.production.min.js" crossorigin></script>
   <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js" crossorigin></script>
   <script>
@@ -188,8 +183,8 @@ const SCENARIOS = [
    scene_en:"9am at Cafe de Flore, one of Paris's most famous cafes. You ordered a black coffee, no sugar -- you're allergic. The waiter just placed a sweetened one in front of you and is already walking away. Other customers are watching.",
    goal_fr:"Rappelez le serveur et expliquez le probleme poliment.",
    goal_en:"Call the waiter back and explain the problem politely.",
-   hint_fr:"Essayez : 'Excusez-moi, monsieur -- j'ai commande un cafe sans sucre et je suis allergique au sucre.'",
-   hint_en:"Try: 'Excusez-moi, monsieur -- j'ai commande un cafe sans sucre et je suis allergique au sucre.'",
+   hint_fr:"Pensez : comment attire-t-on poliment l'attention d'un serveur en France ? Que faut-il expliquer sur votre commande ?",
+   hint_en:"Think: how do you politely get someone's attention in France? What do you need to explain about your order?",
    culture_fr:"En France, on dit 'monsieur' ou 'madame' -- jamais 'garcon'. Ne claquez jamais des doigts.",
    culture_en:"In France, say 'monsieur' or 'madame' -- never 'garcon'. Never snap your fingers to get attention."},
 
@@ -213,8 +208,8 @@ const SCENARIOS = [
    scene_en:"10am. You've had a headache and sore throat since last night, and a slight fever -- 38.2. You're travelling in Paris with no doctor. The pharmacist is available and looks at you kindly. French pharmacists are highly trained and can give real medical guidance.",
    goal_fr:"Decrivez vos symptomes precisement pour obtenir le bon traitement.",
    goal_en:"Describe your symptoms precisely to get the right treatment.",
-   hint_fr:"Essayez : 'J'ai mal a la tete et a la gorge depuis hier soir. J'ai aussi un peu de fievre -- 38 degres.'",
-   hint_en:"Try: 'J'ai mal a la tete et a la gorge depuis hier soir. J'ai aussi un peu de fievre -- 38 degres.'",
+   hint_fr:"Soyez precis(e) : nommez chaque symptome et dites depuis quand. Le pharmacien a besoin de details pour vous aider.",
+   hint_en:"Be specific: name each symptom separately and say when it started. The pharmacist needs details to help you.",
    culture_fr:"Les pharmaciens francais sont d'excellents diagnosticiens de premiere ligne. Soyez precis(e) et ils prendront tres soin de vous.",
    culture_en:"French pharmacists are excellent first-line diagnosticians. Be specific and they'll take excellent care of you."},
 
@@ -225,8 +220,8 @@ const SCENARIOS = [
    scene_en:"12:30am on a Tuesday night. You have an important job interview tomorrow at 8am. Your neighbours have been partying since 10pm -- loud music, laughter. You knocked on the wall. Nothing. You need to knock on their door. You barely know them.",
    goal_fr:"Demandez-leur poliment de baisser le son -- sans creer de conflit.",
    goal_en:"Ask them politely to keep it down -- without creating conflict.",
-   hint_fr:"Commencez par vous excuser de deranger : 'Je suis vraiment desole(e) de vous deranger...' puis expliquez.",
-   hint_en:"Start by apologising for disturbing them: 'Je suis vraiment desole(e) de vous deranger...' then explain.",
+   hint_fr:"En France, la facon dont on commence une demande compte plus que la demande elle-meme. Commencez par la consideration, pas la plainte.",
+   hint_en:"In France, how you start a request matters more than the request itself. Lead with consideration, not complaint.",
    culture_fr:"En France, s'excuser AVANT de faire une demande est presque obligatoire. Ca adoucit tout.",
    culture_en:"In France, apologising BEFORE making a request is almost mandatory. It softens everything."},
 
@@ -238,8 +233,8 @@ const SCENARIOS = [
    scene_en:"Your TGV to Lyon left exactly 2 minutes ago. You ran. The SNCF counter queue is long. The agent who serves you looks tired -- he's seen it all before. Your ticket is non-exchangeable, non-refundable. Your meeting in Lyon is in 3 hours.",
    goal_fr:"Renseignez-vous sur vos options calmement -- sans vous montrer agressif(ve).",
    goal_en:"Ask about your options calmly -- without sounding aggressive or desperate.",
-   hint_fr:"Essayez : 'Bonjour, j'ai rate mon TGV de 14h32 pour Lyon. Est-ce qu'il serait possible d'echanger mon billet ou de prendre le prochain train ?'",
-   hint_en:"Try: 'Bonjour, j'ai rate mon TGV de 14h32 pour Lyon. Est-ce qu'il serait possible d'echanger mon billet ou de prendre le prochain train ?'",
+   hint_fr:"Exposez les faits d'abord, puis proposez une solution. Les agents repondent mieux aux personnes calmes qui ont deja une idee.",
+   hint_en:"State the facts first, then propose a solution. Agents respond better to calm people who already have a plan.",
    culture_fr:"Les agents SNCF gerent des voyageurs frustres toute la journee. Etre calme et solution-oriented fonctionne beaucoup mieux que l'agressivite.",
    culture_en:"SNCF agents deal with frustrated travellers all day. Staying calm and solution-focused works far better than showing frustration."},
 
@@ -250,8 +245,8 @@ const SCENARIOS = [
    scene_en:"You ordered duck confit -- the house speciality. The waiter brings... salmon. You don't eat fish -- allergy. Everyone at your table has already started eating. The restaurant is packed and noisy. The waiter is already gone.",
    goal_fr:"Signalez l'erreur discretement, sans gacher l'ambiance de la table.",
    goal_en:"Correct the mistake discreetly, without spoiling the atmosphere for the whole table.",
-   hint_fr:"Essayez : 'Excusez-moi, je crois qu'il y a une petite erreur -- j'avais commande le confit de canard.'",
-   hint_en:"Try: 'Excusez-moi, je crois qu'il y a une petite erreur -- j'avais commande le confit de canard.'",
+   hint_fr:"Culture francaise : adoucissez toujours une correction avec 'je crois' ou 'il me semble'. Ne presentez jamais une erreur comme un fait.",
+   hint_en:"French culture: always soften a correction with 'je crois' or 'il me semble'. Never state a mistake as a fact.",
    culture_fr:"En France, signalez les erreurs discretement avec un sourire. Un ton leger montre votre bonne volonte et donne envie au serveur de vous aider.",
    culture_en:"In France, flag mistakes quietly with a light tone and a smile. This shows goodwill and makes the waiter want to help you."},
 
@@ -263,8 +258,8 @@ const SCENARIOS = [
    scene_en:"You're returning a rental car at Nice airport. The agent spots a scratch on the front right wing and claims it wasn't there at pickup. You're certain it was already there -- you photographed it at departure with a timestamp.",
    goal_fr:"Contestez la reclamation calmement, en vous appuyant sur vos preuves.",
    goal_en:"Dispute the claim calmly and professionally, backed by your photographic evidence.",
-   hint_fr:"Essayez : 'Je tiens a preciser que cette rayure etait deja presente lors de la prise en charge -- j'en ai la preuve photographique avec horodatage.'",
-   hint_en:"Try: 'Je tiens a preciser que cette rayure etait deja presente lors de la prise en charge -- j'en ai la preuve photographique avec horodatage.'",
+   hint_fr:"Commencez par la preuve, pas par l'emotion. Dans un litige formel en France, les faits parlent plus fort que les sentiments.",
+   hint_en:"Lead with evidence, not emotion. In French formal disputes, facts speak louder than feelings.",
    culture_fr:"Restez factuel(le) et calme. En France, la preuve documentaire est tres respectee. Ne montrez jamais d'emotion -- ca affaiblit votre position.",
    culture_en:"Stay factual and calm. In France, documentary evidence is highly respected. Never show emotion -- it weakens your position."},
 
@@ -275,8 +270,8 @@ const SCENARIOS = [
    scene_en:"You're interviewing for a position at a French company. The recruiter is direct and serious -- she has read your CV carefully. After some standard questions, she asks the hard one: 'Why do you want to work in France rather than your home country?'",
    goal_fr:"Repondez de facon convaincante et personnelle -- pas une reponse apprise par coeur.",
    goal_en:"Answer convincingly and personally -- not a rehearsed speech about loving France.",
-   hint_fr:"Allez au-dela de 'j'aime la France'. Parlez de quelque chose de specifique et personnel : 'Ce qui m'attire particulierement, c'est...'",
-   hint_en:"Go beyond 'I love France'. Talk about something specific and personal: 'Ce qui m'attire particulierement, c'est...'",
+   hint_fr:"Les recruteurs francais se mefient des reponses preparees. Trouvez une vraie raison specifique -- personnelle ou professionnelle -- que personne d'autre ne donnerait.",
+   hint_en:"French interviewers distrust prepared answers. Think of one real, specific reason -- personal or professional -- that no one else would give.",
    culture_fr:"Les recruteurs francais valorisent la substance intellectuelle et l'authenticite. Une reponse vague ne convainc personne.",
    culture_en:"French recruiters value intellectual substance and authenticity above all. A vague or overly enthusiastic answer convinces no one."},
 
@@ -287,8 +282,8 @@ const SCENARIOS = [
    scene_en:"You have an appointment at BNP Paribas to open a bank account. You brought every document on the official checklist. The advisor examines your papers, frowns, and tells you one proof of address is not 'recent' enough -- less than 3 months. Yours is 4 months old. You can't get another one quickly.",
    goal_fr:"Negociez une solution alternative avec le conseiller -- sans perdre patience.",
    goal_en:"Negotiate an alternative solution with the advisor -- without losing patience.",
-   hint_fr:"Essayez : 'Je comprends votre contrainte. Serait-il possible d'utiliser ce document a la place, ou existe-t-il une procedure exceptionnelle ?'",
-   hint_en:"Try: 'Je comprends votre contrainte. Serait-il possible d'utiliser ce document a la place, ou existe-t-il une procedure exceptionnelle ?'",
+   hint_fr:"Ne contestez pas la regle -- proposez une alternative. La bureaucratie francaise a des exceptions, mais il faut les trouver ensemble.",
+   hint_en:"Don't argue the rule -- propose an alternative. French bureaucracy has exceptions, but you have to find them together.",
    culture_fr:"La bureaucratie francaise est reelle mais pas infranchissable. Proposer une alternative legale est plus efficace que de se plaindre.",
    culture_en:"French bureaucracy is real but not immovable. Proposing a concrete legal alternative beats frustration every time."},
 
@@ -300,10 +295,87 @@ const SCENARIOS = [
    scene_en:"You're invited to dinner at a French family's home -- the Moreaus. The evening is pleasant, the wine is good. Then Monsieur Moreau looks you in the eye and asks the question everyone was waiting for: 'So, what do you really think of France?' Silence. Everyone is waiting.",
    goal_fr:"Donnez une reponse honnete, nuancee et culturellement intelligente.",
    goal_en:"Give an honest, nuanced, culturally intelligent answer -- not a polite non-answer.",
-   hint_fr:"Soyez precis(e). Mentionnez une vraie surprise -- bonne ou difficile. Terminez par une question pour relancer la conversation.",
-   hint_en:"Be specific. Mention one real surprise -- good or difficult. End with a question to keep the conversation going.",
+   hint_fr:"Les Francais respectent la nuance plus que la politesse. Dites quelque chose de vrai -- une contradiction que vous avez remarquee, quelque chose qui vous a surpris. Puis retournez la question.",
+   hint_en:"The French respect nuance over politeness. Say something real -- a contradiction you noticed, something that surprised you. Then ask them back.",
    culture_fr:"Les Francais respectent infiniment plus l'honnetete intellectuelle que la politesse de facade. Une reponse nuancee vous fait gagner leur respect.",
    culture_en:"The French respect intellectual honesty far more than polite flattery. A nuanced, specific answer earns their genuine respect."},
+  // -- A2 --
+  {id:11,cefrLevel:"A2",place:"Marche de Provence · Aix-en-Provence",
+   title:"Le prix du melon",titleEn:"The price of the melon",
+   skills:["shopping","negotiation","numbers"],
+   scene_fr:"Il est 10h du matin au marche dominical d'Aix-en-Provence. Un marchand vous interpelle et vous tend une tranche de melon -- delicieux. Vous regardez le prix : 8 euros le kilo. Trop cher pour vous. Il attend votre reaction.",
+   scene_en:"10am at the Sunday market in Aix-en-Provence. A vendor calls out and hands you a slice of melon -- delicious. You look at the price: 8 euros a kilo. Too expensive. He's waiting for your reaction.",
+   goal_fr:"Dire que c'est un peu cher et essayer d'obtenir un meilleur prix ou une plus petite quantite.",
+   goal_en:"Say it's a bit expensive and try to get a better price or a smaller amount.",
+   hint_fr:"Au marche francais, on ne marchande pas agressivement. Un sourire, une explication, une proposition -- la politesse fait tout.",
+   hint_en:"At a French market, don't bargain aggressively. A smile, an explanation, a suggestion -- politeness does everything.",
+   culture_fr:"Complimentez le produit avant de negocier -- les marchands adorent les clients qui s'interessent vraiment a ce qu'ils vendent.",
+   culture_en:"Compliment the product before negotiating -- vendors love customers who genuinely appreciate what they sell."},
+
+  // -- B1 --
+  {id:12,cefrLevel:"B1",place:"Colocation · Bordeaux",
+   title:"Le loyer et la machine",titleEn:"Rent and the washing machine",
+   skills:["housing","conflict resolution"],
+   scene_fr:"Vous partagez un appartement a Bordeaux depuis 2 mois. Votre colocataire Nicolas n'a pas paye sa part du loyer depuis le mois dernier, et la machine a laver est cassee depuis 3 semaines -- il avait promis de la faire reparer. Vous le croisez dans le couloir ce soir.",
+   scene_en:"You've shared a flat in Bordeaux for 2 months. Your flatmate Nicolas hasn't paid his rent share since last month, and the washing machine has been broken for 3 weeks -- he promised to fix it. You run into him in the corridor tonight.",
+   goal_fr:"Aborder les deux problemes clairement et calmement -- ferme mais sans creer de conflit.",
+   goal_en:"Bring up both issues clearly and calmly -- firm enough to be heard, warm enough to keep the peace.",
+   hint_fr:"Utilisez 'je' plutot que 'tu' pour eviter les accusations directes. Abordez un probleme a la fois.",
+   hint_en:"Use 'I feel' rather than 'you always' to avoid direct accusations. Address one issue at a time.",
+   culture_fr:"En France les conflits de colocation se gerent mieux en face a face qu'a l'ecrit -- le ton fait toute la difference.",
+   culture_en:"In France flatmate conflicts are better handled face-to-face than by message -- tone makes all the difference."},
+
+  // -- B1 --
+  {id:13,cefrLevel:"B1",place:"Restaurant gastronomique · Lyon",
+   title:"L'allergie ignoree",titleEn:"The ignored allergy",
+   skills:["assertiveness","formal register","health"],
+   scene_fr:"Vous dinez dans un restaurant gastronomique a Lyon pour un repas d'affaires. Vous aviez signale votre allergie aux fruits de mer lors de la reservation. Le plat arrive -- il contient clairement des crevettes. Votre client en face de vous regarde. Le chef de rang approche.",
+   scene_en:"You're at a gastronomic restaurant in Lyon for a business dinner. You flagged your shellfish allergy when booking. The dish arrives -- it clearly contains shrimp. Your client across the table is watching. The head waiter approaches.",
+   goal_fr:"Signaler le probleme avec fermete et tact dans un contexte formel -- sans faire de scene, sans risquer votre sante.",
+   goal_en:"Flag the problem firmly and tactfully in a formal setting -- without making a scene, without risking your health.",
+   hint_fr:"Dans un restaurant haut de gamme, la fermete s'exprime avec du vocabulaire precis et un ton calme -- jamais avec du volume.",
+   hint_en:"In a high-end restaurant, firmness is expressed with precise vocabulary and a calm tone -- never with volume.",
+   culture_fr:"Adressez-vous directement au chef de rang -- c'est lui le responsable, pas le serveur qui a apporte le plat.",
+   culture_en:"Address the head waiter directly -- they are responsible for everything, not the server who brought the dish."},
+
+  // -- B2 --
+  {id:14,cefrLevel:"B2",place:"Stade de France · Saint-Denis",
+   title:"Le joueur ne parle qu'en francais",titleEn:"The player only speaks French",
+   skills:["journalism","sports French","improvisation"],
+   scene_fr:"Vous etes journaliste sportif pour un media international. La France vient de battre l'Angleterre 3-2. Dans la zone mixte du Stade de France, vous avez 3 minutes avec Karim Benzara, l'attaquant vedette. Il croise les bras : 'Je suis Francais, je parle francais -- point.' Votre redacteur en chef attend l'interview en direct.",
+   scene_en:"You're a sports journalist for an international outlet. France just beat England 3-2. In the mixed zone at the Stade de France, you have 3 minutes with star striker Karim Benzara. He crosses his arms: 'Je suis Francais, je parle francais -- point.' Your editor needs the live interview.",
+   goal_fr:"Conduire l'interview entierement en francais -- poser des questions sur le match, le but decisif, les ambitions. Pas le choix !",
+   goal_en:"Conduct the entire interview in French -- ask about the match, the decisive goal, the team's ambitions. No choice!",
+   hint_fr:"Un bon journaliste pose des questions ouvertes, relance sur les details, reagit aux reponses. Commencez par feliciter.",
+   hint_en:"A good journalist asks open questions, follows up on details, reacts to answers. Start by congratulating him.",
+   culture_fr:"Le football francais est tres attache a la langue francaise. Zidane, Cantona, Pogba -- les grands joueurs ont toujours prefere le francais.",
+   culture_en:"French football is deeply attached to the French language. Zidane, Cantona, Pogba -- the great players always preferred French in interviews."},
+
+  // -- C1 --
+  {id:15,cefrLevel:"C1",place:"France Inter · Studio 105 · Paris",
+   title:"L'invite surprise",titleEn:"The surprise guest",
+   skills:["media French","debate","argumentation"],
+   scene_fr:"Vous etes invite(e) a debattre en direct sur France Inter : 'Les etrangers aiment-ils vraiment la France ou juste l'idee de la France ?' Face a vous, un chroniqueur provocateur qui n'attend qu'une chose : vous faire perdre vos moyens. Les auditeurs votent en direct.",
+   scene_en:"You're invited to debate live on France Inter: 'Do foreigners really love France, or just the idea of France?' Facing you, a provocative commentator just waiting to knock you off balance. Listeners are voting live.",
+   goal_fr:"Defendre votre point de vue avec nuance, humour et precision -- sans vous laisser destabiliser, sans tomber dans le piege de la generalisation.",
+   goal_en:"Defend your point of view with nuance, wit, and precision -- without being destabilised, without falling into generalisation.",
+   hint_fr:"A la radio, la vitesse de la pensee compte autant que la qualite de l'argument. Anticipez la contradiction, utilisez les connecteurs logiques.",
+   hint_en:"On radio, the speed of thought matters as much as the quality of the argument. Anticipate the counterargument, use logical connectors.",
+   culture_fr:"France Inter est l'une des radios les plus ecoutees de France. Le debat public y est un sport national -- ironie et rigueur coexistent.",
+   culture_en:"France Inter is one of France's most listened-to stations. Public debate there is a national sport -- irony and rigour coexist."},
+
+  // -- C1 --
+  {id:16,cefrLevel:"C1",place:"Tribunal de grande instance · Paris",
+   title:"Le temoignage",titleEn:"The testimony",
+   skills:["legal French","precision","formal register"],
+   scene_fr:"Vous avez ete temoin d'un accident de la route. Vous etes convoque(e) au tribunal pour temoigner. L'avocat de la defense vous pose des questions pointues sur ce que vous avez vu -- heure, position, visibilite. Chaque mot compte. La juge ecoute. Le prevenu vous regarde.",
+   scene_en:"You witnessed a road accident. You've been summoned to court to testify. The defence lawyer asks sharp questions about exactly what you saw -- time, position, visibility. Every word counts. The judge is listening. The defendant is watching you.",
+   goal_fr:"Temoigner avec precision et calme -- dire exactement ce que vous avez vu, sans vous laisser manipuler par les questions orientees.",
+   goal_en:"Testify with precision and composure -- say exactly what you saw, no more, no less, without being manipulated by leading questions.",
+   hint_fr:"Un bon temoin dit 'je ne sais pas' quand il ne sait pas. La precision vaut mieux que la confiance. Ne deduisez pas -- decrivez.",
+   hint_en:"A good witness says 'I don't know' when they don't know. Precision beats confidence. Don't deduce -- describe.",
+   culture_fr:"Le systeme judiciaire francais est inquisitoire : le juge est actif. Un vocabulaire juridique precis est indispensable.",
+   culture_en:"The French judicial system is inquisitorial: the judge plays an active role. Precise legal vocabulary is essential."},
 ];
 // -- Copy -
 const T = (imm) => ({
@@ -351,14 +423,21 @@ const T = (imm) => ({
   usefulWords: imm?"Mots utiles":"Useful words",
   starterSentence: imm?"Commencez avec :":"Start with:",
   typeYourAnswer: imm?"Completez et envoyez votre phrase…":"Complete the sentence and send…",
-  bravo: imm?"Bravo.":"Well done.",
+  bravo: imm?"Scenario termine !":"Scenario complete!",
   sceneDone: imm?"Scenario termine":"Scenario complete",
   backToChallenges: imm?"Retour aux defis":"Back to challenges",
   listening: imm?"Je vous ecoute…":"Listening…",
   speakNow: imm?"Parlez maintenant":"Speak now",
   inputHint: imm?"Tout en francais · Entree pour envoyer":"French only · Enter to send",
-  starExplain: imm?["Complete","Retour sans corrections","Niveau superieur"]
-    :["Completed","Returned, no corrections","Above your level"],
+  starExplain: imm?[
+    "Tu as tente le scenario -- c'est le plus important. Reviens pour t'ameliorer.",
+    "Bonne reponse, bon registre. Encore un effort pour la 3eme etoile !",
+    "Excellent ! Niveau superieur au scenario, naturel et fluide. Bravo !"
+  ]:[
+    "You gave it a shot -- that's what matters. Come back to improve!",
+    "Good response, right register. One more push for that third star!",
+    "Excellent! Above the scenario level, natural and fluent. Well done!"
+  ],
   profile: imm?"Mon profil":"My profile",
   done: "Done", left: "Left",
   retakeTest: imm?"↻ Repasser le test":"↻ Retake the test",
@@ -394,63 +473,31 @@ const LEVEL_CONTEXT = {
          fr:"L'eleve est AVANCE (C1). Attendez une quasi-fluidite native, intelligence culturelle, argumentation complexe. Ne commentez que les registres subtils, lacunes idiomatiques ou nuances culturelles."},
 };
 
-const TUTOR_PROMPT = (imm, cefrLevel="A1") => {
+const TUTOR_PROMPT = (imm, cefrLevel="A1", failCount=0) => {
   const isPreA1 = cefrLevel === "0";
   const lvlCtx = LEVEL_CONTEXT[cefrLevel] || LEVEL_CONTEXT["A1"];
-  if(isPreA1) return `You are a warm French teacher running a guided role-play. ${lvlCtx.en}
-If the student asks a grammar or vocabulary question -- answer directly and warmly, never reproach them for asking. Give the answer then a natural sentence starter to continue.
-For scenario responses -- FORMAT: 2 sentences max.
-Sentence 1: Did they attempt the objective? If yes, name exactly what they got right. If no, give the correct phrase in quotes.
-Sentence 2 (only if needed): One tiny correction.
-NEVER: lists, grammar jargon, more than 2 sentences, hollow praise.
-${imm?"Respond in very simple French.":"Respond in English."}`;
-  return imm
-  ? `Tu es prof de francais qui anime un jeu de role. Direct, precis, chaleureux -- jamais de listes.
-CONTEXTE NIVEAU : ${lvlCtx.fr}
-
-GESTION DES QUESTIONS (en anglais ou francais) :
-Les questions de vocabulaire ou grammaire sont les BIENVENUES -- elles montrent de la vraie curiosite. Ne reproche jamais a l'eleve de poser une question.
-Quand l'eleve pose une question (ex: "pourquoi du ?", "comment dit-on X ?", "qu'est-ce que X ?") :
-- Commence par : "Bonne question !" (sincere, pas creux)
-- Explique le point de grammaire clairement en 1 phrase
-- Dis : "Je vais ajouter ca a tes exercices."
-- Donne une amorce naturelle pour reprendre le scenario
-- Sur la TOUTE DERNIERE LIGNE, ajoute ce tag JSON (cache, l'eleve ne le verra pas) : {"grammar":"LABEL"}
-  ou LABEL est le plus proche parmi : "Passe compose vs imparfait" | "Missing articles (le/la/un/une)" | "Subjonctif not triggered" | "Word order in questions" | "Wrong register (too informal)" | "Natural word order" | "Past tenses" | ou un label court de 3 mots decrivant le point specifique
-Exemple : l'eleve demande "pourquoi du ?" ->
-"Bonne question ! Du = de + le, s'utilise avec les noms masculins indenombrables -- sucre, cafe, pain. Je vais ajouter ca a tes exercices. Essaie maintenant : Excusez-moi monsieur, il y a du sucre dans mon cafe...
-{"grammar":"Missing articles (le/la/un/une)"}"
-
-Pour les reponses normales au scenario, FORMAT STRICT -- 2-3 phrases courtes :
-Ph1: L'eleve a-t-il repondu a l'objectif ? Oui -> dis ce qui marche. Non -> redirige avec la phrase correcte.
-Ph2: Si erreur inadequate pour son niveau : UNE correction + regle en 5 mots. Sinon passe.
-Ph3 (optionnelle): Question naturelle pour relancer la conversation.
-JAMAIS : listes, points, plus de 3 phrases, "c'est parfait", reprocher l'utilisation de l'anglais.
-Reponds en francais.`
-  : `You are a French teacher running a role-play scenario. Direct, precise, warm -- no hollow praise, no lists.
-LEVEL CONTEXT: ${lvlCtx.en}
-
-HANDLING QUESTIONS (any language):
-Questions about vocabulary or grammar are WELCOME -- they show real curiosity. Never reproach a student for asking.
-When the student asks a grammar/vocab question (e.g. "why du?", "how do I say X?", "what does X mean?"):
-- Start with: "Great question!" (genuine, not hollow)
-- Explain the grammar point clearly in 1 sentence
-- Say: "I'll add this to your practice exercises."
-- Give a natural sentence starter to continue the scenario
-- On the VERY LAST LINE, add this JSON tag (hidden, student won't see it): {"grammar":"LABEL"}
-  where LABEL is the closest match from: "Passe compose vs imparfait" | "Missing articles (le/la/un/une)" | "Subjonctif not triggered" | "Word order in questions" | "Wrong register (too informal)" | "Natural word order" | "Past tenses" | or a short 3-word label describing the specific point
-Example: Student asks "why du?" ->
-"Great question! Du = de + le, used with masculine uncountable nouns -- sucre, cafe, pain. I'll add this to your practice exercises. Now try: Excusez-moi monsieur, il y a du sucre dans mon cafe...
-{"grammar":"Missing articles (le/la/un/une)"}"
-
-For normal scenario responses, use STRICT FORMAT -- 2-3 short sentences:
-S1: Did the student address the objective? Yes -> name what works. No -> redirect with the correct phrase in quotes.
-S2: If grammar/vocab error for their level: ONE correct alternative in quotes + rule in 5 words. Otherwise skip.
-S3 (optional): A natural follow-up question to keep the conversation going.
-NEVER: lists, bullet points, more than 3 sentences, "great job", "well done", reproaching English use.
-Respond in English.`;
+  const lang = imm ? "Reponds UNIQUEMENT en francais -- meme si l'eleve ecrit en anglais." : "Respond ONLY in English -- even if the student writes in French.";
+  const giveModel = failCount >= 3;
+  const modelInstr = giveModel
+    ? (imm ? "IMPORTANT : L'eleve a echoue plusieurs fois. DONNE-LUI LA PHRASE COMPLETE CORRECTE entre guillemets, explique pourquoi en 1 phrase, invite-le a la reproduire."
+           : "IMPORTANT: The student has failed several times. GIVE THE COMPLETE CORRECT PHRASE in quotes, explain why in 1 sentence, invite them to reproduce it.")
+    : "";
+  const qBlock = imm
+    ? `QUESTIONS (toute langue) : Bienvenues ! Ne reproche jamais. Si question grammaire/vocab : "Bonne question !", explique, "Je vais ajouter ca a tes exercices.", amorce pour reprendre. Derniere ligne : {"grammar":"LABEL"}`
+    : `QUESTIONS (any language): Always welcome! Never reproach. If grammar/vocab question: "Great question!", explain, "I'll add this to your exercises.", starter to continue. Last line: {"grammar":"LABEL"}`;
+  const sBlock = imm
+    ? `Tu es prof de francais ET tu joues le personnage du scenario (serveur, boulanger, agent SNCF...). Reponds d'abord brievement comme le personnage, puis donne ton feedback de prof.
+NIVEAU : ${lvlCtx.fr}
+${modelInstr}
+FORMAT : 2-3 phrases. Ph1: objectif atteint ? Oui->ce qui marche. Non->phrase correcte entre guillemets. Ph2: UNE correction si erreur. Ph3 optionnelle : question de relance.
+JAMAIS : listes, "c'est parfait", reproches.`
+    : `You are a French teacher AND you play the scenario character (waiter, baker, SNCF agent...). First respond briefly as the character, then give teacher feedback.
+LEVEL: ${lvlCtx.en}
+${modelInstr}
+FORMAT: 2-3 sentences. S1: objective met? Yes->name what works. No->correct phrase in quotes. S2: ONE correction if needed. S3 optional: follow-up question.
+NEVER: lists, hollow praise, reproaching language use.`;
+  return qBlock + "\n\n" + sBlock + "\n" + lang;
 }
-
 const PLACEMENT_PROMPT = (imm) => imm
   ? `Tu évalues le niveau CECR d'un apprenant. Réponds UNIQUEMENT avec du JSON valide, sans markdown, sans texte avant ou après.
 Format exact : {"level":"A1","explanation":"Phrase courte directe.","focus":"Un conseil actionnable."}
@@ -461,27 +508,24 @@ Exact format: {"level":"A1","explanation":"Short direct sentence.","focus":"One 
 Levels: A1=beginner, A2=elementary, B1=intermediate, B2=upper-intermediate, C1=advanced.
 Be generous -- it's better to slightly overestimate than to discourage.`;
 
-// -- Star analysis prompt 
-// After a return visit, ask the tutor to evaluate if it deserves star 2 or 3
+// -- Star analysis prompt
 const STAR_PROMPT = (imm, currentStars, cefrLevel="A1") => {
   const lvlCtx = LEVEL_CONTEXT[cefrLevel] || LEVEL_CONTEXT["A1"];
+  const lang = imm ? "Reponds UNIQUEMENT en francais." : "Respond ONLY in English.";
   return imm
-  ? `Tu es prof de francais. L'eleve refait un scenario (actuellement ${currentStars} etoile(s)).
-CONTEXTE NIVEAU : ${lvlCtx.fr}
-Donne ton feedback en 2-3 phrases max, adapte a son niveau.
-PUIS sur la toute derniere ligne, ecris UNIQUEMENT ce JSON :
-{"stars":1}  ou  {"stars":2}  ou  {"stars":3}
-Criteres adaptes au niveau : 1 = erreurs notables pour ce niveau, 2 = correct et approprie, 3 = au-dessus du niveau attendu et naturel.
-Reponds en francais.`
-  : `You are a French teacher. The student is replaying a scenario (currently ${currentStars} star(s)).
-LEVEL CONTEXT: ${lvlCtx.en}
-Give your feedback in 2-3 sentences max, calibrated to their level.
-THEN on the very last line write ONLY this JSON:
-{"stars":1}  or  {"stars":2}  or  {"stars":3}
-Level-calibrated criteria: 1 = notable errors for this level, 2 = correct and appropriate, 3 = above expected level and natural.
-Respond in English.`;
+  ? `Tu es professeur de francais. L'eleve vient de refaire un scenario (${currentStars} etoile(s) avant).
+NIVEAU : ${lvlCtx.fr}
+Donne un feedback personnel et honnete en 2-3 phrases. Cite un exemple precis.
+PUIS sur la TOUTE DERNIERE LIGNE uniquement : {"stars":1} ou {"stars":2} ou {"stars":3}
+Criteres : 1=erreurs notables->encourage+conseille. 2=correct et approprie->felicite+suggere amelioration. 3=au-dessus du niveau->explique pourquoi excellent+prochaine etape.
+${lang}`
+  : `You are a French teacher. The student just replayed a scenario (${currentStars} star(s) before).
+LEVEL: ${lvlCtx.en}
+Give personal, honest feedback in 2-3 sentences. Cite a specific example.
+THEN on the VERY LAST LINE only: {"stars":1} or {"stars":2} or {"stars":3}
+Criteria: 1=notable errors->encourage+advise. 2=correct and appropriate->congratulate+suggest one improvement. 3=above level->explain exactly why excellent+next step.
+${lang}`;
 }
-
 // -- Diagnostic extraction prompt --
 const DIAG_PROMPT = `Analyse a French learner response. Return ONLY valid JSON, no markdown.
 {"errors":["label1","label2"],"strengths":["label1"],"note":"one observation, max 10 words"}
@@ -1203,269 +1247,332 @@ function HomeScreen({progress,immersion,userLevel,onSelect,onProfile,onToggleMod
   })).filter(g=>g.scenarios.length>0);
 
   // Tiny SVG illustrations per place type
-  // Unique rich illustrations per scenario -- 80x80, colored scenes
+  // Unique rich illustrations -- pure SVG shapes only, no text/entities
   const PlaceIllustration = ({scenarioId}) => {
-    const W=80,H=80;
     const il = {
 
-      // 101 - Bonjour: sunny cafe facade with awning
-      101: React.createElement('svg', { width: W, height: H, viewBox: "0 0 80 80"   ,}
-        , React.createElement('rect', { x: 8, y: 28, width: 64, height: 44, rx: 3, fill: "#F5E6C8",})
-        , React.createElement('rect', { x: 8, y: 28, width: 64, height: 12, fill: "#002395",})
-        , React.createElement('path', { d: "M8 28 Q20 22 32 28 Q44 22 56 28 Q68 22 72 28"             , stroke: "#ED2939", strokeWidth: 3, fill: "none", strokeLinecap: "round",})
-        , React.createElement('rect', { x: 16, y: 44, width: 18, height: 22, rx: 2, fill: "#85B7EB", opacity: 0.7,})
-        , React.createElement('rect', { x: 46, y: 44, width: 18, height: 22, rx: 2, fill: "#85B7EB", opacity: 0.7,})
-        , React.createElement('line', { x1: 25, y1: 44, x2: 25, y2: 66, stroke: "#5A8FBB", strokeWidth: 0.8,})
-        , React.createElement('line', { x1: 55, y1: 44, x2: 55, y2: 66, stroke: "#5A8FBB", strokeWidth: 0.8,})
-        , React.createElement('rect', { x: 33, y: 52, width: 14, height: 18, rx: 1, fill: "#C4955A",})
-        , React.createElement('circle', { cx: 64, cy: 18, r: 8, fill: "#F5C518", opacity: 0.9,})
-        , React.createElement('path', { d: "M64 10 L64 8 M72 18 L74 18 M64 26 L64 28 M56 18 L54 18"               , stroke: "#E8A800", strokeWidth: 1.5, strokeLinecap: "round",})
-        , React.createElement('circle', { cx: 40, cy: 36, r: 2, fill: "white", opacity: 0.8,})
-        , React.createElement('circle', { cx: 48, cy: 34, r: 1.5, fill: "white", opacity: 0.6,})
+      // 101 - Cafe: facade with awning stripes + cup
+      101:React.createElement('svg', { width: "80", height: "80", viewBox: "0 0 80 80"   ,}
+        , React.createElement('rect', { x: "4", y: "26", width: "58", height: "46", rx: "3", fill: "#F5E6C8",})
+        , React.createElement('rect', { x: "4", y: "26", width: "58", height: "12", fill: "#002395",})
+        , React.createElement('path', { d: "M4 26 Q13 20 22 26 Q31 20 40 26 Q49 20 58 26"             , stroke: "#ED2939", strokeWidth: "3", fill: "none", strokeLinecap: "round",})
+        , React.createElement('rect', { x: "10", y: "42", width: "14", height: "22", rx: "2", fill: "#85B7EB", opacity: "0.75",})
+        , React.createElement('rect', { x: "34", y: "42", width: "14", height: "22", rx: "2", fill: "#85B7EB", opacity: "0.75",})
+        , React.createElement('rect', { x: "22", y: "52", width: "10", height: "12", rx: "1", fill: "#8B4513", opacity: "0.7",})
+        , React.createElement('ellipse', { cx: "68", cy: "40", rx: "9", ry: "9", fill: "#F5C518", opacity: "0.9",})
+        , React.createElement('line', { x1: "68", y1: "30", x2: "68", y2: "28", stroke: "#E8A800", strokeWidth: "2", strokeLinecap: "round",})
+        , React.createElement('line', { x1: "77", y1: "40", x2: "79", y2: "40", stroke: "#E8A800", strokeWidth: "2", strokeLinecap: "round",})
+        , React.createElement('line', { x1: "68", y1: "50", x2: "68", y2: "52", stroke: "#E8A800", strokeWidth: "2", strokeLinecap: "round",})
+        , React.createElement('line', { x1: "59", y1: "40", x2: "57", y2: "40", stroke: "#E8A800", strokeWidth: "2", strokeLinecap: "round",})
+        , React.createElement('ellipse', { cx: "38", cy: "70", rx: "10", ry: "3", fill: "#2A1810",})
+        , React.createElement('path', { d: "M28 58 Q28 70 38 70 Q48 70 48 58"         , fill: "#F2EDE3", stroke: "#C4955A", strokeWidth: "1.2",})
+        , React.createElement('ellipse', { cx: "38", cy: "58", rx: "10", ry: "3", fill: "#2A1810",})
+        , React.createElement('path', { d: "M44 58 Q48 58 48 63 Q48 68 44 68"         , stroke: "#C4955A", strokeWidth: "1.5", fill: "none", strokeLinecap: "round",})
       ),
 
-      // 102 - I'm hungry: restaurant table with menu
-      102: React.createElement('svg', { width: W, height: H, viewBox: "0 0 80 80"   ,}
-        , React.createElement('rect', { x: 4, y: 50, width: 72, height: 6, rx: 2, fill: "#C4955A",})
-        , React.createElement('rect', { x: 10, y: 52, width: 8, height: 20, rx: 1, fill: "#A0784A",})
-        , React.createElement('rect', { x: 62, y: 52, width: 8, height: 20, rx: 1, fill: "#A0784A",})
-        , React.createElement('ellipse', { cx: 40, cy: 50, rx: 36, ry: 4, fill: "#D4A870", opacity: 0.5,})
-        , React.createElement('rect', { x: 28, y: 28, width: 24, height: 22, rx: 2, fill: "#F2EDE3", stroke: "#C4955A", strokeWidth: 1,})
-        , React.createElement('rect', { x: 28, y: 28, width: 24, height: 5, rx: 2, fill: "#002395",})
-        , React.createElement('rect', { x: 32, y: 36, width: 8, height: 1.5, rx: 0.75, fill: "#888", opacity: 0.6,})
-        , React.createElement('rect', { x: 32, y: 39, width: 12, height: 1.5, rx: 0.75, fill: "#888", opacity: 0.5,})
-        , React.createElement('rect', { x: 32, y: 42, width: 10, height: 1.5, rx: 0.75, fill: "#888", opacity: 0.4,})
-        , React.createElement('circle', { cx: 18, cy: 42, r: 7, fill: "white", stroke: "#DDD", strokeWidth: 0.8,})
-        , React.createElement('ellipse', { cx: 18, cy: 42, rx: 5, ry: 5, fill: "#F5E6C8",})
-        , React.createElement('path', { d: "M14 50 L18 72"   , stroke: "#888", strokeWidth: 1, strokeLinecap: "round",})
-        , React.createElement('ellipse', { cx: 18, cy: 72, rx: 5, ry: 1.5, fill: "#888", opacity: 0.3,})
-        , React.createElement('circle', { cx: 62, cy: 42, r: 7, fill: "white", stroke: "#DDD", strokeWidth: 0.8,})
-        , React.createElement('rect', { x: 58, y: 30, width: 1.5, height: 22, rx: 0.75, fill: "#888",})
-        , React.createElement('rect', { x: 62, y: 30, width: 1.5, height: 22, rx: 0.75, fill: "#888",})
-        , React.createElement('path', { d: "M58 30 Q60 26 64 30"     , stroke: "#888", strokeWidth: 1, fill: "none",})
+      // 102 - Restaurant: table with plate and fork+knife
+      102:React.createElement('svg', { width: "80", height: "80", viewBox: "0 0 80 80"   ,}
+        , React.createElement('rect', { x: "4", y: "52", width: "72", height: "5", rx: "2", fill: "#C4955A",})
+        , React.createElement('ellipse', { cx: "40", cy: "52", rx: "36", ry: "3.5", fill: "#D4A870", opacity: "0.5",})
+        , React.createElement('rect', { x: "12", y: "54", width: "6", height: "20", rx: "1", fill: "#A0784A",})
+        , React.createElement('rect', { x: "62", y: "54", width: "6", height: "20", rx: "1", fill: "#A0784A",})
+        , React.createElement('circle', { cx: "40", cy: "38", r: "16", fill: "white", stroke: "#E0D8CC", strokeWidth: "1.5",})
+        , React.createElement('circle', { cx: "40", cy: "38", r: "12", fill: "#FFF8F0",})
+        , React.createElement('ellipse', { cx: "40", cy: "38", rx: "7", ry: "5", fill: "#E8906A", opacity: "0.8",})
+        , React.createElement('path', { d: "M36 34 Q40 32 44 34 Q46 38 44 42 Q40 44 36 42 Q34 38 36 34Z"                 , fill: "#C4703A", opacity: "0.5",})
+        , React.createElement('line', { x1: "20", y1: "26", x2: "20", y2: "48", stroke: "#888", strokeWidth: "1.5", strokeLinecap: "round",})
+        , React.createElement('path', { d: "M18 26 L18 34 Q20 36 22 34 L22 26"         , stroke: "#888", strokeWidth: "1", fill: "none", strokeLinecap: "round",})
+        , React.createElement('line', { x1: "60", y1: "26", x2: "60", y2: "48", stroke: "#888", strokeWidth: "1.5", strokeLinecap: "round",})
+        , React.createElement('line', { x1: "58", y1: "26", x2: "58", y2: "36", stroke: "#888", strokeWidth: "1", strokeLinecap: "round",})
+        , React.createElement('line', { x1: "62", y1: "26", x2: "62", y2: "36", stroke: "#888", strokeWidth: "1", strokeLinecap: "round",})
       ),
 
-      // 103 - Where is: cobblestone street with signpost
-      103: React.createElement('svg', { width: W, height: H, viewBox: "0 0 80 80"   ,}
-        , React.createElement('rect', { x: 0, y: 0, width: 80, height: 80, rx: 4, fill: "#87CEEB", opacity: 0.3,})
-        , React.createElement('rect', { x: 0, y: 48, width: 80, height: 32, fill: "#9B8E7A",})
-        , React.createElement('rect', { x: 10, y: 48, width: 12, height: 5, rx: 1, fill: "#7A6E5A",})
-        , React.createElement('rect', { x: 26, y: 50, width: 10, height: 3, rx: 1, fill: "#7A6E5A",})
-        , React.createElement('rect', { x: 40, y: 48, width: 14, height: 5, rx: 1, fill: "#7A6E5A",})
-        , React.createElement('rect', { x: 58, y: 50, width: 12, height: 3, rx: 1, fill: "#7A6E5A",})
-        , React.createElement('rect', { x: 36, y: 10, width: 3, height: 42, fill: "#888",})
-        , React.createElement('rect', { x: 24, y: 16, width: 26, height: 12, rx: 2, fill: "#002395",})
-        , React.createElement('text', { x: 37, y: 25, textAnchor: "middle", fill: "white", fontSize: "7", fontFamily: "sans-serif",}, "GARE")
-        , React.createElement('path', { d: "M24 22 L18 22"   , stroke: "#002395", strokeWidth: 2, fill: "none", markerEnd: "url(#a103)",})
-        , React.createElement('rect', { x: 30, y: 30, width: 20, height: 10, rx: 2, fill: "#ED2939",})
-        , React.createElement('text', { x: 40, y: 38, textAnchor: "middle", fill: "white", fontSize: "6", fontFamily: "sans-serif",}, "METRO")
-        , React.createElement('path', { d: "M50 35 L56 35"   , stroke: "#ED2939", strokeWidth: 2, fill: "none",})
-        , React.createElement('rect', { x: 16, y: 20, width: 14, height: 30, rx: 1, fill: "#F5E6C8", stroke: "#C4955A", strokeWidth: 0.8,})
-        , React.createElement('rect', { x: 16, y: 20, width: 14, height: 6, fill: "#002395", rx: 1,})
-        , React.createElement('rect', { x: 52, y: 24, width: 14, height: 24, rx: 1, fill: "#F5E6C8", stroke: "#C4955A", strokeWidth: 0.8,})
-        , React.createElement('circle', { cx: 60, cy: 14, r: 6, fill: "#F5C518", opacity: 0.8,})
+      // 103 - Street: cobblestones + direction signpost
+      103:React.createElement('svg', { width: "80", height: "80", viewBox: "0 0 80 80"   ,}
+        , React.createElement('rect', { x: "0", y: "0", width: "80", height: "80", fill: "#87CEEB", opacity: "0.25",})
+        , React.createElement('rect', { x: "0", y: "54", width: "80", height: "26", fill: "#9B8E7A",})
+        , React.createElement('ellipse', { cx: "15", cy: "54", rx: "8", ry: "3", fill: "#7A6E5A",})
+        , React.createElement('ellipse', { cx: "35", cy: "56", rx: "7", ry: "2.5", fill: "#7A6E5A",})
+        , React.createElement('ellipse', { cx: "55", cy: "54", rx: "9", ry: "3", fill: "#7A6E5A",})
+        , React.createElement('ellipse', { cx: "70", cy: "57", rx: "6", ry: "2", fill: "#7A6E5A",})
+        , React.createElement('rect', { x: "38", y: "10", width: "4", height: "48", fill: "#777",})
+        , React.createElement('rect', { x: "20", y: "16", width: "28", height: "12", rx: "2", fill: "#002395",})
+        , React.createElement('path', { d: "M20 22 L14 22"   , stroke: "#002395", strokeWidth: "2.5", strokeLinecap: "round",})
+        , React.createElement('path', { d: "M14 18 L9 22 L14 26"     , stroke: "#002395", strokeWidth: "2.5", fill: "none", strokeLinejoin: "round", strokeLinecap: "round",})
+        , React.createElement('rect', { x: "32", y: "30", width: "22", height: "10", rx: "2", fill: "#ED2939",})
+        , React.createElement('path', { d: "M54 35 L60 35"   , stroke: "#ED2939", strokeWidth: "2.5", strokeLinecap: "round",})
+        , React.createElement('path', { d: "M60 31 L65 35 L60 39"     , stroke: "#ED2939", strokeWidth: "2.5", fill: "none", strokeLinejoin: "round", strokeLinecap: "round",})
+        , React.createElement('circle', { cx: "18", cy: "8", r: "7", fill: "#F5C518", opacity: "0.85",})
+        , React.createElement('circle', { cx: "62", cy: "46", r: "5", fill: "#F5C518", opacity: "0.5",})
       ),
 
-      // 1 - Sugar in coffee: elegant cafe table, coffee cup
-      1: React.createElement('svg', { width: W, height: H, viewBox: "0 0 80 80"   ,}
-        , React.createElement('rect', { x: 0, y: 0, width: 80, height: 80, rx: 4, fill: "#1A1D2E", opacity: 0.05,})
-        , React.createElement('ellipse', { cx: 40, cy: 72, rx: 32, ry: 4, fill: "#C4955A", opacity: 0.3,})
-        , React.createElement('rect', { x: 10, y: 60, width: 60, height: 6, rx: 2, fill: "#C4955A",})
-        , React.createElement('ellipse', { cx: 40, cy: 60, rx: 30, ry: 3, fill: "#D4A870", opacity: 0.5,})
-        , React.createElement('ellipse', { cx: 40, cy: 44, rx: 18, ry: 4, fill: "#D4A870",})
-        , React.createElement('path', { d: "M22 44 Q22 62 40 62 Q58 62 58 44"         , fill: "#F2EDE3", stroke: "#C4955A", strokeWidth: 1,})
-        , React.createElement('ellipse', { cx: 40, cy: 44, rx: 18, ry: 4, fill: "#2A1810",})
-        , React.createElement('ellipse', { cx: 40, cy: 43, rx: 14, ry: 2.5, fill: "#3D2010",})
-        , React.createElement('path', { d: "M58 50 Q66 50 66 56 Q66 62 58 62"         , stroke: "#C4955A", strokeWidth: 2, fill: "none", strokeLinecap: "round",})
-        , React.createElement('ellipse', { cx: 40, cy: 68, rx: 22, ry: 2.5, fill: "#C4955A", opacity: 0.4,})
-        , React.createElement('path', { d: "M34 44 Q34 36 38 30"     , stroke: "#CCC", strokeWidth: 1, fill: "none", opacity: 0.5, strokeLinecap: "round",})
-        , React.createElement('path', { d: "M40 44 Q40 34 44 28"     , stroke: "#CCC", strokeWidth: 1, fill: "none", opacity: 0.4, strokeLinecap: "round",})
-        , React.createElement('circle', { cx: 60, cy: 30, r: 8, fill: "#ED2939", opacity: 0.2, stroke: "#ED2939", strokeWidth: 1.5, opacity: 0.6,})
-        , React.createElement('path', { d: "M57 27 L63 33 M63 27 L57 33"       , stroke: "#ED2939", strokeWidth: 2, strokeLinecap: "round",})
-        , React.createElement('text', { x: 60, y: 18, textAnchor: "middle", fill: "#ED2939", fontSize: "7", fontFamily: "sans-serif", opacity: 0.8,}, "!")
+      // 1 - Sugar/coffee: espresso cup with X mark for allergy
+      1:React.createElement('svg', { width: "80", height: "80", viewBox: "0 0 80 80"   ,}
+        , React.createElement('ellipse', { cx: "36", cy: "72", rx: "24", ry: "4", fill: "#C4955A", opacity: "0.3",})
+        , React.createElement('rect', { x: "10", y: "58", width: "52", height: "6", rx: "2", fill: "#C4955A",})
+        , React.createElement('ellipse', { cx: "36", cy: "58", rx: "26", ry: "3.5", fill: "#D4A870", opacity: "0.5",})
+        , React.createElement('path', { d: "M14 46 Q14 62 36 64 Q58 62 58 46"         , fill: "#F2EDE3", stroke: "#C4955A", strokeWidth: "1.2",})
+        , React.createElement('ellipse', { cx: "36", cy: "46", rx: "22", ry: "5", fill: "#1A0800",})
+        , React.createElement('ellipse', { cx: "36", cy: "45", rx: "18", ry: "3.5", fill: "#2D1000",})
+        , React.createElement('path', { d: "M58 52 Q68 52 68 58 Q68 64 58 64"         , stroke: "#C4955A", strokeWidth: "2", fill: "none", strokeLinecap: "round",})
+        , React.createElement('path', { d: "M28 46 Q28 36 32 30"     , stroke: "#CCC", strokeWidth: "1.2", fill: "none", opacity: "0.6", strokeLinecap: "round",})
+        , React.createElement('path', { d: "M36 46 Q36 34 40 28"     , stroke: "#CCC", strokeWidth: "1", fill: "none", opacity: "0.4", strokeLinecap: "round",})
+        , React.createElement('circle', { cx: "62", cy: "22", r: "12", fill: "#ED2939", opacity: "0.15", stroke: "#ED2939", strokeWidth: "2",})
+        , React.createElement('line', { x1: "57", y1: "17", x2: "67", y2: "27", stroke: "#ED2939", strokeWidth: "2.5", strokeLinecap: "round",})
+        , React.createElement('line', { x1: "67", y1: "17", x2: "57", y2: "27", stroke: "#ED2939", strokeWidth: "2.5", strokeLinecap: "round",})
       ),
 
-      // 2 - Last baguette: bakery with bread
-      2: React.createElement('svg', { width: W, height: H, viewBox: "0 0 80 80"   ,}
-        , React.createElement('rect', { x: 2, y: 14, width: 76, height: 58, rx: 3, fill: "#F5E6C8",})
-        , React.createElement('rect', { x: 2, y: 14, width: 76, height: 16, fill: "#8B4513", opacity: 0.8,})
-        , React.createElement('text', { x: 40, y: 26, textAnchor: "middle", fill: "#F5C518", fontSize: "9", fontFamily: "serif", fontStyle: "italic",}, "Boulangerie")
-        , React.createElement('rect', { x: 10, y: 34, width: 22, height: 32, rx: 2, fill: "#87CEEB", opacity: 0.6, stroke: "#5A8FBB", strokeWidth: 0.8,})
-        , React.createElement('rect', { x: 48, y: 34, width: 22, height: 32, rx: 2, fill: "#87CEEB", opacity: 0.6, stroke: "#5A8FBB", strokeWidth: 0.8,})
-        , React.createElement('rect', { x: 32, y: 46, width: 16, height: 20, rx: 1, fill: "#8B4513", opacity: 0.7,})
-        , React.createElement('path', { d: "M12 58 Q40 48 68 56"     , stroke: "#E8C98A", strokeWidth: 8, strokeLinecap: "round", fill: "none",})
-        , React.createElement('path', { d: "M12 58 Q40 48 68 56"     , stroke: "#C4955A", strokeWidth: 8, strokeLinecap: "round", fill: "none", opacity: 0.5,})
-        , React.createElement('path', { d: "M20 56 L24 60 M30 53 L34 57 M40 51 L44 55 M50 52 L54 56 M60 54 L64 58"                   , stroke: "#A0784A", strokeWidth: 1, strokeLinecap: "round", opacity: 0.6,})
-        , React.createElement('circle', { cx: 40, cy: 56, r: 3, fill: "#F5C518", opacity: 0.9,})
+      // 2 - Baguette: long golden loaf with scoring marks
+      2:React.createElement('svg', { width: "80", height: "80", viewBox: "0 0 80 80"   ,}
+        , React.createElement('ellipse', { cx: "40", cy: "72", rx: "30", ry: "4", fill: "#888", opacity: "0.12",})
+        , React.createElement('ellipse', { cx: "8", cy: "44", rx: "8", ry: "5", fill: "#C4955A",})
+        , React.createElement('path', { d: "M6 40 Q10 34 40 30 Q70 26 76 38 Q78 46 74 50 Q44 56 10 52 Q4 48 6 40Z"                     , fill: "#E8C98A",})
+        , React.createElement('path', { d: "M6 40 Q10 34 40 30 Q70 26 76 38"         , stroke: "#C4955A", strokeWidth: "1", fill: "none", opacity: "0.6",})
+        , React.createElement('ellipse', { cx: "72", cy: "44", rx: "8", ry: "5", fill: "#C4955A",})
+        , React.createElement('line', { x1: "18", y1: "32", x2: "16", y2: "50", stroke: "#B8844A", strokeWidth: "1.2", opacity: "0.5", strokeLinecap: "round",})
+        , React.createElement('line', { x1: "28", y1: "30", x2: "26", y2: "48", stroke: "#B8844A", strokeWidth: "1.2", opacity: "0.5", strokeLinecap: "round",})
+        , React.createElement('line', { x1: "38", y1: "30", x2: "36", y2: "48", stroke: "#B8844A", strokeWidth: "1.2", opacity: "0.5", strokeLinecap: "round",})
+        , React.createElement('line', { x1: "48", y1: "30", x2: "46", y2: "48", stroke: "#B8844A", strokeWidth: "1.2", opacity: "0.5", strokeLinecap: "round",})
+        , React.createElement('line', { x1: "58", y1: "30", x2: "56", y2: "48", stroke: "#B8844A", strokeWidth: "1.2", opacity: "0.5", strokeLinecap: "round",})
+        , React.createElement('line', { x1: "68", y1: "32", x2: "66", y2: "48", stroke: "#B8844A", strokeWidth: "1.2", opacity: "0.5", strokeLinecap: "round",})
+        , React.createElement('ellipse', { cx: "40", cy: "40", rx: "34", ry: "10", fill: "#F5D880", opacity: "0.3",})
       ),
 
-      // 3 - Pharmacy: green cross, pills, caring hands
-      3: React.createElement('svg', { width: W, height: H, viewBox: "0 0 80 80"   ,}
-        , React.createElement('rect', { x: 4, y: 4, width: 72, height: 72, rx: 6, fill: "#EBF4E8",})
-        , React.createElement('rect', { x: 30, y: 14, width: 20, height: 52, rx: 6, fill: "#2D6B2B",})
-        , React.createElement('rect', { x: 14, y: 30, width: 52, height: 20, rx: 6, fill: "#2D6B2B",})
-        , React.createElement('rect', { x: 30, y: 14, width: 20, height: 52, rx: 6, fill: "#2D6B2B", opacity: 0.7,})
-        , React.createElement('ellipse', { cx: 22, cy: 60, rx: 7, ry: 4, fill: "white", stroke: "#2D6B2B", strokeWidth: 1,})
-        , React.createElement('rect', { x: 22, y: 56, width: 0.5, height: 8, stroke: "#2D6B2B", strokeWidth: 1,})
-        , React.createElement('ellipse', { cx: 58, cy: 55, rx: 5, ry: 8, fill: "white", stroke: "#2D6B2B", strokeWidth: 1, transform: "rotate(-30 58 55)"  ,})
-        , React.createElement('rect', { x: 55, y: 50, width: 6, height: 1, fill: "#2D6B2B", transform: "rotate(-30 58 55)"  ,})
-        , React.createElement('circle', { cx: 20, cy: 22, r: 5, fill: "white", stroke: "#2D6B2B", strokeWidth: 1,})
-        , React.createElement('path', { d: "M17 22 L23 22 M20 19 L20 25"       , stroke: "#2D6B2B", strokeWidth: 1.5, strokeLinecap: "round",})
+      // 3 - Pharmacy: green cross + pill capsules
+      3:React.createElement('svg', { width: "80", height: "80", viewBox: "0 0 80 80"   ,}
+        , React.createElement('rect', { x: "4", y: "4", width: "72", height: "72", rx: "8", fill: "#EBF4E8",})
+        , React.createElement('rect', { x: "28", y: "12", width: "24", height: "56", rx: "12", fill: "#2D6B2B",})
+        , React.createElement('rect', { x: "12", y: "28", width: "56", height: "24", rx: "12", fill: "#2D6B2B",})
+        , React.createElement('rect', { x: "28", y: "12", width: "24", height: "56", rx: "12", fill: "white", opacity: "0.25",})
+        , React.createElement('ellipse', { cx: "20", cy: "62", rx: "8", ry: "5", fill: "white", stroke: "#2D6B2B", strokeWidth: "1.2",})
+        , React.createElement('line', { x1: "20", y1: "57", x2: "20", y2: "67", stroke: "#2D6B2B", strokeWidth: "1.2",})
+        , React.createElement('ellipse', { cx: "60", cy: "56", rx: "5", ry: "9", fill: "white", stroke: "#2D6B2B", strokeWidth: "1.2", transform: "rotate(-25 60 56)"  ,})
+        , React.createElement('line', { x1: "57", y1: "51", x2: "63", y2: "61", stroke: "#2D6B2B", strokeWidth: "1.2", transform: "rotate(-25 60 56)"  ,})
+        , React.createElement('circle', { cx: "16", cy: "20", r: "6", fill: "white", stroke: "#2D6B2B", strokeWidth: "1.2",})
+        , React.createElement('line', { x1: "13", y1: "20", x2: "19", y2: "20", stroke: "#2D6B2B", strokeWidth: "1.5", strokeLinecap: "round",})
+        , React.createElement('line', { x1: "16", y1: "17", x2: "16", y2: "23", stroke: "#2D6B2B", strokeWidth: "1.5", strokeLinecap: "round",})
       ),
 
-      // 4 - Midnight noise: dark apartment, music notes, moon
-      4: React.createElement('svg', { width: W, height: H, viewBox: "0 0 80 80"   ,}
-        , React.createElement('rect', { x: 0, y: 0, width: 80, height: 80, rx: 4, fill: "#0A0E1F",})
-        , React.createElement('path', { d: "M54 6 A18 18 0 0 1 54 42 A14 14 0 0 0 54 6Z"               , fill: "#F5C518", opacity: 0.8,})
-        , React.createElement('circle', { cx: 54, cy: 24, r: 12, fill: "#0A0E1F", opacity: 0,})
-        , React.createElement('rect', { x: 4, y: 20, width: 48, height: 52, rx: 2, fill: "#1A2240",})
-        , React.createElement('rect', { x: 4, y: 20, width: 48, height: 6, fill: "#243060",})
-        , React.createElement('rect', { x: 8, y: 30, width: 12, height: 10, rx: 1, fill: "#F5C518", opacity: 0.8,})
-        , React.createElement('rect', { x: 24, y: 30, width: 12, height: 10, rx: 1, fill: "#C4955A", opacity: 0.6,})
-        , React.createElement('rect', { x: 40, y: 30, width: 8, height: 10, rx: 1, fill: "#1A2240",})
-        , React.createElement('rect', { x: 8, y: 44, width: 12, height: 10, rx: 1, fill: "#1A2240",})
-        , React.createElement('rect', { x: 24, y: 44, width: 12, height: 10, rx: 1, fill: "#F5C518", opacity: 0.5,})
-        , React.createElement('rect', { x: 40, y: 44, width: 8, height: 10, rx: 1, fill: "#F5C518", opacity: 0.9,})
-        , React.createElement('rect', { x: 8, y: 58, width: 12, height: 14, rx: 1, fill: "#F5C518", opacity: 0.4,})
-        , React.createElement('rect', { x: 24, y: 58, width: 12, height: 14, rx: 1, fill: "#1A2240",})
-        , React.createElement('rect', { x: 40, y: 58, width: 8, height: 14, rx: 1, fill: "#F5C518", opacity: 0.7,})
-        , React.createElement('text', { x: 70, y: 30, fontSize: "10", fill: "#F5C518", opacity: 0.9, fontFamily: "sans-serif",}, "♫")
-        , React.createElement('text', { x: 64, y: 46, fontSize: "8", fill: "#F5C518", opacity: 0.7, fontFamily: "sans-serif",}, "♪")
-        , React.createElement('text', { x: 68, y: 58, fontSize: "7", fill: "#F5C518", opacity: 0.6, fontFamily: "sans-serif",}, "♫")
+      // 4 - Midnight party: dark building with lit windows + music waves
+      4:React.createElement('svg', { width: "80", height: "80", viewBox: "0 0 80 80"   ,}
+        , React.createElement('rect', { x: "0", y: "0", width: "80", height: "80", rx: "4", fill: "#0D1235",})
+        , React.createElement('path', { d: "M52 6 A16 16 0 0 1 52 42 A12 12 0 0 0 52 6Z"               , fill: "#F5E870", opacity: "0.7",})
+        , React.createElement('rect', { x: "4", y: "18", width: "48", height: "54", rx: "2", fill: "#1A2650",})
+        , React.createElement('rect', { x: "4", y: "18", width: "48", height: "7", fill: "#243270",})
+        , React.createElement('rect', { x: "8", y: "30", width: "12", height: "9", rx: "1", fill: "#F5C518", opacity: "0.9",})
+        , React.createElement('rect', { x: "24", y: "30", width: "12", height: "9", rx: "1", fill: "#F5A000", opacity: "0.7",})
+        , React.createElement('rect', { x: "40", y: "30", width: "8", height: "9", rx: "1", fill: "#1A2650",})
+        , React.createElement('rect', { x: "8", y: "44", width: "12", height: "9", rx: "1", fill: "#1A2650",})
+        , React.createElement('rect', { x: "24", y: "44", width: "12", height: "9", rx: "1", fill: "#F5C518", opacity: "0.6",})
+        , React.createElement('rect', { x: "40", y: "44", width: "8", height: "9", rx: "1", fill: "#F5C518", opacity: "0.95",})
+        , React.createElement('rect', { x: "8", y: "58", width: "12", height: "12", rx: "1", fill: "#F5A000", opacity: "0.5",})
+        , React.createElement('rect', { x: "24", y: "58", width: "12", height: "12", rx: "1", fill: "#1A2650",})
+        , React.createElement('rect', { x: "40", y: "58", width: "8", height: "12", rx: "1", fill: "#F5C518", opacity: "0.8",})
+        , React.createElement('path', { d: "M62 28 Q70 34 62 40"     , stroke: "#F5C518", strokeWidth: "2", fill: "none", opacity: "0.7", strokeLinecap: "round",})
+        , React.createElement('path', { d: "M64 22 Q76 30 64 46"     , stroke: "#F5C518", strokeWidth: "1.5", fill: "none", opacity: "0.4", strokeLinecap: "round",})
+        , React.createElement('circle', { cx: "66", cy: "34", r: "2", fill: "#F5C518", opacity: "0.8",})
       ),
 
-      // 5 - TGV station: train on platform
-      5: React.createElement('svg', { width: W, height: H, viewBox: "0 0 80 80"   ,}
-        , React.createElement('rect', { x: 0, y: 0, width: 80, height: 80, rx: 4, fill: "#E8ECF8", opacity: 0.4,})
-        , React.createElement('rect', { x: 0, y: 52, width: 80, height: 8, fill: "#888", opacity: 0.3,})
-        , React.createElement('rect', { x: 0, y: 58, width: 80, height: 4, fill: "#555", opacity: 0.2,})
-        , React.createElement('rect', { x: 4, y: 58, width: 72, height: 2, fill: "#888", opacity: 0.4,})
-        , React.createElement('rect', { x: 0, y: 62, width: 80, height: 18, fill: "#9B8E7A", opacity: 0.5,})
-        , React.createElement('path', { d: "M-4 36 Q12 24 32 24 L70 24 Q78 24 80 30 L80 52 L-4 52Z"               , fill: "#002395",})
-        , React.createElement('path', { d: "M-4 36 Q12 26 28 26"     , stroke: "white", strokeWidth: 2, fill: "none", opacity: 0.6, strokeLinecap: "round",})
-        , React.createElement('rect', { x: 8, y: 30, width: 12, height: 14, rx: 1, fill: "#87CEEB", opacity: 0.8,})
-        , React.createElement('rect', { x: 24, y: 30, width: 12, height: 14, rx: 1, fill: "#87CEEB", opacity: 0.8,})
-        , React.createElement('rect', { x: 40, y: 30, width: 12, height: 14, rx: 1, fill: "#87CEEB", opacity: 0.8,})
-        , React.createElement('rect', { x: 56, y: 30, width: 12, height: 14, rx: 1, fill: "#87CEEB", opacity: 0.8,})
-        , React.createElement('rect', { x: 0, y: 46, width: 80, height: 6, fill: "#001A6E",})
-        , React.createElement('circle', { cx: 16, cy: 54, r: 3, fill: "#555",})
-        , React.createElement('circle', { cx: 16, cy: 54, r: 1.5, fill: "#333",})
-        , React.createElement('circle', { cx: 60, cy: 54, r: 3, fill: "#555",})
-        , React.createElement('circle', { cx: 60, cy: 54, r: 1.5, fill: "#333",})
-        , React.createElement('path', { d: "M80 46 L80 52"   , stroke: "#ED2939", strokeWidth: 3, strokeLinecap: "round",})
-        , React.createElement('rect', { x: 60, y: 10, width: 18, height: 28, rx: 1, fill: "#F2EDE3", stroke: "#888", strokeWidth: 0.5,})
-        , React.createElement('rect', { x: 62, y: 14, width: 14, height: 3, fill: "#002395", opacity: 0.6,})
-        , React.createElement('rect', { x: 62, y: 19, width: 10, height: 1.5, fill: "#888", opacity: 0.5,})
-        , React.createElement('rect', { x: 62, y: 22, width: 12, height: 1.5, fill: "#888", opacity: 0.4,})
-        , React.createElement('rect', { x: 62, y: 25, width: 8, height: 1.5, fill: "#888", opacity: 0.3,})
+      // 5 - TGV station: sleek train profile
+      5:React.createElement('svg', { width: "80", height: "80", viewBox: "0 0 80 80"   ,}
+        , React.createElement('rect', { x: "0", y: "56", width: "80", height: "24", fill: "#9B8E7A", opacity: "0.25",})
+        , React.createElement('rect', { x: "0", y: "54", width: "80", height: "5", fill: "#666", opacity: "0.25",})
+        , React.createElement('line', { x1: "0", y1: "57", x2: "80", y2: "57", stroke: "#888", strokeWidth: "2", opacity: "0.3",})
+        , React.createElement('path', { d: "M0 40 L0 32 Q0 26 8 26 L18 14 Q22 8 32 8 L58 8 Q68 8 72 14 L80 26 L80 44 Q80 48 76 48 L4 48 Q0 48 0 44Z"                                 , fill: "#002395",})
+        , React.createElement('path', { d: "M0 40 L0 32 Q0 26 8 26 L18 16"         , stroke: "white", strokeWidth: "2", fill: "none", opacity: "0.4", strokeLinecap: "round",})
+        , React.createElement('rect', { x: "10", y: "16", width: "14", height: "16", rx: "1", fill: "#87CEEB", opacity: "0.85",})
+        , React.createElement('rect', { x: "28", y: "14", width: "14", height: "16", rx: "1", fill: "#87CEEB", opacity: "0.85",})
+        , React.createElement('rect', { x: "46", y: "14", width: "14", height: "16", rx: "1", fill: "#87CEEB", opacity: "0.85",})
+        , React.createElement('rect', { x: "0", y: "42", width: "80", height: "8", fill: "#001570",})
+        , React.createElement('circle', { cx: "14", cy: "52", r: "5", fill: "#444",})
+        , React.createElement('circle', { cx: "14", cy: "52", r: "2.5", fill: "#222",})
+        , React.createElement('circle', { cx: "58", cy: "52", r: "5", fill: "#444",})
+        , React.createElement('circle', { cx: "58", cy: "52", r: "2.5", fill: "#222",})
+        , React.createElement('rect', { x: "72", y: "26", width: "8", height: "22", rx: "1", fill: "#ED2939", opacity: "0.9",})
+        , React.createElement('rect', { x: "72", y: "26", width: "8", height: "7", rx: "1", fill: "#F5C518",})
       ),
 
-      // 6 - Wrong dish: plate with salmon vs duck
-      6: React.createElement('svg', { width: W, height: H, viewBox: "0 0 80 80"   ,}
-        , React.createElement('ellipse', { cx: 40, cy: 76, rx: 30, ry: 3, fill: "#888", opacity: 0.15,})
-        , React.createElement('circle', { cx: 40, cy: 44, rx: 28, ry: 28, r: 28, fill: "white", stroke: "#E0D8CC", strokeWidth: 1.5,})
-        , React.createElement('circle', { cx: 40, cy: 44, r: 22, fill: "#FFF8F0",})
-        , React.createElement('path', { d: "M28 38 Q30 30 36 28 Q42 26 46 30 Q50 34 48 40 Q46 46 40 48 Q34 50 30 46 Q26 42 28 38Z"                         , fill: "#E8906A", opacity: 0.9,})
-        , React.createElement('path', { d: "M30 36 L46 36 M32 40 L44 40 M34 44 L42 44"           , stroke: "white", strokeWidth: 0.8, strokeLinecap: "round", opacity: 0.5,})
-        , React.createElement('path', { d: "M38 28 Q40 24 44 22"     , stroke: "#F0A07A", strokeWidth: 2, fill: "none", strokeLinecap: "round",})
-        , React.createElement('circle', { cx: 52, cy: 38, r: 5, fill: "#ED2939", opacity: 0.15, stroke: "#ED2939", strokeWidth: 1.5, opacity: 0.6,})
-        , React.createElement('path', { d: "M49 35 L55 41 M55 35 L49 41"       , stroke: "#ED2939", strokeWidth: 1.5, strokeLinecap: "round",})
-        , React.createElement('ellipse', { cx: 40, cy: 68, rx: 20, ry: 2, fill: "#E0D8CC", opacity: 0.5,})
-        , React.createElement('rect', { x: 36, y: 68, width: 8, height: 8, rx: 0.5, fill: "#888", opacity: 0.3,})
-        , React.createElement('ellipse', { cx: 40, cy: 76, rx: 12, ry: 1.5, fill: "#888", opacity: 0.2,})
+      // 6 - Wrong dish: plate with salmon, red X
+      6:React.createElement('svg', { width: "80", height: "80", viewBox: "0 0 80 80"   ,}
+        , React.createElement('ellipse', { cx: "40", cy: "74", rx: "30", ry: "4", fill: "#888", opacity: "0.12",})
+        , React.createElement('circle', { cx: "40", cy: "46", r: "28", fill: "white", stroke: "#E0D8CC", strokeWidth: "1.5",})
+        , React.createElement('circle', { cx: "40", cy: "46", r: "22", fill: "#FFF8F0",})
+        , React.createElement('circle', { cx: "40", cy: "46", r: "16", fill: "#FFF0E8",})
+        , React.createElement('path', { d: "M30 40 Q32 30 40 28 Q48 30 50 40 Q48 52 40 54 Q32 52 30 40Z"                 , fill: "#E8906A", opacity: "0.85",})
+        , React.createElement('path', { d: "M32 38 L48 38 M34 42 L46 42 M36 46 L44 46"           , stroke: "white", strokeWidth: "1", strokeLinecap: "round", opacity: "0.6",})
+        , React.createElement('circle', { cx: "62", cy: "24", r: "10", fill: "#ED2939", opacity: "0.15", stroke: "#ED2939", strokeWidth: "2",})
+        , React.createElement('line', { x1: "57", y1: "19", x2: "67", y2: "29", stroke: "#ED2939", strokeWidth: "2.5", strokeLinecap: "round",})
+        , React.createElement('line', { x1: "67", y1: "19", x2: "57", y2: "29", stroke: "#ED2939", strokeWidth: "2.5", strokeLinecap: "round",})
+        , React.createElement('rect', { x: "36", y: "70", width: "8", height: "8", rx: "0.5", fill: "#888", opacity: "0.3",})
+        , React.createElement('ellipse', { cx: "40", cy: "78", rx: "12", ry: "2", fill: "#888", opacity: "0.2",})
       ),
 
-      // 7 - Car scratch: car with visible scratch
-      7: React.createElement('svg', { width: W, height: H, viewBox: "0 0 80 80"   ,}
-        , React.createElement('rect', { x: 0, y: 56, width: 80, height: 24, fill: "#9B8E7A", opacity: 0.3,})
-        , React.createElement('path', { d: "M4 42 L4 34 Q4 28 12 28 L20 18 Q24 12 34 12 L52 12 Q62 12 66 18 L74 28 Q78 28 78 34 L78 52 Q78 56 74 56 L6 56 Q4 56 4 52Z"                                     , fill: "#D4D4D4",})
-        , React.createElement('path', { d: "M4 42 L4 34 Q4 28 12 28 L20 18 Q24 12 34 12 L52 12 Q62 12 66 18 L74 28"                     , stroke: "#BBBBBB", strokeWidth: 1, fill: "none",})
-        , React.createElement('rect', { x: 10, y: 22, width: 20, height: 16, rx: 1, fill: "#87CEEB", opacity: 0.8,})
-        , React.createElement('rect', { x: 34, y: 22, width: 16, height: 14, rx: 1, fill: "#87CEEB", opacity: 0.8,})
-        , React.createElement('rect', { x: 54, y: 24, width: 14, height: 12, rx: 1, fill: "#87CEEB", opacity: 0.8,})
-        , React.createElement('circle', { cx: 18, cy: 57, r: 7, fill: "#555", stroke: "#333", strokeWidth: 1,})
-        , React.createElement('circle', { cx: 18, cy: 57, r: 3.5, fill: "#333",})
-        , React.createElement('circle', { cx: 62, cy: 57, r: 7, fill: "#555", stroke: "#333", strokeWidth: 1,})
-        , React.createElement('circle', { cx: 62, cy: 57, r: 3.5, fill: "#333",})
-        , React.createElement('rect', { x: 4, y: 42, width: 72, height: 10, rx: 1, fill: "#CC0000", opacity: 0.15,})
-        , React.createElement('path', { d: "M42 28 L52 18"   , stroke: "#ED2939", strokeWidth: 3, strokeLinecap: "round", opacity: 0.9,})
-        , React.createElement('path', { d: "M46 26 L54 20"   , stroke: "#ED2939", strokeWidth: 2, strokeLinecap: "round", opacity: 0.5,})
-        , React.createElement('path', { d: "M44 30 L50 22"   , stroke: "white", strokeWidth: 1, strokeLinecap: "round", opacity: 0.4,})
-        , React.createElement('rect', { x: 28, y: 44, width: 24, height: 8, rx: 1, fill: "#888", opacity: 0.3,})
+      // 7 - Car scratch: car side view with red scratch
+      7:React.createElement('svg', { width: "80", height: "80", viewBox: "0 0 80 80"   ,}
+        , React.createElement('rect', { x: "0", y: "58", width: "80", height: "22", fill: "#9B8E7A", opacity: "0.2",})
+        , React.createElement('path', { d: "M2 44 L2 36 Q2 30 10 30 L18 20 Q22 14 32 14 L52 14 Q62 14 66 20 L74 30 Q78 30 78 36 L78 52 Q78 56 74 56 L6 56 Q2 56 2 52Z"                                     , fill: "#D0D0D0", stroke: "#BBBBBB", strokeWidth: "1",})
+        , React.createElement('path', { d: "M2 44 L2 36 Q2 30 10 30 L18 20"         , stroke: "#CCCCCC", strokeWidth: "0.8", fill: "none",})
+        , React.createElement('rect', { x: "10", y: "22", width: "20", height: "18", rx: "1", fill: "#87CEEB", opacity: "0.8",})
+        , React.createElement('rect', { x: "34", y: "20", width: "18", height: "16", rx: "1", fill: "#87CEEB", opacity: "0.8",})
+        , React.createElement('rect', { x: "56", y: "24", width: "14", height: "14", rx: "1", fill: "#87CEEB", opacity: "0.8",})
+        , React.createElement('rect', { x: "0", y: "44", width: "80", height: "10", rx: "1", fill: "#BB0000", opacity: "0.12",})
+        , React.createElement('circle', { cx: "18", cy: "58", r: "8", fill: "#555", stroke: "#333", strokeWidth: "1",})
+        , React.createElement('circle', { cx: "18", cy: "58", r: "4", fill: "#333",})
+        , React.createElement('circle', { cx: "60", cy: "58", r: "8", fill: "#555", stroke: "#333", strokeWidth: "1",})
+        , React.createElement('circle', { cx: "60", cy: "58", r: "4", fill: "#333",})
+        , React.createElement('path', { d: "M46 22 L58 10"   , stroke: "#ED2939", strokeWidth: "3.5", strokeLinecap: "round", opacity: "0.9",})
+        , React.createElement('path', { d: "M50 20 L60 12"   , stroke: "#FF6B6B", strokeWidth: "2", strokeLinecap: "round", opacity: "0.5",})
+        , React.createElement('path', { d: "M43 24 L55 12"   , stroke: "white", strokeWidth: "1", strokeLinecap: "round", opacity: "0.3",})
       ),
 
-      // 8 - Job interview: two people across table
-      8: React.createElement('svg', { width: W, height: H, viewBox: "0 0 80 80"   ,}
-        , React.createElement('rect', { x: 4, y: 4, width: 72, height: 72, rx: 4, fill: "#F2EDE3", opacity: 0.5,})
-        , React.createElement('rect', { x: 8, y: 40, width: 64, height: 6, rx: 2, fill: "#C4955A",})
-        , React.createElement('ellipse', { cx: 40, cy: 40, rx: 32, ry: 3, fill: "#D4A870", opacity: 0.4,})
-        , React.createElement('circle', { cx: 18, cy: 28, r: 8, fill: "#E8C98A",})
-        , React.createElement('rect', { x: 12, y: 36, width: 12, height: 14, rx: 4, fill: "#002395",})
-        , React.createElement('path', { d: "M14 38 L12 50 M26 38 L28 50"       , stroke: "#001A6E", strokeWidth: 2, fill: "none", strokeLinecap: "round",})
-        , React.createElement('path', { d: "M12 50 L28 50"   , stroke: "#001A6E", strokeWidth: 1, fill: "none",})
-        , React.createElement('circle', { cx: 62, cy: 28, r: 8, fill: "#C4955A",})
-        , React.createElement('rect', { x: 56, y: 36, width: 12, height: 14, rx: 4, fill: "#8B4513", opacity: 0.7,})
-        , React.createElement('path', { d: "M58 38 L56 50 M68 38 L70 50"       , stroke: "#6B3410", strokeWidth: 2, fill: "none", strokeLinecap: "round",})
-        , React.createElement('rect', { x: 28, y: 48, width: 24, height: 16, rx: 1, fill: "#F2EDE3", stroke: "#C4955A", strokeWidth: 0.8,})
-        , React.createElement('rect', { x: 30, y: 50, width: 8, height: 1.5, rx: 0.75, fill: "#888", opacity: 0.5,})
-        , React.createElement('rect', { x: 30, y: 53, width: 14, height: 1.5, rx: 0.75, fill: "#888", opacity: 0.4,})
-        , React.createElement('rect', { x: 30, y: 56, width: 10, height: 1.5, rx: 0.75, fill: "#888", opacity: 0.3,})
-        , React.createElement('path', { d: "M10 30 Q14 26 18 28"     , stroke: "#888", strokeWidth: 1, fill: "none", opacity: 0.4,})
-        , React.createElement('path', { d: "M62 24 Q58 20 60 16 Q64 12 66 16"         , stroke: "#B87333", strokeWidth: 0.8, fill: "none", opacity: 0.5,})
+      // 8 - Job interview: two people at table, building
+      8:React.createElement('svg', { width: "80", height: "80", viewBox: "0 0 80 80"   ,}
+        , React.createElement('rect', { x: "4", y: "8", width: "72", height: "56", rx: "3", fill: "#F5EDD8", opacity: "0.6",})
+        , React.createElement('rect', { x: "4", y: "8", width: "72", height: "10", fill: "#002395", opacity: "0.8", rx: "3",})
+        , React.createElement('rect', { x: "8", y: "8", width: "8", height: "3", rx: "1", fill: "white", opacity: "0.3",})
+        , React.createElement('rect', { x: "20", y: "8", width: "8", height: "3", rx: "1", fill: "white", opacity: "0.3",})
+        , React.createElement('rect', { x: "4", y: "44", width: "72", height: "8", rx: "1", fill: "#C4955A", opacity: "0.7",})
+        , React.createElement('ellipse', { cx: "40", cy: "44", rx: "36", ry: "4", fill: "#D4A870", opacity: "0.4",})
+        , React.createElement('circle', { cx: "18", cy: "30", r: "8", fill: "#E8C98A",})
+        , React.createElement('path', { d: "M10 44 L10 36 Q18 32 26 36 L26 44"         , fill: "#002395", opacity: "0.8",})
+        , React.createElement('circle', { cx: "62", cy: "30", r: "8", fill: "#C4955A",})
+        , React.createElement('path', { d: "M54 44 L54 36 Q62 32 70 36 L70 44"         , fill: "#8B4513", opacity: "0.7",})
+        , React.createElement('rect', { x: "28", y: "50", width: "24", height: "18", rx: "1", fill: "#F5EDD8", stroke: "#C4955A", strokeWidth: "0.8",})
+        , React.createElement('line', { x1: "31", y1: "55", x2: "43", y2: "55", stroke: "#888", strokeWidth: "1", strokeLinecap: "round", opacity: "0.5",})
+        , React.createElement('line', { x1: "31", y1: "59", x2: "49", y2: "59", stroke: "#888", strokeWidth: "1", strokeLinecap: "round", opacity: "0.4",})
+        , React.createElement('line', { x1: "31", y1: "63", x2: "45", y2: "63", stroke: "#888", strokeWidth: "1", strokeLinecap: "round", opacity: "0.3",})
+        , React.createElement('path', { d: "M18 24 Q14 20 18 16 Q22 14 22 18"         , stroke: "#C4955A", strokeWidth: "1", fill: "none", opacity: "0.4",})
       ),
 
-      // 9 - Bank: neoclassical columns, papers
-      9: React.createElement('svg', { width: W, height: H, viewBox: "0 0 80 80"   ,}
-        , React.createElement('rect', { x: 0, y: 60, width: 80, height: 20, fill: "#9B8E7A", opacity: 0.2,})
-        , React.createElement('rect', { x: 4, y: 58, width: 72, height: 4, rx: 1, fill: "#888", opacity: 0.3,})
-        , React.createElement('rect', { x: 4, y: 16, width: 72, height: 4, rx: 1, fill: "#888", opacity: 0.3,})
-        , React.createElement('path', { d: "M4 16 L40 4 L76 16"     , fill: "#C4955A", opacity: 0.5,})
-        , React.createElement('rect', { x: 10, y: 20, width: 8, height: 38, rx: 2, fill: "#D4D4C4", stroke: "#BBBBAA", strokeWidth: 0.5,})
-        , React.createElement('rect', { x: 22, y: 20, width: 8, height: 38, rx: 2, fill: "#D4D4C4", stroke: "#BBBBAA", strokeWidth: 0.5,})
-        , React.createElement('rect', { x: 50, y: 20, width: 8, height: 38, rx: 2, fill: "#D4D4C4", stroke: "#BBBBAA", strokeWidth: 0.5,})
-        , React.createElement('rect', { x: 62, y: 20, width: 8, height: 38, rx: 2, fill: "#D4D4C4", stroke: "#BBBBAA", strokeWidth: 0.5,})
-        , React.createElement('rect', { x: 34, y: 30, width: 12, height: 28, rx: 1, fill: "#888", opacity: 0.4,})
-        , React.createElement('rect', { x: 34, y: 44, width: 12, height: 4, fill: "#888", opacity: 0.2,})
-        , React.createElement('rect', { x: 44, y: 22, width: 18, height: 24, rx: 1, fill: "white", stroke: "#ED2939", strokeWidth: 1.5,})
-        , React.createElement('rect', { x: 46, y: 26, width: 8, height: 1.5, rx: 0.75, fill: "#888", opacity: 0.5,})
-        , React.createElement('rect', { x: 46, y: 29, width: 12, height: 1.5, rx: 0.75, fill: "#888", opacity: 0.4,})
-        , React.createElement('rect', { x: 46, y: 32, width: 10, height: 1.5, rx: 0.75, fill: "#888", opacity: 0.3,})
-        , React.createElement('circle', { cx: 58, cy: 22, r: 5, fill: "#ED2939", opacity: 0.2, stroke: "#ED2939", strokeWidth: 1,})
-        , React.createElement('path', { d: "M56 22 L60 22 M58 20 L58 24"       , stroke: "#ED2939", strokeWidth: 1.5, strokeLinecap: "round",})
+      // 9 - Bank: neoclassical building + refused document
+      9:React.createElement('svg', { width: "80", height: "80", viewBox: "0 0 80 80"   ,}
+        , React.createElement('rect', { x: "0", y: "64", width: "80", height: "16", fill: "#9B8E7A", opacity: "0.2",})
+        , React.createElement('rect', { x: "4", y: "60", width: "72", height: "6", rx: "1", fill: "#AAA", opacity: "0.3",})
+        , React.createElement('rect', { x: "4", y: "16", width: "72", height: "4", rx: "1", fill: "#AAA", opacity: "0.3",})
+        , React.createElement('path', { d: "M4 16 L40 4 L76 16"     , fill: "#C4955A", opacity: "0.4", stroke: "#B8844A", strokeWidth: "0.5",})
+        , React.createElement('rect', { x: "10", y: "20", width: "8", height: "40", rx: "3", fill: "#D4D4C4", stroke: "#BBBBA0", strokeWidth: "0.5",})
+        , React.createElement('rect', { x: "22", y: "20", width: "8", height: "40", rx: "3", fill: "#D4D4C4", stroke: "#BBBBA0", strokeWidth: "0.5",})
+        , React.createElement('rect', { x: "50", y: "20", width: "8", height: "40", rx: "3", fill: "#D4D4C4", stroke: "#BBBBA0", strokeWidth: "0.5",})
+        , React.createElement('rect', { x: "62", y: "20", width: "8", height: "40", rx: "3", fill: "#D4D4C4", stroke: "#BBBBA0", strokeWidth: "0.5",})
+        , React.createElement('rect', { x: "34", y: "34", width: "12", height: "26", rx: "1", fill: "#888", opacity: "0.4",})
+        , React.createElement('rect', { x: "42", y: "18", width: "20", height: "26", rx: "1", fill: "white", stroke: "#ED2939", strokeWidth: "1.5",})
+        , React.createElement('line', { x1: "45", y1: "24", x2: "59", y2: "24", stroke: "#888", strokeWidth: "1", strokeLinecap: "round", opacity: "0.5",})
+        , React.createElement('line', { x1: "45", y1: "28", x2: "59", y2: "28", stroke: "#888", strokeWidth: "1", strokeLinecap: "round", opacity: "0.4",})
+        , React.createElement('line', { x1: "45", y1: "32", x2: "55", y2: "32", stroke: "#888", strokeWidth: "1", strokeLinecap: "round", opacity: "0.3",})
+        , React.createElement('circle', { cx: "58", cy: "20", r: "7", fill: "white", stroke: "#ED2939", strokeWidth: "1.5",})
+        , React.createElement('line', { x1: "55", y1: "17", x2: "61", y2: "23", stroke: "#ED2939", strokeWidth: "1.8", strokeLinecap: "round",})
+        , React.createElement('line', { x1: "61", y1: "17", x2: "55", y2: "23", stroke: "#ED2939", strokeWidth: "1.8", strokeLinecap: "round",})
       ),
 
-      // 10 - Dinner debate: elegant table, wine, candle, speech
-      10: React.createElement('svg', { width: W, height: H, viewBox: "0 0 80 80"   ,}
-        , React.createElement('rect', { x: 0, y: 0, width: 80, height: 80, rx: 4, fill: "#1A0A0A", opacity: 0.05,})
-        , React.createElement('ellipse', { cx: 40, cy: 76, rx: 35, ry: 3, fill: "#888", opacity: 0.15,})
-        , React.createElement('rect', { x: 4, y: 54, width: 72, height: 6, rx: 2, fill: "#8B4513", opacity: 0.7,})
-        , React.createElement('ellipse', { cx: 40, cy: 54, rx: 36, ry: 4, fill: "#A0682A", opacity: 0.4,})
-        , React.createElement('path', { d: "M22 24 Q22 36 26 42 L20 42 L20 44 L28 44 L28 42 L24 42"               , stroke: "#C4955A", strokeWidth: 1.5, fill: "none", strokeLinecap: "round",})
-        , React.createElement('path', { d: "M16 24 L28 24"   , stroke: "#C4955A", strokeWidth: 1.5, strokeLinecap: "round",})
-        , React.createElement('ellipse', { cx: 22, cy: 38, rx: 6, ry: 2, fill: "#ED2939", opacity: 0.5,})
-        , React.createElement('path', { d: "M58 20 Q58 36 54 42 L60 42 L60 44 L52 44 L52 42 L56 42"               , stroke: "#C4955A", strokeWidth: 1.5, fill: "none", strokeLinecap: "round",})
-        , React.createElement('path', { d: "M52 20 L64 20"   , stroke: "#C4955A", strokeWidth: 1.5, strokeLinecap: "round",})
-        , React.createElement('ellipse', { cx: 58, cy: 38, rx: 6, ry: 2, fill: "#ED2939", opacity: 0.5,})
-        , React.createElement('rect', { x: 38, y: 30, width: 4, height: 22, rx: 1, fill: "#F5C518", opacity: 0.6,})
-        , React.createElement('ellipse', { cx: 40, cy: 30, rx: 3, ry: 5, fill: "#F5C518", opacity: 0.4,})
-        , React.createElement('circle', { cx: 40, cy: 26, r: 2, fill: "#F5C518", opacity: 0.8,})
-        , React.createElement('path', { d: "M40 24 Q42 20 40 16 Q38 20 40 24"         , stroke: "#F5C518", strokeWidth: 0.5, fill: "#FFA500", opacity: 0.7,})
-        , React.createElement('circle', { cx: 20, cy: 46, r: 6, fill: "white", stroke: "#E0D8CC", strokeWidth: 0.8,})
-        , React.createElement('circle', { cx: 60, cy: 46, r: 6, fill: "white", stroke: "#E0D8CC", strokeWidth: 0.8,})
-        , React.createElement('path', { d: "M30 14 Q38 10 46 14 Q50 18 46 22 Q42 24 40 22 L38 26 L36 22 Q30 20 28 16 Q26 12 30 14Z"                         , fill: "#002395", opacity: 0.15, stroke: "#002395", strokeWidth: 1, opacity: 0.5,})
-        , React.createElement('path', { d: "M34 16 L44 16 M34 19 L40 19"       , stroke: "#002395", strokeWidth: 1, opacity: 0.5, strokeLinecap: "round",})
+      // 10 - Dinner debate: candlelit table, wine glasses, speech bubble
+      10:React.createElement('svg', { width: "80", height: "80", viewBox: "0 0 80 80"   ,}
+        , React.createElement('rect', { x: "0", y: "0", width: "80", height: "80", rx: "4", fill: "#1A0505", opacity: "0.06",})
+        , React.createElement('rect', { x: "4", y: "54", width: "72", height: "6", rx: "2", fill: "#6B3410", opacity: "0.7",})
+        , React.createElement('ellipse', { cx: "40", cy: "54", rx: "36", ry: "4", fill: "#8B4513", opacity: "0.4",})
+        , React.createElement('path', { d: "M18 26 Q18 38 22 44 L14 44 L14 46 L26 46 L26 44 L20 44"               , stroke: "#C4955A", strokeWidth: "1.5", fill: "none", strokeLinecap: "round",})
+        , React.createElement('path', { d: "M14 26 L26 26"   , stroke: "#C4955A", strokeWidth: "1.5", strokeLinecap: "round",})
+        , React.createElement('ellipse', { cx: "20", cy: "40", rx: "6", ry: "2", fill: "#8B1A1A", opacity: "0.6",})
+        , React.createElement('path', { d: "M62 22 Q62 38 58 44 L66 44 L66 46 L54 46 L54 44 L60 44"               , stroke: "#C4955A", strokeWidth: "1.5", fill: "none", strokeLinecap: "round",})
+        , React.createElement('path', { d: "M54 22 L66 22"   , stroke: "#C4955A", strokeWidth: "1.5", strokeLinecap: "round",})
+        , React.createElement('ellipse', { cx: "60", cy: "40", rx: "6", ry: "2", fill: "#8B1A1A", opacity: "0.6",})
+        , React.createElement('rect', { x: "38", y: "32", width: "4", height: "22", rx: "1", fill: "#F5C518", opacity: "0.5",})
+        , React.createElement('ellipse', { cx: "40", cy: "30", rx: "4", ry: "6", fill: "#F5C518", opacity: "0.3",})
+        , React.createElement('circle', { cx: "40", cy: "26", r: "3", fill: "#F5C518", opacity: "0.7",})
+        , React.createElement('path', { d: "M40 23 Q43 18 40 14 Q37 18 40 23"         , fill: "#FFA500", opacity: "0.6",})
+        , React.createElement('circle', { cx: "20", cy: "48", r: "6", fill: "white", stroke: "#E0D8CC", strokeWidth: "0.8",})
+        , React.createElement('circle', { cx: "60", cy: "48", r: "6", fill: "white", stroke: "#E0D8CC", strokeWidth: "0.8",})
+        , React.createElement('path', { d: "M26 14 Q34 9 44 13 Q48 17 44 22 Q40 24 40 22 L38 27 L36 22 Q30 20 28 16 Q24 12 26 14Z"                         , fill: "#002395", opacity: "0.18", stroke: "#002395", strokeWidth: "1", opacity: "0.4",})
+        , React.createElement('line', { x1: "30", y1: "16", x2: "42", y2: "16", stroke: "#002395", strokeWidth: "1", strokeLinecap: "round", opacity: "0.5",})
+        , React.createElement('line', { x1: "31", y1: "19", x2: "39", y2: "19", stroke: "#002395", strokeWidth: "1", strokeLinecap: "round", opacity: "0.4",})
       ),
     };
-
-    return il[scenarioId] || (
-      React.createElement('svg', { width: W, height: H, viewBox: "0 0 80 80"   ,}
-        , React.createElement('circle', { cx: 40, cy: 36, r: 20, fill: "#002395", opacity: 0.1, stroke: "#002395", strokeWidth: 1, opacity: 0.3,})
-        , React.createElement('path', { d: "M40 22 C30 22 22 30 22 40 C22 52 40 64 40 64 C40 64 58 52 58 40 C58 30 50 22 40 22Z"                         , fill: "#002395", opacity: 0.15,})
-        , React.createElement('circle', { cx: 40, cy: 38, r: 6, fill: "#002395", opacity: 0.3,})
+    
+      11:React.createElement('svg', { width: "80", height: "80", viewBox: "0 0 80 80"},
+        React.createElement('rect', {x:"0",y:"44",width:"80",height:"36",fill:"#9B8E7A",opacity:"0.25"}),
+        React.createElement('rect', {x:"4",y:"28",width:"72",height:"20",rx:"2",fill:"#F5E6C8",stroke:"#C4955A",strokeWidth:"0.8"}),
+        React.createElement('rect', {x:"4",y:"28",width:"72",height:"6",rx:"2",fill:"#E8C98A"}),
+        React.createElement('ellipse', {cx:"20",cy:"42",rx:"9",ry:"7",fill:"#F5A623",stroke:"#E8901A",strokeWidth:"0.8"}),
+        React.createElement('ellipse', {cx:"40",cy:"40",rx:"9",ry:"8",fill:"#ED2939",stroke:"#C41F2D",strokeWidth:"0.8"}),
+        React.createElement('ellipse', {cx:"60",cy:"42",rx:"8",ry:"6",fill:"#F5C518",stroke:"#D4A800",strokeWidth:"0.8"}),
+        React.createElement('rect', {x:"2",y:"22",width:"76",height:"8",rx:"1",fill:"#ED2939",opacity:"0.8"}),
+        React.createElement('circle', {cx:"62",cy:"16",r:"8",fill:"#F5C518",opacity:"0.8"}),
+        React.createElement('line', {x1:"62",y1:"8",x2:"62",y2:"6",stroke:"#D4A800",strokeWidth:"1.5",strokeLinecap:"round"}),
+        React.createElement('line', {x1:"70",y1:"16",x2:"72",y2:"16",stroke:"#D4A800",strokeWidth:"1.5",strokeLinecap:"round"})
+      ),
+      12:React.createElement('svg', { width: "80", height: "80", viewBox: "0 0 80 80"},
+        React.createElement('rect', {x:"0",y:"0",width:"80",height:"80",fill:"#1A1D2E",opacity:"0.08"}),
+        React.createElement('rect', {x:"0",y:"62",width:"80",height:"18",fill:"#9B8E7A",opacity:"0.3"}),
+        React.createElement('rect', {x:"20",y:"10",width:"40",height:"54",rx:"2",fill:"#8B6914",opacity:"0.7",stroke:"#6B4F0A",strokeWidth:"1"}),
+        React.createElement('rect', {x:"26",y:"16",width:"16",height:"22",rx:"1",fill:"#87CEEB",opacity:"0.4",stroke:"#5A8FBB",strokeWidth:"0.5"}),
+        React.createElement('rect', {x:"46",y:"16",width:"8",height:"22",rx:"1",fill:"#87CEEB",opacity:"0.4",stroke:"#5A8FBB",strokeWidth:"0.5"}),
+        React.createElement('circle', {cx:"52",cy:"38",r:"3",fill:"#C4955A",stroke:"#A07840",strokeWidth:"0.8"}),
+        React.createElement('circle', {cx:"52",cy:"38",r:"1.2",fill:"#888"}),
+        React.createElement('rect', {x:"0",y:"0",width:"18",height:"80",fill:"#D4C4A0",opacity:"0.4"}),
+        React.createElement('rect', {x:"62",y:"0",width:"18",height:"80",fill:"#D4C4A0",opacity:"0.4"}),
+        React.createElement('circle', {cx:"68",cy:"30",r:"5",fill:"#F5C518",opacity:"0.8"})
+      ),
+      13:React.createElement('svg', { width: "80", height: "80", viewBox: "0 0 80 80"},
+        React.createElement('circle', {cx:"40",cy:"44",r:"28",fill:"white",stroke:"#E8E0D0",strokeWidth:"1"}),
+        React.createElement('circle', {cx:"40",cy:"44",r:"22",fill:"#FDF8F0"}),
+        React.createElement('circle', {cx:"40",cy:"44",r:"16",fill:"#FFF5E8"}),
+        React.createElement('path', {d:"M30 40 Q32 32 38 30 Q44 28 48 34 Q50 40 46 46 Q42 52 36 50 Q28 46 30 40Z",fill:"#E8C098",opacity:"0.8"}),
+        React.createElement('ellipse', {cx:"36",cy:"36",rx:"4",ry:"2.5",fill:"#F5A070",opacity:"0.9",transform:"rotate(-20 36 36)"}),
+        React.createElement('ellipse', {cx:"44",cy:"38",rx:"4",ry:"2.5",fill:"#F5A070",opacity:"0.9",transform:"rotate(15 44 38)"}),
+        React.createElement('circle', {cx:"60",cy:"28",r:"9",fill:"#ED2939",opacity:"0.15",stroke:"#ED2939",strokeWidth:"1.5"}),
+        React.createElement('line', {x1:"56",y1:"24",x2:"64",y2:"32",stroke:"#ED2939",strokeWidth:"2",strokeLinecap:"round"}),
+        React.createElement('line', {x1:"64",y1:"24",x2:"56",y2:"32",stroke:"#ED2939",strokeWidth:"2",strokeLinecap:"round"}),
+        React.createElement('rect', {x:"36",y:"68",width:"8",height:"8",rx:"0.5",fill:"#888",opacity:"0.3"})
+      ),
+      14:React.createElement('svg', { width: "80", height: "80", viewBox: "0 0 80 80"},
+        React.createElement('rect', {x:"0",y:"0",width:"80",height:"80",rx:"4",fill:"#0A1F0A"}),
+        React.createElement('circle', {cx:"20",cy:"8",r:"12",fill:"#F5C518",opacity:"0.7"}),
+        React.createElement('circle', {cx:"60",cy:"8",r:"12",fill:"#F5C518",opacity:"0.7"}),
+        React.createElement('rect', {x:"0",y:"52",width:"80",height:"28",fill:"#2D6B2B",opacity:"0.9"}),
+        React.createElement('line', {x1:"0",y1:"52",x2:"80",y2:"52",stroke:"white",strokeWidth:"2",opacity:"0.4"}),
+        React.createElement('ellipse', {cx:"40",cy:"52",rx:"24",ry:"3",fill:"#3D8B3D",opacity:"0.5"}),
+        React.createElement('rect', {x:"32",y:"22",width:"6",height:"26",rx:"3",fill:"#888"}),
+        React.createElement('ellipse', {cx:"35",cy:"22",rx:"5",ry:"7",fill:"#555",stroke:"#444",strokeWidth:"0.8"}),
+        React.createElement('circle', {cx:"58",cy:"24",r:"6",fill:"#E8C98A"}),
+        React.createElement('rect', {x:"52",y:"30",width:"12",height:"14",rx:"4",fill:"#002395",opacity:"0.8"}),
+        React.createElement('rect', {x:"68",y:"52",width:"6",height:"28",fill:"#ED2939",opacity:"0.6"}),
+        React.createElement('rect', {x:"0",y:"52",width:"6",height:"28",fill:"#002395",opacity:"0.6"})
+      ),
+      15:React.createElement('svg', { width: "80", height: "80", viewBox: "0 0 80 80"},
+        React.createElement('rect', {x:"14",y:"28",width:"52",height:"34",rx:"4",fill:"#2A1A4E",opacity:"0.9"}),
+        React.createElement('rect', {x:"14",y:"28",width:"52",height:"8",rx:"4",fill:"#ED2939",opacity:"0.9"}),
+        React.createElement('circle', {cx:"40",cy:"32",r:"3",fill:"white",opacity:"0.9"}),
+        React.createElement('rect', {x:"22",y:"40",width:"36",height:"2",rx:"1",fill:"#555",opacity:"0.6"}),
+        React.createElement('rect', {x:"22",y:"46",width:"28",height:"2",rx:"1",fill:"#555",opacity:"0.4"}),
+        React.createElement('rect', {x:"22",y:"52",width:"32",height:"2",rx:"1",fill:"#555",opacity:"0.3"}),
+        React.createElement('rect', {x:"36",y:"62",width:"8",height:"12",rx:"1",fill:"#444"}),
+        React.createElement('rect', {x:"28",y:"72",width:"24",height:"4",rx:"1",fill:"#333"}),
+        React.createElement('path', {d:"M6 36 Q10 42 6 48",stroke:"#ED2939",strokeWidth:"2",fill:"none",opacity:"0.7",strokeLinecap:"round"}),
+        React.createElement('path', {d:"M74 36 Q70 42 74 48",stroke:"#ED2939",strokeWidth:"2",fill:"none",opacity:"0.7",strokeLinecap:"round"}),
+        React.createElement('circle', {cx:"40",cy:"18",r:"8",fill:"white",opacity:"0.1",stroke:"#ED2939",strokeWidth:"1",opacity:"0.6"}),
+        React.createElement('circle', {cx:"40",cy:"18",r:"2",fill:"#ED2939",opacity:"0.8"})
+      ),
+      16:React.createElement('svg', { width: "80", height: "80", viewBox: "0 0 80 80"},
+        React.createElement('rect', {x:"4",y:"60",width:"72",height:"5",rx:"1",fill:"#AAA",opacity:"0.3"}),
+        React.createElement('rect', {x:"4",y:"16",width:"72",height:"4",rx:"1",fill:"#AAA",opacity:"0.3"}),
+        React.createElement('path', {d:"M4 16 L40 4 L76 16",fill:"#C4955A",opacity:"0.35",stroke:"#B8844A",strokeWidth:"0.5"}),
+        React.createElement('rect', {x:"8",y:"20",width:"8",height:"40",rx:"3",fill:"#D4D4C4",stroke:"#BBBBA0",strokeWidth:"0.5"}),
+        React.createElement('rect', {x:"20",y:"20",width:"8",height:"40",rx:"3",fill:"#D4D4C4",stroke:"#BBBBA0",strokeWidth:"0.5"}),
+        React.createElement('rect', {x:"52",y:"20",width:"8",height:"40",rx:"3",fill:"#D4D4C4",stroke:"#BBBBA0",strokeWidth:"0.5"}),
+        React.createElement('rect', {x:"64",y:"20",width:"8",height:"40",rx:"3",fill:"#D4D4C4",stroke:"#BBBBA0",strokeWidth:"0.5"}),
+        React.createElement('rect', {x:"30",y:"30",width:"20",height:"30",rx:"1",fill:"#C4955A",opacity:"0.5"}),
+        React.createElement('circle', {cx:"28",cy:"34",r:"4",fill:"#E8C98A"}),
+        React.createElement('rect', {x:"24",y:"38",width:"8",height:"8",rx:"2",fill:"#002395",opacity:"0.7"}),
+        React.createElement('rect', {x:"46",y:"26",width:"14",height:"8",rx:"1",fill:"#8B4513",opacity:"0.6"}),
+        React.createElement('path', {d:"M46 34 L60 34",stroke:"#6B3410",strokeWidth:"1.5",strokeLinecap:"round"})
+      ),
+      return il[scenarioId] || (
+      React.createElement('svg', { width: "80", height: "80", viewBox: "0 0 80 80"   ,}
+        , React.createElement('circle', { cx: "40", cy: "38", r: "22", fill: "#002395", opacity: "0.1", stroke: "#002395", strokeWidth: "1.5",})
+        , React.createElement('path', { d: "M40 22 C30 22 22 30 22 38 C22 50 40 60 40 60 C40 60 58 50 58 38 C58 30 50 22 40 22Z"                         , fill: "#002395", opacity: "0.12",})
+        , React.createElement('circle', { cx: "40", cy: "38", r: "7", fill: "#002395", opacity: "0.3",})
       )
     );
   };
-
   return(
     React.createElement('div', { style: {height:"100%",display:"flex",flexDirection:"column",background:C.bg},}
 
@@ -1665,6 +1772,8 @@ function ScenarioScreen({scenario:s,immersion,ttsEnabled,progress,onComplete,onD
   const [input,setInput]=useState("");
   const [loading,setLoading]=useState(false);
   const [done,setDone]=useState(false);
+  const [failCount,setFailCount]=useState(0);
+  const [failCount,setFailCount]=useState(0);
   const [count,setCount]=useState(0);
   const [showCulture,setShowCulture]=useState(false);
   const [earnedStars,setEarnedStars]=useState(null);
@@ -1694,14 +1803,18 @@ function ScenarioScreen({scenario:s,immersion,ttsEnabled,progress,onComplete,onD
     const nm=[...messages,{role:"user",content:msg}];
     setMessages(nm);setLoading(true);
     try{
-      const system = isReturn ? STAR_PROMPT(immersion, currentStars, s.cefrLevel) : TUTOR_PROMPT(immersion, s.cefrLevel);
+      const forceImmersion = s.id === 14;
+      const footballerNote = (!immersion && forceImmersion)
+        ? "IMPORTANT: You are playing Karim Benzara, a French footballer who REFUSES to speak English. Even if the journalist writes in English, respond IN FRENCH ONLY as the character, then add teacher feedback in English explaining what the journalist should have said in French."
+        : "";
+      const system = isReturn ? STAR_PROMPT(forceImmersion||immersion, currentStars, s.cefrLevel) : TUTOR_PROMPT(forceImmersion||immersion, s.cefrLevel, failCount);
       const ctrl=new AbortController();
       const timer=setTimeout(()=>ctrl.abort(),30000);
       const r=await fetch(API_BASE+"/chat",{method:"POST",
         signal:ctrl.signal,
         headers:{"Content-Type":"application/json","X-Session-ID":SESSION_ID},
         body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:1000,system,
-          messages:[{role:"user",content:`Scenario: "${title}"\nContext: ${scene}\nObjective: "${goal}"\nStudent response: "${msg}"`}]})});
+          messages:[{role:"user",content:`Scenario: "${immersion?s.title:s.titleEn}"\nContext (FR): ${s.scene_fr}\nContext (EN): ${s.scene_en}\nObjective: "${immersion?s.goal_fr:s.goal_en}"\nStudent response: "${msg}"\nFail count this session: ${failCount}`}]})});
       clearTimeout(timer);
       if(!r.ok){
         const errBody=await r.json().catch(()=>({}));
@@ -1739,6 +1852,11 @@ function ScenarioScreen({scenario:s,immersion,ttsEnabled,progress,onComplete,onD
       setMessages([...nm,{role:"assistant",content:rawReply}]);
       speakText(rawReply,ttsEnabled);
       const n=count+1;setCount(n);
+      // Track fails -- if tutor had to redirect (no objective achieved), count it
+      const tutorRedirected = /^(Non|Not quite|Pas tout a fait|Essayez|Try|Rappelle|Remember|Redirige)/i.test(rawReply.slice(0,40));
+      if(tutorRedirected && !isReturn) setFailCount(f=>f+1);
+      const tutorRedirected=/^(Non|Not quite|Pas tout|Essayez|Try|Rappel|Remember)/i.test(rawReply.slice(0,40));
+      if(tutorRedirected&&!isReturn)setFailCount(f=>f+1);
       if(n>=5){setDone(true);setEarnedStars(isReturn?newStars:1);}
       else if(n===3){setSuggestWrap(true);}
       // Update remaining from server meta
@@ -2876,8 +2994,9 @@ function App(){
   );
 }
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
+const root=ReactDOM.createRoot(document.getElementById('root'));
 root.render(React.createElement(App));
+  
   </script>
 </body>
 </html>
