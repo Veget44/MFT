@@ -1319,11 +1319,7 @@ function HomeScreen({progress,immersion,userLevel,onSelect,onProfile,onToggleMod
   // Tiny SVG illustrations per place type
   // Unique rich illustrations -- pure SVG shapes only, no text/entities
 
-const PlaceIllustration = ({scenarioId}) => {
-  const img = SCENARIO_IMAGES[scenarioId];
-  if(!img) return null;
-  return React.createElement('img', {src: img.src, width: 80, height: 80, style: {objectFit:'cover', borderRadius: 6, display:'block'}});
-};}
+}
 
 
 // -- SCENARIO 
