@@ -2020,7 +2020,7 @@ function App(){
           onComplete: (id,stars)=>{
             saveProgress({...progress,[id]:{stars:Math.max(getStars(progress[id]),stars||1),visits:(_optionalChain([progress, 'access', _34 => _34[id], 'optionalAccess', _35 => _35.visits])||0)+1}});
             go("home");
-          },
+          }, onDiag:saveDiag, onBack:()=>go('home')})
         , screen==="profile"&&React.createElement(ProfileScreen, { progress: progress, immersion: immersion,
           userLevel: userLevel||"B1", sessions: thisWeek,
           onBack: ()=>go("home"), onReset: ()=>{saveProgress({});setDiagnostics({});try{localStorage.removeItem("mft_diag");localStorage.removeItem("mft_level");localStorage.removeItem("mft_sessions");}catch (e20){}setUserLevel(null);}, onDiagnostics: ()=>go("diagnostics"),
@@ -2036,8 +2036,6 @@ function App(){
 }
 
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
-root.render(React.createElement(App));
 const root=ReactDOM.createRoot(document.getElementById('root'));
 root.render(React.createElement(App));
 </script>
