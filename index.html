@@ -1219,7 +1219,7 @@ function AssistantBubble({ content, immersion }) {
         borderRadius: "16px 16px 16px 4px",
         padding: "12px 16px",
         fontFamily: "'DM Serif Text', serif",
-        fontSize: 15, lineHeight: 1.75, color: C.ink,
+        fontSize: 16, lineHeight: 1.8, color: C.ink,
         boxShadow: "0 1px 3px rgba(0,0,0,0.07)",
         whiteSpace: "pre-wrap",
       },}
@@ -1238,7 +1238,7 @@ function AssistantBubble({ content, immersion }) {
           , React.createElement('span', { style: { fontSize: 13, flexShrink: 0, marginTop: 1 },}, "✏️")
           , React.createElement('div', { style: {
             fontFamily: "'DM Sans', sans-serif",
-            fontWeight: 300, fontSize: 13, color: C.inkMid, lineHeight: 1.65,
+            fontWeight: 300, fontSize: 14, color: C.inkMid, lineHeight: 1.65,
           },}
             , teacherNote
           )
@@ -1404,10 +1404,10 @@ function ScenarioScreen({ scenario: s, immersion, ttsEnabled, progress, onComple
         , React.createElement('div', { style: { padding: "12px 20px 0", display: "flex", alignItems: "center", gap: 12 },}
           , React.createElement(BackBtn, { onClick: onBack,} )
           , React.createElement('div', { style: { flex: 1, minWidth: 0 },}
-            , React.createElement('div', { style: { fontFamily: "'DM Serif Text',serif", fontSize: 16, color: C.onHeader, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" },}
+            , React.createElement('div', { style: { fontFamily: "'DM Serif Text',serif", fontSize: 18, color: C.onHeader, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" },}
               , title
             )
-            , React.createElement('div', { style: { fontFamily: "'DM Sans',sans-serif", fontWeight: 300, fontSize: 10, color: C.onHeaderDim },}
+            , React.createElement('div', { style: { fontFamily: "'DM Sans',sans-serif", fontWeight: 300, fontSize: 11, color: C.onHeaderDim },}
               , s.place
             )
           )
@@ -1417,30 +1417,43 @@ function ScenarioScreen({ scenario: s, immersion, ttsEnabled, progress, onComple
           )
         )
 
-        /* Scene + Goal */
-        , React.createElement('div', { style: { padding: "12px 20px 14px" },}
-          , React.createElement('div', { style: { fontFamily: "'DM Serif Text',serif", fontStyle: "italic", fontSize: 13, color: "rgba(240,242,248,0.5)", lineHeight: 1.75, marginBottom: 8 },}
+        /* Scene */
+        , React.createElement('div', { style: { padding: "10px 20px 0" },}
+          , React.createElement('div', { style: { fontFamily: "'DM Serif Text',serif", fontStyle: "italic", fontSize: 14, color: "rgba(240,242,248,0.6)", lineHeight: 1.7 },}
             , scene
           )
-          , React.createElement('div', { style: { height: 1, background: "rgba(240,242,248,0.1)", marginBottom: 8 },} )
-          , React.createElement('div', { style: { display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 12 },}
-            , React.createElement('div', { style: { fontFamily: "'DM Sans',sans-serif", fontWeight: 300, fontSize: 12, color: C.onHeaderDim, lineHeight: 1.6, flex: 1 },}
-              , goal
-            )
-            , React.createElement('button', { onClick: () => setShowHint(v => !v), style: {
-              background: "none", border: "none", cursor: "pointer",
-              fontFamily: "'DM Sans',sans-serif", fontSize: 9, fontWeight: 500,
-              color: showHint ? C.red : C.onHeaderDim,
-              letterSpacing: 1.5, textTransform: "uppercase", flexShrink: 0,
-            },}
-              , showHint ? t.close : t.hint
+        )
+
+        /* Goal + Hint */
+        , React.createElement('div', { style: { padding: "10px 20px 14px", display: "flex", alignItems: "flex-start", gap: 12 },}
+          /* Goal pill — clearly visible */
+          , React.createElement('div', { style: {
+            flex: 1,
+            background: "rgba(255,255,255,0.08)",
+            border: "1px solid rgba(255,255,255,0.12)",
+            borderRadius: 8,
+            padding: "8px 12px",
+          },}
+            , React.createElement('div', { style: { fontFamily: "'DM Sans',sans-serif", fontWeight: 400, fontSize: 13, color: C.onHeader, lineHeight: 1.55 },}, "🎯 "
+               , goal
             )
           )
-          , showHint && (
-            React.createElement('div', { style: { marginTop: 8, borderLeft: `2px solid ${C.red}`, paddingLeft: 10 },}
-              , React.createElement('div', { style: { fontFamily: "'DM Serif Text',serif", fontStyle: "italic", fontSize: 12, color: "rgba(240,242,248,0.45)", lineHeight: 1.6 },}
-                , immersion ? s.hint_fr : s.hint_en
-              )
+          /* Hint button — visible pill */
+          , React.createElement('button', { onClick: () => setShowHint(v => !v), style: {
+            background: showHint ? C.red : "rgba(255,255,255,0.1)",
+            border: showHint ? "none" : "1px solid rgba(255,255,255,0.2)",
+            borderRadius: 6, cursor: "pointer", flexShrink: 0,
+            fontFamily: "'DM Sans',sans-serif", fontSize: 11, fontWeight: 500,
+            color: "white", padding: "8px 12px", letterSpacing: 0.5,
+            transition: "background 0.15s",
+          },}
+            , showHint ? "✕" : "💡 " + t.hint
+          )
+        )
+        , showHint && (
+          React.createElement('div', { style: { margin: "0 20px 12px", borderLeft: `3px solid ${C.red}`, paddingLeft: 12, paddingTop: 2, paddingBottom: 2 },}
+            , React.createElement('div', { style: { fontFamily: "'DM Serif Text',serif", fontStyle: "italic", fontSize: 13, color: "rgba(240,242,248,0.7)", lineHeight: 1.65 },}
+              , immersion ? s.hint_fr : s.hint_en
             )
           )
         )
@@ -1529,11 +1542,225 @@ function ScenarioScreen({ scenario: s, immersion, ttsEnabled, progress, onComple
   );
 }
 
+
+// ─────────────────────────────────────────────────────────────────────────────
+// SCREEN — DIAGNOSTICS (exercises based on conversation errors)
+// ─────────────────────────────────────────────────────────────────────────────
+
+function DiagnosticsScreen({ diag, progress, immersion, onBack }) {
+  const [activeScenario, setActiveScenario] = useState(null);
+  const [exercise, setExercise] = useState(null);
+  const [answer, setAnswer] = useState("");
+  const [feedback, setFeedback] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  // Build list of scenarios that have diagnostics with errors
+  const scenariosWithErrors = SCENARIOS.filter(s => {
+    const entries = diag[s.id] || [];
+    return entries.some(e => e.errors && e.errors.length > 0);
+  });
+
+  // Get unique errors for a scenario
+  function getErrors(scenId) {
+    const entries = diag[scenId] || [];
+    const all = entries.flatMap(e => e.errors || []);
+    return [...new Set(all)];
+  }
+
+  async function generateExercise(scenId, error) {
+    setLoading(true);
+    setFeedback(null);
+    setAnswer("");
+    const scenario = SCENARIOS.find(s => s.id === scenId);
+    const lang = immersion ? "français" : "English";
+    try {
+      const d = await callBackend("/chat", {
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 300,
+        system: `You create short fill-in-the-blank or transformation exercises to practise a specific French grammar/vocab point.
+Output ONLY a JSON object: {"instruction":"...", "sentence":"The sentence with _____ where the answer goes", "answer":"correct answer", "explanation":"brief explanation in ${lang}"}
+No markdown. Make it relevant to the scenario context.`,
+        messages: [{ role: "user", content: `Scenario: "${immersion ? _optionalChain([scenario, 'optionalAccess', _31 => _31.title]) : _optionalChain([scenario, 'optionalAccess', _32 => _32.titleEn])}". Error pattern to practise: "${error}". Create one exercise.` }],
+      });
+      const text = _optionalChain([d, 'optionalAccess', _33 => _33.content, 'optionalAccess', _34 => _34[0], 'optionalAccess', _35 => _35.text]) || "{}";
+      const ex = JSON.parse(text.replace(/```json|```/g, "").trim());
+      setExercise({ ...ex, error, scenId });
+    } catch (e7) {
+      setExercise(null);
+    }
+    setLoading(false);
+  }
+
+  async function checkAnswer() {
+    if (!answer.trim() || !exercise) return;
+    setLoading(true);
+    const lang = immersion ? "français" : "English";
+    try {
+      const d = await callBackend("/chat", {
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 200,
+        system: `You check a student's answer to a French exercise. Be encouraging but precise.
+Output ONLY JSON: {"correct": true|false, "feedback": "brief feedback in ${lang}"}`,
+        messages: [{ role: "user", content: `Exercise: "${exercise.sentence}". Expected: "${exercise.answer}". Student wrote: "${answer}".` }],
+      });
+      const text = _optionalChain([d, 'optionalAccess', _36 => _36.content, 'optionalAccess', _37 => _37[0], 'optionalAccess', _38 => _38.text]) || "{}";
+      const result = JSON.parse(text.replace(/```json|```/g, "").trim());
+      setFeedback(result);
+    } catch (e8) {
+      setFeedback({ correct: false, feedback: "Could not check answer." });
+    }
+    setLoading(false);
+  }
+
+  if (scenariosWithErrors.length === 0) return (
+    React.createElement('div', { style: { height: "100%", display: "flex", flexDirection: "column", background: C.bg },}
+      , React.createElement('style', null, CSS)
+      , React.createElement('div', { style: { background: C.header, padding: "24px 24px 20px", display: "flex", alignItems: "center", gap: 12 },}
+        , React.createElement(BackBtn, { onClick: onBack,} )
+        , React.createElement('div', { style: { fontFamily: "'DM Serif Text',serif", fontSize: 18, color: C.onHeader },}
+          , immersion ? "Mes exercices" : "My exercises"
+        )
+      )
+      , React.createElement('div', { style: { flex: 1, display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", gap: 16, padding: 32, textAlign: "center" },}
+        , React.createElement('div', { style: { fontSize: 40 },}, "✨")
+        , React.createElement('div', { style: { fontFamily: "'DM Serif Display',serif", fontSize: 22, color: C.ink },}
+          , immersion ? "Aucune erreur enregistrée" : "No errors recorded yet"
+        )
+        , React.createElement('div', { style: { fontFamily: "'DM Sans',sans-serif", fontWeight: 300, fontSize: 15, color: C.gray, lineHeight: 1.6 },}
+          , immersion
+            ? "Complétez des scénarios et vos erreurs apparaîtront ici sous forme d'exercices personnalisés."
+            : "Complete some scenarios and your errors will appear here as personalised exercises."
+        )
+      )
+    )
+  );
+
+  return (
+    React.createElement('div', { style: { height: "100%", display: "flex", flexDirection: "column", background: C.bg },}
+      , React.createElement('style', null, CSS)
+      , React.createElement('div', { style: { background: C.header, padding: "24px 24px 20px", display: "flex", alignItems: "center", gap: 12 },}
+        , React.createElement(BackBtn, { onClick: exercise ? () => { setExercise(null); setFeedback(null); } : onBack,} )
+        , React.createElement('div', { style: { fontFamily: "'DM Serif Text',serif", fontSize: 18, color: C.onHeader },}
+          , immersion ? "Mes exercices" : "My exercises"
+        )
+      )
+
+      , !exercise ? (
+        // Error list grouped by scenario
+        React.createElement('div', { style: { flex: 1, overflowY: "auto" },}
+          , React.createElement('div', { style: { padding: "16px 20px 8px", fontFamily: "'DM Sans',sans-serif", fontWeight: 300, fontSize: 13, color: C.gray, lineHeight: 1.6 },}
+            , immersion
+              ? "Ces exercices sont générés à partir de vos erreurs dans les dialogues."
+              : "These exercises are generated from mistakes made in your conversations."
+          )
+          , scenariosWithErrors.map(s => {
+            const errors = getErrors(s.id);
+            return (
+              React.createElement('div', { key: s.id,}
+                , React.createElement('div', { style: { padding: "12px 20px 6px", fontFamily: "'DM Sans',sans-serif", fontWeight: 500, fontSize: 11, letterSpacing: 1.5, color: C.gray, textTransform: "uppercase" },}
+                  , immersion ? s.title : s.titleEn
+                )
+                , errors.map((err, i) => (
+                  React.createElement('button', { key: i, onClick: () => { setActiveScenario(s.id); generateExercise(s.id, err); }, style: {
+                    display: "flex", alignItems: "center", justifyContent: "space-between",
+                    width: "100%", padding: "14px 20px",
+                    background: "white", border: "none", borderBottom: `1px solid ${C.rule}`,
+                    cursor: "pointer", textAlign: "left",
+                  },}
+                    , React.createElement('div', null
+                      , React.createElement('div', { style: { fontFamily: "'DM Sans',sans-serif", fontSize: 14, color: C.ink, marginBottom: 2 },}, err)
+                      , React.createElement('div', { style: { fontFamily: "'DM Sans',sans-serif", fontWeight: 300, fontSize: 12, color: C.gray },}
+                        , immersion ? "Pratiquer →" : "Practise →"
+                      )
+                    )
+                    , React.createElement('div', { style: { color: C.grayLight, fontSize: 18 },}, "›")
+                  )
+                ))
+              )
+            );
+          })
+          , React.createElement('div', { style: { height: 32 },} )
+        )
+      ) : (
+        // Exercise view
+        React.createElement('div', { style: { flex: 1, display: "flex", flexDirection: "column", padding: "24px 20px", gap: 16 },}
+          , loading && !exercise.sentence ? (
+            React.createElement('div', { style: { flex: 1, display: "flex", alignItems: "center", justifyContent: "center" },}
+              , React.createElement(LoadingDots, null )
+            )
+          ) : (
+            React.createElement(React.Fragment, null
+              , React.createElement('div', { style: { background: C.blueLight, borderLeft: `3px solid ${C.blue}`, borderRadius: "0 8px 8px 0", padding: "10px 14px" },}
+                , React.createElement('div', { style: { fontFamily: "'DM Sans',sans-serif", fontWeight: 500, fontSize: 11, letterSpacing: 1.5, color: C.blue, textTransform: "uppercase", marginBottom: 4 },}
+                  , immersion ? "Point à travailler" : "Focus"
+                )
+                , React.createElement('div', { style: { fontFamily: "'DM Sans',sans-serif", fontSize: 14, color: C.inkMid },}, exercise.error)
+              )
+
+              , exercise.instruction && (
+                React.createElement('div', { style: { fontFamily: "'DM Serif Text',serif", fontStyle: "italic", fontSize: 15, color: C.gray, lineHeight: 1.65 },}
+                  , exercise.instruction
+                )
+              )
+
+              , React.createElement('div', { style: { fontFamily: "'DM Serif Display',serif", fontSize: 20, color: C.ink, lineHeight: 1.5 },}
+                , exercise.sentence
+              )
+
+              , React.createElement('textarea', {
+                autoFocus: true,
+                value: answer,
+                onChange: e => setAnswer(e.target.value),
+                onKeyDown: e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); checkAnswer(); } },
+                placeholder: immersion ? "Votre réponse…" : "Your answer…",
+                rows: 2,
+                style: {
+                  resize: "none", border: `1px solid ${C.rule}`, borderRadius: 8,
+                  padding: "12px 14px", fontFamily: "'DM Serif Text',serif",
+                  fontSize: 16, color: C.ink, lineHeight: 1.6, background: "white",
+                },}
+              )
+
+              , feedback && (
+                React.createElement('div', { style: {
+                  borderLeft: `3px solid ${feedback.correct ? C.green : C.red}`,
+                  background: feedback.correct ? C.greenLight : C.redLight,
+                  borderRadius: "0 8px 8px 0", padding: "12px 14px",
+                },}
+                  , React.createElement('div', { style: { fontFamily: "'DM Sans',sans-serif", fontWeight: 500, fontSize: 12, color: feedback.correct ? C.green : C.red, marginBottom: 4 },}
+                    , feedback.correct ? (immersion ? "✓ Correct !" : "✓ Correct!") : (immersion ? "✗ Pas tout à fait" : "✗ Not quite")
+                  )
+                  , React.createElement('div', { style: { fontFamily: "'DM Sans',sans-serif", fontWeight: 300, fontSize: 14, color: C.inkMid, lineHeight: 1.6 },}
+                    , feedback.feedback
+                  )
+                  , exercise.explanation && (
+                    React.createElement('div', { style: { fontFamily: "'DM Sans',sans-serif", fontWeight: 300, fontSize: 13, color: C.gray, marginTop: 6, lineHeight: 1.5 },}
+                      , exercise.explanation
+                    )
+                  )
+                )
+              )
+
+              , React.createElement('button', {
+                onClick: feedback ? () => generateExercise(activeScenario, exercise.error) : checkAnswer,
+                disabled: loading || (!feedback && !answer.trim()),
+                style: primaryBtn,}
+
+                , loading ? "…" : feedback ? (immersion ? "Nouvel exercice" : "New exercise") : (immersion ? "Vérifier →" : "Check →")
+              )
+            )
+          )
+        )
+      )
+    )
+  );
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 // SCREEN — PROFILE
 // ─────────────────────────────────────────────────────────────────────────────
 
-function ProfileScreen({ progress, immersion, userLevel, sessions, onBack, onReset, onToggleMode, onRetakeTest, ttsEnabled, onToggleTTS }) {
+function ProfileScreen({ progress, immersion, userLevel, sessions, onBack, onReset, onToggleMode, onRetakeTest, ttsEnabled, onToggleTTS, onDiagnostics }) {
   const t = T(immersion);
   const effectiveLevel = getUnlockedLevel(progress, userLevel);
   const totalStars = SCENARIOS.reduce((sum, s) => sum + getStars(progress[s.id]), 0);
@@ -1583,6 +1810,7 @@ function ProfileScreen({ progress, immersion, userLevel, sessions, onBack, onRes
 
         /* Options */
         , React.createElement('div', { style: { display: "flex", flexDirection: "column", gap: 1 },}
+          , React.createElement(ProfileRow, { label: immersion ? "📝 Mes exercices" : "📝 My exercises", onClick: onDiagnostics,} )
           , React.createElement(ProfileRow, { label: t.toggleMode, onClick: onToggleMode,} )
           , React.createElement(ProfileRow, { label: t.ttsLabel, onClick: onToggleTTS, badge: ttsEnabled ? "ON" : "OFF",} )
           , React.createElement(ProfileRow, { label: t.retakeTest, onClick: onRetakeTest,} )
@@ -1644,6 +1872,7 @@ function App() {
   const [scenario,  setScenario]  = useState(null);
   const [progress,  setProgress]  = useState(() => ls("mft_progress", {}));
   const [diag,      setDiag]      = useState(() => ls("mft_diag", {}));
+  const [prevScreen, setPrevScreen] = useState("home");
   const [immersion, setImmersion] = useState(() => ls("mft_immersion", false));
   const [userLevel, setUserLevel] = useState(() => ls("mft_level", null));
   const [ttsEnabled,setTtsEnabled]= useState(false);
@@ -1713,7 +1942,7 @@ function App() {
             ttsEnabled: ttsEnabled,
             progress: progress,
             onComplete: (id, stars) => {
-              saveProgress({ ...progress, [id]: { stars: Math.max(getStars(progress[id]), stars || 1), visits: (_optionalChain([progress, 'access', _31 => _31[id], 'optionalAccess', _32 => _32.visits]) || 0) + 1 } });
+              saveProgress({ ...progress, [id]: { stars: Math.max(getStars(progress[id]), stars || 1), visits: (_optionalChain([progress, 'access', _39 => _39[id], 'optionalAccess', _40 => _40.visits]) || 0) + 1 } });
               go("home");
             },
             onDiag: saveDiag,
@@ -1732,7 +1961,17 @@ function App() {
             onReset: () => { saveProgress({}); setDiag({}); lsSet("mft_diag", {}); go("home"); },
             onToggleMode: toggleImmersion,
             onToggleTTS: () => setTtsEnabled(v => !v),
-            onRetakeTest: () => go("leveltest"),}
+            onRetakeTest: () => go("leveltest"),
+            onDiagnostics: () => go("diagnostics"),}
+          )
+        )
+
+        , screen === "diagnostics" && (
+          React.createElement(DiagnosticsScreen, {
+            diag: diag,
+            progress: progress,
+            immersion: immersion,
+            onBack: () => go("profile"),}
           )
         )
 
