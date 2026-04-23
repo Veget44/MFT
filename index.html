@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="theme-color" content="#1E2138">
+<meta name="theme-color" content="#0A0F2E">
 <title>My French Teacher</title>
 <style>*{margin:0;padding:0;box-sizing:border-box}html,body,#root{width:100%;height:100%;height:100dvh;overflow:hidden;background:#F5F0E8}</style>
 </head>
@@ -717,7 +717,7 @@ function LevelChip({ level }) {
   return (
     React.createElement('span', { style: {
       background: bg, color: text,
-      fontFamily: "'DM Sans', sans-serif", fontWeight: 500, fontSize: 10,
+      fontFamily: "'DM Sans', sans-serif", fontWeight: 500, fontSize: 13,
       letterSpacing: 1, padding: "2px 7px", borderRadius: 4,
     },}
       , level === "0" ? "Pré-A1" : level
@@ -770,61 +770,246 @@ function LoadingDots() {
 function SplashScreen({ onEnter, immersion }) {
   const t = T(immersion);
   return (
-    React.createElement('div', { style: { height: "100%", display: "flex", flexDirection: "column", background: C.bg },}
+    React.createElement('div', { style: { height: "100%", display: "flex", flexDirection: "column", background: C.header, overflow: "hidden" },}
       , React.createElement('style', null, CSS)
-      , React.createElement('div', { style: { flex: 1, display: "flex", flexDirection: "column", justifyContent: "space-between", padding: "52px 36px 48px" },}
 
-        /* Logo row */
-        , React.createElement('div', { style: { animation: "fadeIn 0.5s both", display: "flex", alignItems: "center", gap: 12 },}
-          , React.createElement(Flag, { h: 18, w: 32,} )
-          , React.createElement('div', { style: { height: 1, flex: 1, background: C.rule },} )
-        )
+      /* Hero illustration — Parisian skyline */
+      , React.createElement('div', { style: { flex: 1, position: "relative", overflow: "hidden" },}
+        , React.createElement(ParisSkyline, null )
 
-        /* Title */
-        , React.createElement('div', { style: { animation: "fadeUp 0.7s 0.15s both" },}
-          , React.createElement('div', { style: { fontFamily: "'DM Serif Display', serif", fontStyle: "italic", fontSize: 58, lineHeight: 0.95, color: C.ink, letterSpacing: -1, marginBottom: 4 },}, "My French"
+        /* Gradient overlay bottom */
+        , React.createElement('div', { style: {
+          position: "absolute", bottom: 0, left: 0, right: 0, height: "60%",
+          background: "linear-gradient(to bottom, transparent, " + C.header + ")",
+        },} )
 
-          )
-          , React.createElement('div', { style: { fontFamily: "'DM Serif Display', serif", fontSize: 58, lineHeight: 0.95, color: C.ink, letterSpacing: -1, marginBottom: 28 },}, "Teacher"
+        /* Top bar */
+        , React.createElement('div', { style: {
+          position: "absolute", top: 0, left: 0, right: 0,
+          padding: "48px 32px 0",
+          animation: "fadeIn 0.6s both",
+        },}
+          , React.createElement('div', { style: { display: "flex", alignItems: "center", gap: 12 },}
+            , React.createElement(Flag, { h: 16, w: 28,} )
+            , React.createElement('div', { style: { fontFamily: "'DM Sans',sans-serif", fontWeight: 300, fontSize: 11, letterSpacing: 3, color: "rgba(240,242,248,0.5)", textTransform: "uppercase" },}, "My French Teacher"
 
-          )
-          , React.createElement('div', { style: { height: 1, background: C.rule, marginBottom: 20 },} )
-          , React.createElement('div', { style: { display: "flex", flexDirection: "column", gap: 0 },}
-            , t.tagline.map((line, i) => (
-              React.createElement('div', { key: i, style: {
-                fontFamily: "'DM Serif Text', serif",
-                fontStyle: i < 2 ? "italic" : "normal",
-                fontSize: i === 2 ? 17 : 16,
-                color: i === 2 ? C.ink : C.gray,
-                lineHeight: i === 2 ? 1.5 : 1.9,
-              },}
-                , line
-              )
-            ))
+            )
           )
         )
 
-        /* CTA */
-        , React.createElement('div', { style: { animation: "fadeUp 0.7s 0.3s both" },}
-          , React.createElement('div', { style: { display: "flex", height: 2, marginBottom: 20 },}
-            , React.createElement('div', { style: { flex: 1, background: C.blue },} )
-            , React.createElement('div', { style: { flex: 1, background: "white" },} )
-            , React.createElement('div', { style: { flex: 1, background: C.red },} )
-          )
-          , React.createElement('button', {
-            onClick: onEnter,
-            style: {
-              width: "100%", padding: "16px 24px",
-              background: C.ink, color: "white",
-              border: "none", cursor: "pointer",
-              fontFamily: "'DM Sans', sans-serif", fontWeight: 500, fontSize: 13,
-              letterSpacing: 1, textTransform: "uppercase",
-            },}
+        /* Title — overlapping bottom of illustration */
+        , React.createElement('div', { style: {
+          position: "absolute", bottom: 0, left: 0, right: 0,
+          padding: "0 32px 24px",
+          animation: "fadeUp 0.8s 0.1s both",
+        },}
+          , React.createElement('div', { style: { fontFamily: "'DM Serif Display',serif", fontStyle: "italic", fontSize: 52, lineHeight: 0.9, color: "rgba(240,242,248,0.92)", letterSpacing: -1 },}, "My French"
 
-            , t.start
+          )
+          , React.createElement('div', { style: { fontFamily: "'DM Serif Display',serif", fontSize: 52, lineHeight: 0.9, color: C.onHeader, letterSpacing: -1 },}, "Teacher"
+
           )
         )
       )
+
+      /* Bottom panel */
+      , React.createElement('div', { style: {
+        background: C.header,
+        padding: "24px 32px 48px",
+        animation: "fadeUp 0.7s 0.25s both",
+      },}
+        /* Tagline */
+        , React.createElement('div', { style: { marginBottom: 28 },}
+          , t.tagline.map((line, i) => (
+            React.createElement('div', { key: i, style: {
+              fontFamily: "'DM Serif Text',serif",
+              fontStyle: i < 2 ? "italic" : "normal",
+              fontSize: i === 2 ? 19 : 18,
+              color: i === 2 ? C.onHeader : "rgba(240,242,248,0.5)",
+              lineHeight: 1.75,
+              fontWeight: i === 2 ? 500 : 400,
+            },}
+              , line
+            )
+          ))
+        )
+
+        /* Tricolor + CTA */
+        , React.createElement('div', { style: { display: "flex", height: 3, marginBottom: 16, borderRadius: 2, overflow: "hidden" },}
+          , React.createElement('div', { style: { flex: 1, background: C.blue },} )
+          , React.createElement('div', { style: { flex: 1, background: "white" },} )
+          , React.createElement('div', { style: { flex: 1, background: C.red },} )
+        )
+        , React.createElement('button', { onClick: onEnter, style: {
+          width: "100%", padding: "18px 24px",
+          background: "white", color: C.ink,
+          border: "none", cursor: "pointer",
+          fontFamily: "'DM Sans',sans-serif", fontWeight: 600, fontSize: 15,
+          letterSpacing: 1.5, textTransform: "uppercase",
+          borderRadius: 2,
+        },}
+          , t.start
+        )
+      )
+    )
+  );
+}
+
+// Parisian skyline SVG illustration
+function ParisSkyline() {
+  return (
+    React.createElement('svg', {
+      viewBox: "0 0 390 420"   ,
+      xmlns: "http://www.w3.org/2000/svg",
+      style: { width: "100%", height: "100%", display: "block" },
+      preserveAspectRatio: "xMidYMid slice" ,}
+
+      /* Sky gradient */
+      , React.createElement('defs', null
+        , React.createElement('linearGradient', { id: "sky", x1: "0", y1: "0", x2: "0", y2: "1",}
+          , React.createElement('stop', { offset: "0%", stopColor: "#0A0F2E",} )
+          , React.createElement('stop', { offset: "60%", stopColor: "#1E2138",} )
+          , React.createElement('stop', { offset: "100%", stopColor: "#2A1F3D",} )
+        )
+        , React.createElement('linearGradient', { id: "moonGlow", x1: "0", y1: "0", x2: "1", y2: "1",}
+          , React.createElement('stop', { offset: "0%", stopColor: "#F5C842", stopOpacity: "0.3",} )
+          , React.createElement('stop', { offset: "100%", stopColor: "#F5C842", stopOpacity: "0",} )
+        )
+      )
+
+      , React.createElement('rect', { width: "390", height: "420", fill: "url(#sky)",} )
+
+      /* Stars */
+      , [[30,40],[80,25],[140,35],[200,20],[260,45],[310,28],[350,38],[60,80],[170,65],[290,70],[380,55],[20,110],[120,90],[230,85],[340,100]].map(([x,y],i) => (
+        React.createElement('circle', { key: i, cx: x, cy: y, r: i%3===0?1.5:1, fill: "white", opacity: 0.4+Math.sin(i)*0.3,} )
+      ))
+
+      /* Moon */
+      , React.createElement('circle', { cx: "320", cy: "70", r: "28", fill: "#F5E878", opacity: "0.15",} )
+      , React.createElement('circle', { cx: "320", cy: "70", r: "20", fill: "#F5E878", opacity: "0.9",} )
+      , React.createElement('circle', { cx: "330", cy: "62", r: "16", fill: "#1A1F3A",} )
+
+      /* Seine river — bottom */
+      , React.createElement('ellipse', { cx: "195", cy: "410", rx: "250", ry: "30", fill: "#1A3A8F", opacity: "0.4",} )
+      , React.createElement('rect', { x: "0", y: "395", width: "390", height: "25", fill: "#1A2A5A", opacity: "0.5",} )
+
+      /* Far background buildings */
+      , React.createElement('rect', { x: "0", y: "280", width: "50", height: "120", fill: "#252845",} )
+      , React.createElement('rect', { x: "45", y: "295", width: "35", height: "105", fill: "#1E2238",} )
+      , React.createElement('rect', { x: "320", y: "270", width: "70", height: "130", fill: "#252845",} )
+      , React.createElement('rect', { x: "340", y: "285", width: "40", height: "115", fill: "#1E2238",} )
+
+      /* Haussmann buildings left */
+      , React.createElement('rect', { x: "0", y: "240", width: "70", height: "160", fill: "#2A2D50",} )
+      , React.createElement('rect', { x: "5", y: "248", width: "14", height: "18", fill: "#4A6080", opacity: "0.6",} )
+      , React.createElement('rect', { x: "23", y: "248", width: "14", height: "18", fill: "#F5C842", opacity: "0.3",} )
+      , React.createElement('rect', { x: "41", y: "248", width: "14", height: "18", fill: "#4A6080", opacity: "0.6",} )
+      , React.createElement('rect', { x: "5", y: "275", width: "14", height: "18", fill: "#F5C842", opacity: "0.4",} )
+      , React.createElement('rect', { x: "23", y: "275", width: "14", height: "18", fill: "#4A6080", opacity: "0.5",} )
+      , React.createElement('rect', { x: "41", y: "275", width: "14", height: "18", fill: "#F5C842", opacity: "0.3",} )
+      /* Mansard roof */
+      , React.createElement('polygon', { points: "0,240 35,220 70,240"  , fill: "#1E2138",} )
+
+      /* Haussmann buildings right */
+      , React.createElement('rect', { x: "310", y: "230", width: "80", height: "170", fill: "#2A2D50",} )
+      , React.createElement('rect', { x: "318", y: "238", width: "14", height: "18", fill: "#F5C842", opacity: "0.5",} )
+      , React.createElement('rect', { x: "337", y: "238", width: "14", height: "18", fill: "#4A6080", opacity: "0.6",} )
+      , React.createElement('rect', { x: "356", y: "238", width: "14", height: "18", fill: "#F5C842", opacity: "0.3",} )
+      , React.createElement('rect', { x: "374", y: "238", width: "14", height: "18", fill: "#4A6080", opacity: "0.5",} )
+      , React.createElement('rect', { x: "318", y: "265", width: "14", height: "18", fill: "#4A6080", opacity: "0.4",} )
+      , React.createElement('rect', { x: "337", y: "265", width: "14", height: "18", fill: "#F5C842", opacity: "0.5",} )
+      , React.createElement('rect', { x: "356", y: "265", width: "14", height: "18", fill: "#4A6080", opacity: "0.6",} )
+      , React.createElement('polygon', { points: "310,230 350,208 390,230"  , fill: "#1E2138",} )
+
+      /* Notre-Dame left mid */
+      , React.createElement('rect', { x: "55", y: "260", width: "90", height: "140", fill: "#232540",} )
+      , React.createElement('rect', { x: "60", y: "268", width: "12", height: "16", fill: "#F5C842", opacity: "0.4",} )
+      , React.createElement('rect', { x: "76", y: "268", width: "12", height: "16", fill: "#4A6080", opacity: "0.5",} )
+      , React.createElement('rect', { x: "92", y: "268", width: "12", height: "16", fill: "#F5C842", opacity: "0.3",} )
+      , React.createElement('rect', { x: "108", y: "268", width: "12", height: "16", fill: "#4A6080", opacity: "0.5",} )
+      , React.createElement('rect', { x: "124", y: "268", width: "12", height: "16", fill: "#F5C842", opacity: "0.4",} )
+      /* Rose window */
+      , React.createElement('circle', { cx: "100", cy: "295", r: "8", fill: "none", stroke: "#F5C842", strokeWidth: "1", opacity: "0.4",} )
+      , React.createElement('circle', { cx: "100", cy: "295", r: "4", fill: "#F5C842", opacity: "0.2",} )
+      /* Twin towers */
+      , React.createElement('rect', { x: "62", y: "230", width: "22", height: "30", fill: "#2A2D50",} )
+      , React.createElement('rect', { x: "114", y: "225", width: "22", height: "35", fill: "#2A2D50",} )
+      , React.createElement('polygon', { points: "62,230 73,205 84,230"  , fill: "#1E2138",} )
+      , React.createElement('polygon', { points: "114,225 125,198 136,225"  , fill: "#1E2138",} )
+
+      /* Sacré-Cœur domes right mid */
+      , React.createElement('rect', { x: "250", y: "260", width: "85", height: "140", fill: "#232540",} )
+      , React.createElement('ellipse', { cx: "292", cy: "255", rx: "30", ry: "22", fill: "#2A2D50",} )
+      , React.createElement('ellipse', { cx: "292", cy: "248", rx: "20", ry: "15", fill: "#252845",} )
+      , React.createElement('ellipse', { cx: "292", cy: "243", rx: "12", ry: "9", fill: "#2A2D50",} )
+      , React.createElement('line', { x1: "292", y1: "234", x2: "292", y2: "224", stroke: "#C8C6D2", strokeWidth: "2", opacity: "0.6",} )
+      , React.createElement('circle', { cx: "292", cy: "222", r: "3", fill: "#C8C6D2", opacity: "0.6",} )
+      /* Side domes */
+      , React.createElement('ellipse', { cx: "267", cy: "268", rx: "15", ry: "11", fill: "#252845",} )
+      , React.createElement('ellipse', { cx: "317", cy: "268", rx: "15", ry: "11", fill: "#252845",} )
+
+      /* EIFFEL TOWER — center hero */
+      , React.createElement('g', { transform: "translate(195, 60)" ,}
+        /* Legs */
+        , React.createElement('polygon', { points: "-38,280 -20,180 20,180 38,280"   , fill: "#1A1D35",} )
+        /* First floor platform */
+        , React.createElement('rect', { x: "-22", y: "175", width: "44", height: "8", fill: "#D4A800", opacity: "0.8",} )
+        , React.createElement('rect', { x: "-22", y: "175", width: "44", height: "8", fill: "none", stroke: "#F5C842", strokeWidth: "0.5", opacity: "0.5",} )
+        /* First floor lights */
+        , [-14,-7,0,7,14].map((x,i) => (
+          React.createElement('rect', { key: i, x: x-2, y: 160, width: "4", height: "14", fill: "#F5C842", opacity: 0.3+i*0.05,} )
+        ))
+        /* Mid section */
+        , React.createElement('polygon', { points: "-20,175 -10,100 10,100 20,175"   , fill: "#1E2138",} )
+        /* Second floor */
+        , React.createElement('rect', { x: "-13", y: "95", width: "26", height: "7", fill: "#D4A800", opacity: "0.7",} )
+        /* Upper section */
+        , React.createElement('polygon', { points: "-10,95 -4,30 4,30 10,95"   , fill: "#1A1D35",} )
+        /* Antenna */
+        , React.createElement('rect', { x: "-2", y: "-10", width: "4", height: "42", fill: "#C8C6D2", opacity: "0.8",} )
+        , React.createElement('rect', { x: "-1", y: "-10", width: "2", height: "12", fill: "#F5C842", opacity: "0.9",} )
+        /* Beacon */
+        , React.createElement('circle', { cx: "0", cy: "-12", r: "4", fill: "#F5C842", opacity: "0.9",} )
+        , React.createElement('circle', { cx: "0", cy: "-12", r: "8", fill: "#F5C842", opacity: "0.2",} )
+        , React.createElement('circle', { cx: "0", cy: "-12", r: "16", fill: "#F5C842", opacity: "0.08",} )
+        /* Lattice details */
+        , React.createElement('line', { x1: "-20", y1: "200", x2: "0", y2: "185", stroke: "#D4A800", strokeWidth: "0.8", opacity: "0.4",} )
+        , React.createElement('line', { x1: "20", y1: "200", x2: "0", y2: "185", stroke: "#D4A800", strokeWidth: "0.8", opacity: "0.4",} )
+        , React.createElement('line', { x1: "-20", y1: "230", x2: "0", y2: "215", stroke: "#D4A800", strokeWidth: "0.8", opacity: "0.3",} )
+        , React.createElement('line', { x1: "20", y1: "230", x2: "0", y2: "215", stroke: "#D4A800", strokeWidth: "0.8", opacity: "0.3",} )
+        , React.createElement('line', { x1: "-20", y1: "260", x2: "0", y2: "245", stroke: "#D4A800", strokeWidth: "0.8", opacity: "0.25",} )
+        , React.createElement('line', { x1: "20", y1: "260", x2: "0", y2: "245", stroke: "#D4A800", strokeWidth: "0.8", opacity: "0.25",} )
+        /* Cross-bracing */
+        , React.createElement('line', { x1: "-38", y1: "280", x2: "-20", y2: "180", stroke: "#D4A800", strokeWidth: "0.5", opacity: "0.3",} )
+        , React.createElement('line', { x1: "38", y1: "280", x2: "20", y2: "180", stroke: "#D4A800", strokeWidth: "0.5", opacity: "0.3",} )
+        /* Window lights */
+        , [140,150,160].map((y,i) => [-8,-2,4].map((x,j) => (
+          React.createElement('rect', { key: `${i}${j}`, x: x, y: y, width: "3", height: "4", fill: "#F5C842", opacity: Math.random()>0.4?0.6:0.15,} )
+        )))
+        /* Ground glow */
+        , React.createElement('ellipse', { cx: "0", cy: "290", rx: "60", ry: "8", fill: "#F5C842", opacity: "0.06",} )
+      )
+
+      /* Foreground buildings */
+      , React.createElement('rect', { x: "0", y: "310", width: "55", height: "110", fill: "#161830",} )
+      , React.createElement('rect', { x: "50", y: "320", width: "45", height: "100", fill: "#1A1C35",} )
+      , React.createElement('rect', { x: "280", y: "305", width: "55", height: "115", fill: "#161830",} )
+      , React.createElement('rect', { x: "330", y: "318", width: "60", height: "102", fill: "#1A1C35",} )
+
+      /* Street lights */
+      , [40, 100, 280, 340].map((x, i) => (
+        React.createElement('g', { key: i,}
+          , React.createElement('line', { x1: x, y1: "380", x2: x, y2: "340", stroke: "#C8C6D2", strokeWidth: "1.5", opacity: "0.4",} )
+          , React.createElement('circle', { cx: x, cy: "338", r: "4", fill: "#F5E878", opacity: "0.7",} )
+          , React.createElement('circle', { cx: x, cy: "338", r: "8", fill: "#F5E878", opacity: "0.15",} )
+        )
+      ))
+
+      /* River reflection of Eiffel */
+      , React.createElement('polygon', { points: "157,395 175,405 215,405 233,395 225,400 195,408 165,400"      , fill: "#F5C842", opacity: "0.08",} )
+
+      /* Subtle fog layer */
+      , React.createElement('rect', { x: "0", y: "350", width: "390", height: "70", fill: "url(#sky)", opacity: "0.4",} )
     )
   );
 }
@@ -848,11 +1033,11 @@ function ModeScreen({ immersion, onSelect }) {
       , React.createElement('div', { style: { background: C.header, padding: "32px 28px 24px" },}
         , React.createElement('div', { style: { display: "flex", alignItems: "center", gap: 10, marginBottom: 16 },}
           , React.createElement(Flag, { h: 14, w: 24,} )
-          , React.createElement('span', { style: { fontFamily: "'DM Sans',sans-serif", fontWeight: 300, fontSize: 9, letterSpacing: 3, color: C.onHeaderDim, textTransform: "uppercase" },}, "My French Teacher"
+          , React.createElement('span', { style: { fontFamily: "'DM Sans',sans-serif", fontWeight: 300, fontSize: 12, letterSpacing: 3, color: C.onHeaderDim, textTransform: "uppercase" },}, "My French Teacher"
 
           )
         )
-        , React.createElement('div', { style: { fontFamily: "'DM Serif Display',serif", fontSize: 26, color: C.onHeader, lineHeight: 1.2 },}
+        , React.createElement('div', { style: { fontFamily: "'DM Serif Display',serif", fontSize: 28, color: C.onHeader, lineHeight: 1.2 },}
           , t.modeTitle
         )
       )
@@ -877,10 +1062,10 @@ function ModeScreen({ immersion, onSelect }) {
                 , active && React.createElement('div', { style: { width: 8, height: 8, borderRadius: "50%", background: C.blue },} )
               )
               , React.createElement('div', null
-                , React.createElement('div', { style: { fontFamily: "'DM Serif Text',serif", fontSize: 17, color: C.ink, marginBottom: 4 },}
+                , React.createElement('div', { style: { fontFamily: "'DM Serif Text',serif", fontSize: 19, color: C.ink, marginBottom: 4 },}
                   , m.label
                 )
-                , React.createElement('div', { style: { fontFamily: "'DM Sans',sans-serif", fontWeight: 300, fontSize: 13, color: C.gray },}
+                , React.createElement('div', { style: { fontFamily: "'DM Sans',sans-serif", fontWeight: 300, fontSize: 16, color: C.gray },}
                   , m.sub
                 )
               )
@@ -897,7 +1082,7 @@ function ModeScreen({ immersion, onSelect }) {
               width: "100%", padding: "15px",
               background: C.ink, color: "white",
               border: "none", cursor: "pointer",
-              fontFamily: "'DM Sans',sans-serif", fontWeight: 500, fontSize: 13,
+              fontFamily: "'DM Sans',sans-serif", fontWeight: 500, fontSize: 16,
               letterSpacing: 1, textTransform: "uppercase",
             },}
 
@@ -956,14 +1141,14 @@ Be precise and encouraging.`;
       , React.createElement('style', null, CSS)
       , React.createElement('div', { style: { background: C.header, padding: "24px 24px 20px", display: "flex", alignItems: "center", gap: 12 },}
         , React.createElement(BackBtn, { onClick: onBack,} )
-        , React.createElement('div', { style: { fontFamily: "'DM Serif Text',serif", fontSize: 18, color: C.onHeader },}, t.testTitle)
+        , React.createElement('div', { style: { fontFamily: "'DM Serif Text',serif", fontSize: 20, color: C.onHeader },}, t.testTitle)
       )
       , React.createElement('div', { style: { flex: 1, display: "flex", flexDirection: "column", justifyContent: "space-between", padding: "32px 28px" },}
         , React.createElement('div', null
-          , React.createElement('div', { style: { fontFamily: "'DM Serif Display',serif", fontSize: 28, color: C.ink, lineHeight: 1.25, marginBottom: 12 },}
+          , React.createElement('div', { style: { fontFamily: "'DM Serif Display',serif", fontSize: 30, color: C.ink, lineHeight: 1.25, marginBottom: 12 },}
             , t.testTitle
           )
-          , React.createElement('div', { style: { fontFamily: "'DM Sans',sans-serif", fontWeight: 300, fontSize: 14, color: C.gray, lineHeight: 1.7 },}
+          , React.createElement('div', { style: { fontFamily: "'DM Sans',sans-serif", fontWeight: 300, fontSize: 16, color: C.gray, lineHeight: 1.7 },}
             , t.testSub
           )
         )
@@ -972,14 +1157,14 @@ Be precise and encouraging.`;
             , t.testTakeTest
           )
           , React.createElement('div', { style: { height: 1, background: C.rule },} )
-          , React.createElement('div', { style: { fontFamily: "'DM Sans',sans-serif", fontWeight: 300, fontSize: 12, color: C.gray, marginBottom: 4 },}
+          , React.createElement('div', { style: { fontFamily: "'DM Sans',sans-serif", fontWeight: 300, fontSize: 15, color: C.gray, marginBottom: 4 },}
             , t.testKnowLevel
           )
           , CEFR_ORDER.filter(l => l !== "0").map(l => (
             React.createElement('button', { key: l, onClick: () => onComplete(l), style: {
               background: "none", border: `1px solid ${C.rule}`,
               padding: "10px 16px", cursor: "pointer",
-              fontFamily: "'DM Sans',sans-serif", fontSize: 13, color: C.inkMid,
+              fontFamily: "'DM Sans',sans-serif", fontSize: 16, color: C.inkMid,
               display: "flex", alignItems: "center", justifyContent: "space-between",
             },}
               , React.createElement('span', { style: { fontWeight: 500 },}, l)
@@ -996,10 +1181,10 @@ Be precise and encouraging.`;
       , React.createElement('style', null, CSS)
       , React.createElement('div', { style: { background: C.header, padding: "24px 24px 20px", display: "flex", alignItems: "center", gap: 12 },}
         , React.createElement(BackBtn, { onClick: () => setPhase("intro"),} )
-        , React.createElement('div', { style: { fontFamily: "'DM Serif Text',serif", fontSize: 18, color: C.onHeader },}, t.testTitle)
+        , React.createElement('div', { style: { fontFamily: "'DM Serif Text',serif", fontSize: 20, color: C.onHeader },}, t.testTitle)
       )
       , React.createElement('div', { style: { flex: 1, padding: "28px 24px", display: "flex", flexDirection: "column", gap: 16 },}
-        , React.createElement('div', { style: { fontFamily: "'DM Serif Text',serif", fontStyle: "italic", fontSize: 16, color: C.inkMid, lineHeight: 1.7 },}
+        , React.createElement('div', { style: { fontFamily: "'DM Serif Text',serif", fontStyle: "italic", fontSize: 18, color: C.inkMid, lineHeight: 1.7 },}
           , immersion
             ? "Écrivez 2 ou 3 phrases en français — présentez-vous, dites ce que vous faites, ou parlez d'un endroit que vous aimez."
             : "Write 2 or 3 sentences in French — introduce yourself, say what you do, or talk about a place you like."
@@ -1012,7 +1197,7 @@ Be precise and encouraging.`;
           style: {
             flex: 1, resize: "none", border: `1px solid ${C.rule}`,
             borderRadius: 4, padding: "14px 16px",
-            fontFamily: "'DM Serif Text',serif", fontSize: 16, color: C.ink,
+            fontFamily: "'DM Serif Text',serif", fontSize: 18, color: C.ink,
             background: "white", lineHeight: 1.7,
           },}
         )
@@ -1028,7 +1213,7 @@ Be precise and encouraging.`;
     React.createElement('div', { style: { height: "100%", display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", gap: 20, background: C.bg },}
       , React.createElement('style', null, CSS)
       , React.createElement('div', { style: { width: 28, height: 28, border: `2px solid ${C.rule}`, borderTopColor: C.ink, borderRadius: "50%", animation: "spin 0.8s linear infinite" },} )
-      , React.createElement('div', { style: { fontFamily: "'DM Sans',sans-serif", fontWeight: 300, fontSize: 13, color: C.gray },}, t.testLoading)
+      , React.createElement('div', { style: { fontFamily: "'DM Sans',sans-serif", fontWeight: 300, fontSize: 16, color: C.gray },}, t.testLoading)
     )
   );
 
@@ -1036,21 +1221,21 @@ Be precise and encouraging.`;
     React.createElement('div', { style: { height: "100%", display: "flex", flexDirection: "column", background: C.bg },}
       , React.createElement('style', null, CSS)
       , React.createElement('div', { style: { background: C.header, padding: "24px 24px 20px" },}
-        , React.createElement('div', { style: { fontFamily: "'DM Sans',sans-serif", fontWeight: 300, fontSize: 9, letterSpacing: 3, color: C.onHeaderDim, textTransform: "uppercase", marginBottom: 8 },}
+        , React.createElement('div', { style: { fontFamily: "'DM Sans',sans-serif", fontWeight: 300, fontSize: 12, letterSpacing: 3, color: C.onHeaderDim, textTransform: "uppercase", marginBottom: 8 },}
           , t.testYourLevel
         )
         , React.createElement('div', { style: { display: "flex", alignItems: "baseline", gap: 12 },}
           , React.createElement('div', { style: { fontFamily: "'DM Serif Display',serif", fontSize: 52, color: C.onHeader, lineHeight: 1 },}
             , result.level
           )
-          , React.createElement('div', { style: { fontFamily: "'DM Sans',sans-serif", fontWeight: 300, fontSize: 14, color: C.onHeaderDim },}
+          , React.createElement('div', { style: { fontFamily: "'DM Sans',sans-serif", fontWeight: 300, fontSize: 16, color: C.onHeaderDim },}
             , _optionalChain([CEFR, 'access', _7 => _7[result.level], 'optionalAccess', _8 => _8.name])
           )
         )
       )
       , React.createElement('div', { style: { flex: 1, overflowY: "auto", padding: "24px" },}
         , result.encouragement && (
-          React.createElement('div', { style: { fontFamily: "'DM Serif Text',serif", fontStyle: "italic", fontSize: 15, color: C.inkMid, lineHeight: 1.75, marginBottom: 24 },}
+          React.createElement('div', { style: { fontFamily: "'DM Serif Text',serif", fontStyle: "italic", fontSize: 17, color: C.inkMid, lineHeight: 1.75, marginBottom: 24 },}
             , result.encouragement
           )
         )
@@ -1079,7 +1264,7 @@ Be precise and encouraging.`;
 function Section({ title, color, children }) {
   return (
     React.createElement('div', { style: { marginBottom: 20 },}
-      , React.createElement('div', { style: { fontFamily: "'DM Sans',sans-serif", fontWeight: 500, fontSize: 9, letterSpacing: 2, color, textTransform: "uppercase", marginBottom: 8 },}
+      , React.createElement('div', { style: { fontFamily: "'DM Sans',sans-serif", fontWeight: 500, fontSize: 12, letterSpacing: 2, color, textTransform: "uppercase", marginBottom: 8 },}
         , title
       )
       , children
@@ -1091,7 +1276,7 @@ function Item({ text, color }) {
   return (
     React.createElement('div', { style: { display: "flex", gap: 10, alignItems: "flex-start", marginBottom: 6 },}
       , React.createElement('div', { style: { width: 4, height: 4, borderRadius: "50%", background: color, marginTop: 7, flexShrink: 0 },} )
-      , React.createElement('div', { style: { fontFamily: "'DM Sans',sans-serif", fontWeight: 300, fontSize: 13, color: C.inkMid, lineHeight: 1.6 },}
+      , React.createElement('div', { style: { fontFamily: "'DM Sans',sans-serif", fontWeight: 300, fontSize: 16, color: C.inkMid, lineHeight: 1.6 },}
         , text
       )
     )
@@ -1102,7 +1287,7 @@ function Item({ text, color }) {
 // SCREEN — HOME
 // ─────────────────────────────────────────────────────────────────────────────
 
-function HomeScreen({ progress, immersion, userLevel, sessions, onSelect, onProfile, onToggleMode }) {
+function HomeScreen({ progress, immersion, userLevel, sessions, onSelect, onProfile, onToggleMode, onExercises }) {
   const t = T(immersion);
   const effectiveLevel = getUnlockedLevel(progress, userLevel);
 
@@ -1113,7 +1298,7 @@ function HomeScreen({ progress, immersion, userLevel, sessions, onSelect, onProf
   const totalDone = SCENARIOS.filter(s => getStars(progress[s.id]) > 0).length;
 
   return (
-    React.createElement('div', { style: { height: "100%", display: "flex", flexDirection: "column", background: C.bg },}
+    React.createElement('div', { style: { height: "100%", display: "flex", flexDirection: "column", background: C.bg, position: "relative" },}
       , React.createElement('style', null, CSS)
 
       /* Header */
@@ -1121,7 +1306,7 @@ function HomeScreen({ progress, immersion, userLevel, sessions, onSelect, onProf
         , React.createElement('div', { style: { display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 },}
           , React.createElement('div', { style: { display: "flex", alignItems: "center", gap: 10 },}
             , React.createElement(Flag, { h: 14, w: 24,} )
-            , React.createElement('span', { style: { fontFamily: "'DM Sans',sans-serif", fontWeight: 300, fontSize: 9, letterSpacing: 3, color: C.onHeaderDim, textTransform: "uppercase" },}, "My French Teacher"
+            , React.createElement('span', { style: { fontFamily: "'DM Sans',sans-serif", fontWeight: 300, fontSize: 12, letterSpacing: 3, color: C.onHeaderDim, textTransform: "uppercase" },}, "My French Teacher"
 
             )
           )
@@ -1147,7 +1332,7 @@ function HomeScreen({ progress, immersion, userLevel, sessions, onSelect, onProf
                 position: "sticky", top: 0, background: C.bgDeep, zIndex: 1,
               },}
                 , React.createElement(LevelChip, { level: lvl,} )
-                , React.createElement('div', { style: { fontFamily: "'DM Sans',sans-serif", fontWeight: 300, fontSize: 11, color: C.gray },}
+                , React.createElement('div', { style: { fontFamily: "'DM Sans',sans-serif", fontWeight: 300, fontSize: 14, color: C.gray },}
                   , immersion ? CEFR[lvl].nameFr : CEFR[lvl].name
                 )
                 , !unlocked && React.createElement('div', { style: { marginLeft: "auto", fontSize: 14 },}, "🔒")
@@ -1170,10 +1355,10 @@ function HomeScreen({ progress, immersion, userLevel, sessions, onSelect, onProf
                   },}
                     , React.createElement(PlaceIllustration, { scenarioId: s.id,} )
                     , React.createElement('div', { style: { flex: 1, minWidth: 0 },}
-                      , React.createElement('div', { style: { fontFamily: "'DM Serif Text',serif", fontSize: 16, color: C.ink, marginBottom: 2 },}
+                      , React.createElement('div', { style: { fontFamily: "'DM Serif Text',serif", fontSize: 18, color: C.ink, marginBottom: 2 },}
                         , immersion ? s.title : s.titleEn
                       )
-                      , React.createElement('div', { style: { fontFamily: "'DM Sans',sans-serif", fontWeight: 300, fontSize: 11, color: C.gray, marginBottom: done ? 6 : 0 },}
+                      , React.createElement('div', { style: { fontFamily: "'DM Sans',sans-serif", fontWeight: 300, fontSize: 14, color: C.gray, marginBottom: done ? 6 : 0 },}
                         , s.place
                       )
                       , done && React.createElement(StarRow, { stars: stars, size: 12,} )
@@ -1185,7 +1370,26 @@ function HomeScreen({ progress, immersion, userLevel, sessions, onSelect, onProf
             )
           );
         })
-        , React.createElement('div', { style: { height: 40 },} )
+        , React.createElement('div', { style: { height: 80 },} )
+      )
+
+      /* Floating exercises button */
+      , Object.keys(progress).length > 0 && (
+        React.createElement('div', { style: {
+          position: "absolute", bottom: 24, right: 20,
+          pointerEvents: "auto",
+        },}
+          , React.createElement('button', { onClick: onExercises, style: {
+            background: C.ink, color: "white",
+            border: "none", borderRadius: 24,
+            padding: "12px 20px",
+            fontFamily: "'DM Sans',sans-serif", fontWeight: 500, fontSize: 15,
+            cursor: "pointer", display: "flex", alignItems: "center", gap: 8,
+            boxShadow: "0 4px 16px rgba(0,0,0,0.25)",
+          },}, "📝 "
+             , immersion ? "Exercices" : "Exercises"
+          )
+        )
       )
     )
   );
@@ -1194,8 +1398,8 @@ function HomeScreen({ progress, immersion, userLevel, sessions, onSelect, onProf
 function Stat({ value, label }) {
   return (
     React.createElement('div', null
-      , React.createElement('div', { style: { fontFamily: "'DM Serif Display',serif", fontSize: 28, color: C.onHeader, lineHeight: 1 },}, value)
-      , React.createElement('div', { style: { fontFamily: "'DM Sans',sans-serif", fontWeight: 300, fontSize: 10, color: C.onHeaderDim },}, label)
+      , React.createElement('div', { style: { fontFamily: "'DM Serif Display',serif", fontSize: 30, color: C.onHeader, lineHeight: 1 },}, value)
+      , React.createElement('div', { style: { fontFamily: "'DM Sans',sans-serif", fontWeight: 300, fontSize: 13, color: C.onHeaderDim },}, label)
     )
   );
 }
@@ -1219,7 +1423,7 @@ function AssistantBubble({ content, immersion }) {
         borderRadius: "16px 16px 16px 4px",
         padding: "12px 16px",
         fontFamily: "'DM Serif Text', serif",
-        fontSize: 16, lineHeight: 1.8, color: C.ink,
+        fontSize: 18, lineHeight: 1.8, color: C.ink,
         boxShadow: "0 1px 3px rgba(0,0,0,0.07)",
         whiteSpace: "pre-wrap",
       },}
@@ -1235,10 +1439,10 @@ function AssistantBubble({ content, immersion }) {
           padding: "9px 13px",
           display: "flex", gap: 8, alignItems: "flex-start",
         },}
-          , React.createElement('span', { style: { fontSize: 13, flexShrink: 0, marginTop: 1 },}, "✏️")
+          , React.createElement('span', { style: { fontSize: 16, flexShrink: 0, marginTop: 1 },}, "✏️")
           , React.createElement('div', { style: {
             fontFamily: "'DM Sans', sans-serif",
-            fontWeight: 300, fontSize: 14, color: C.inkMid, lineHeight: 1.65,
+            fontWeight: 300, fontSize: 16, color: C.inkMid, lineHeight: 1.65,
           },}
             , teacherNote
           )
@@ -1376,11 +1580,11 @@ function ScenarioScreen({ scenario: s, immersion, ttsEnabled, progress, onComple
       , React.createElement('style', null, CSS)
       , React.createElement('div', { style: { flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "40px 32px", gap: 20 },}
         , React.createElement('div', { style: { fontSize: 48 },}, "🇫🇷")
-        , React.createElement('div', { style: { fontFamily: "'DM Serif Display',serif", fontSize: 28, color: C.ink, textAlign: "center" },}
+        , React.createElement('div', { style: { fontFamily: "'DM Serif Display',serif", fontSize: 30, color: C.ink, textAlign: "center" },}
           , t.sceneDone
         )
         , React.createElement(StarRow, { stars: earnedStars, size: 32,} )
-        , React.createElement('div', { style: { fontFamily: "'DM Sans',sans-serif", fontWeight: 300, fontSize: 13, color: C.gray, textAlign: "center" },}
+        , React.createElement('div', { style: { fontFamily: "'DM Sans',sans-serif", fontWeight: 300, fontSize: 16, color: C.gray, textAlign: "center" },}
           , t.starExplain[earnedStars - 1]
         )
       )
@@ -1404,10 +1608,10 @@ function ScenarioScreen({ scenario: s, immersion, ttsEnabled, progress, onComple
         , React.createElement('div', { style: { padding: "12px 20px 0", display: "flex", alignItems: "center", gap: 12 },}
           , React.createElement(BackBtn, { onClick: onBack,} )
           , React.createElement('div', { style: { flex: 1, minWidth: 0 },}
-            , React.createElement('div', { style: { fontFamily: "'DM Serif Text',serif", fontSize: 18, color: C.onHeader, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" },}
+            , React.createElement('div', { style: { fontFamily: "'DM Serif Text',serif", fontSize: 20, color: C.onHeader, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" },}
               , title
             )
-            , React.createElement('div', { style: { fontFamily: "'DM Sans',sans-serif", fontWeight: 300, fontSize: 11, color: C.onHeaderDim },}
+            , React.createElement('div', { style: { fontFamily: "'DM Sans',sans-serif", fontWeight: 300, fontSize: 14, color: C.onHeaderDim },}
               , s.place
             )
           )
@@ -1419,7 +1623,7 @@ function ScenarioScreen({ scenario: s, immersion, ttsEnabled, progress, onComple
 
         /* Scene */
         , React.createElement('div', { style: { padding: "10px 20px 0" },}
-          , React.createElement('div', { style: { fontFamily: "'DM Serif Text',serif", fontStyle: "italic", fontSize: 14, color: "rgba(240,242,248,0.6)", lineHeight: 1.7 },}
+          , React.createElement('div', { style: { fontFamily: "'DM Serif Text',serif", fontStyle: "italic", fontSize: 16, color: "rgba(240,242,248,0.6)", lineHeight: 1.7 },}
             , scene
           )
         )
@@ -1434,7 +1638,7 @@ function ScenarioScreen({ scenario: s, immersion, ttsEnabled, progress, onComple
             borderRadius: 8,
             padding: "8px 12px",
           },}
-            , React.createElement('div', { style: { fontFamily: "'DM Sans',sans-serif", fontWeight: 400, fontSize: 13, color: C.onHeader, lineHeight: 1.55 },}, "🎯 "
+            , React.createElement('div', { style: { fontFamily: "'DM Sans',sans-serif", fontWeight: 400, fontSize: 16, color: C.onHeader, lineHeight: 1.55 },}, "🎯 "
                , goal
             )
           )
@@ -1443,7 +1647,7 @@ function ScenarioScreen({ scenario: s, immersion, ttsEnabled, progress, onComple
             background: showHint ? C.red : "rgba(255,255,255,0.1)",
             border: showHint ? "none" : "1px solid rgba(255,255,255,0.2)",
             borderRadius: 6, cursor: "pointer", flexShrink: 0,
-            fontFamily: "'DM Sans',sans-serif", fontSize: 11, fontWeight: 500,
+            fontFamily: "'DM Sans',sans-serif", fontSize: 14, fontWeight: 500,
             color: "white", padding: "8px 12px", letterSpacing: 0.5,
             transition: "background 0.15s",
           },}
@@ -1452,7 +1656,7 @@ function ScenarioScreen({ scenario: s, immersion, ttsEnabled, progress, onComple
         )
         , showHint && (
           React.createElement('div', { style: { margin: "0 20px 12px", borderLeft: `3px solid ${C.red}`, paddingLeft: 12, paddingTop: 2, paddingBottom: 2 },}
-            , React.createElement('div', { style: { fontFamily: "'DM Serif Text',serif", fontStyle: "italic", fontSize: 13, color: "rgba(240,242,248,0.7)", lineHeight: 1.65 },}
+            , React.createElement('div', { style: { fontFamily: "'DM Serif Text',serif", fontStyle: "italic", fontSize: 16, color: "rgba(240,242,248,0.7)", lineHeight: 1.65 },}
               , immersion ? s.hint_fr : s.hint_en
             )
           )
@@ -1462,7 +1666,7 @@ function ScenarioScreen({ scenario: s, immersion, ttsEnabled, progress, onComple
       /* Messages */
       , React.createElement('div', { style: { flex: 1, overflowY: "auto", padding: "16px 20px", display: "flex", flexDirection: "column", gap: 12 },}
         , messages.length === 0 && (
-          React.createElement('div', { style: { fontFamily: "'DM Serif Text',serif", fontStyle: "italic", fontSize: 14, color: C.gray, textAlign: "center", marginTop: 20, lineHeight: 1.75 },}
+          React.createElement('div', { style: { fontFamily: "'DM Serif Text',serif", fontStyle: "italic", fontSize: 16, color: C.gray, textAlign: "center", marginTop: 20, lineHeight: 1.75 },}
             , immersion ? "Commencez à parler en français…" : "Start speaking in French…"
           )
         )
@@ -1474,7 +1678,7 @@ function ScenarioScreen({ scenario: s, immersion, ttsEnabled, progress, onComple
                 background: C.ink, color: C.onHeader,
                 borderRadius: "16px 16px 4px 16px",
                 padding: "11px 14px",
-                fontFamily: "'DM Sans',sans-serif", fontSize: 14, lineHeight: 1.7,
+                fontFamily: "'DM Sans',sans-serif", fontSize: 16, lineHeight: 1.7,
                 boxShadow: "0 1px 3px rgba(0,0,0,0.08)",
                 animation: "slideUp 0.2s both",
               },}
@@ -1507,7 +1711,7 @@ function ScenarioScreen({ scenario: s, immersion, ttsEnabled, progress, onComple
             style: {
               flex: 1, resize: "none", border: `1px solid ${listening ? C.red : C.rule}`,
               borderRadius: 8, padding: "10px 12px",
-              fontFamily: "'DM Serif Text',serif", fontSize: 15, color: C.ink,
+              fontFamily: "'DM Serif Text',serif", fontSize: 17, color: C.ink,
               background: listening ? "#FFF5F5" : "white",
               lineHeight: 1.5, maxHeight: 100, overflowY: "auto",
               transition: "border-color 0.15s",
@@ -1519,7 +1723,7 @@ function ScenarioScreen({ scenario: s, immersion, ttsEnabled, progress, onComple
               style: {
                 width: 40, height: 40, borderRadius: "50%", flexShrink: 0,
                 background: listening ? C.red : C.bgCard,
-                border: "none", cursor: "pointer", fontSize: 16,
+                border: "none", cursor: "pointer", fontSize: 18,
                 display: "flex", alignItems: "center", justifyContent: "center",
                 transition: "background 0.15s",
               },}
@@ -1531,7 +1735,7 @@ function ScenarioScreen({ scenario: s, immersion, ttsEnabled, progress, onComple
             width: 40, height: 40, borderRadius: "50%", flexShrink: 0,
             background: input.trim() && !loading ? C.ink : C.grayLight,
             border: "none", cursor: input.trim() && !loading ? "pointer" : "default",
-            color: "white", fontSize: 18, display: "flex", alignItems: "center", justifyContent: "center",
+            color: "white", fontSize: 20, display: "flex", alignItems: "center", justifyContent: "center",
             transition: "background 0.15s",
           },}, "→"
 
@@ -1565,6 +1769,15 @@ function DiagnosticsScreen({ diag, progress, immersion, onBack }) {
     const entries = diag[scenId] || [];
     const all = entries.flatMap(e => e.errors || []);
     return [...new Set(all)];
+  }
+
+  // Auto-load first exercise when user clicks an error
+  function selectError(scenId, error) {
+    setActiveScenario(scenId);
+    setExercise({ error, scenId, sentence: null }); // show loading state immediately
+    setFeedback(null);
+    setAnswer("");
+    generateExercise(scenId, error);
   }
 
   async function generateExercise(scenId, error) {
@@ -1617,7 +1830,7 @@ Output ONLY JSON: {"correct": true|false, "feedback": "brief feedback in ${lang}
       , React.createElement('style', null, CSS)
       , React.createElement('div', { style: { background: C.header, padding: "24px 24px 20px", display: "flex", alignItems: "center", gap: 12 },}
         , React.createElement(BackBtn, { onClick: onBack,} )
-        , React.createElement('div', { style: { fontFamily: "'DM Serif Text',serif", fontSize: 18, color: C.onHeader },}
+        , React.createElement('div', { style: { fontFamily: "'DM Serif Text',serif", fontSize: 20, color: C.onHeader },}
           , immersion ? "Mes exercices" : "My exercises"
         )
       )
@@ -1626,7 +1839,7 @@ Output ONLY JSON: {"correct": true|false, "feedback": "brief feedback in ${lang}
         , React.createElement('div', { style: { fontFamily: "'DM Serif Display',serif", fontSize: 22, color: C.ink },}
           , immersion ? "Aucune erreur enregistrée" : "No errors recorded yet"
         )
-        , React.createElement('div', { style: { fontFamily: "'DM Sans',sans-serif", fontWeight: 300, fontSize: 15, color: C.gray, lineHeight: 1.6 },}
+        , React.createElement('div', { style: { fontFamily: "'DM Sans',sans-serif", fontWeight: 300, fontSize: 17, color: C.gray, lineHeight: 1.6 },}
           , immersion
             ? "Complétez des scénarios et vos erreurs apparaîtront ici sous forme d'exercices personnalisés."
             : "Complete some scenarios and your errors will appear here as personalised exercises."
@@ -1640,7 +1853,7 @@ Output ONLY JSON: {"correct": true|false, "feedback": "brief feedback in ${lang}
       , React.createElement('style', null, CSS)
       , React.createElement('div', { style: { background: C.header, padding: "24px 24px 20px", display: "flex", alignItems: "center", gap: 12 },}
         , React.createElement(BackBtn, { onClick: exercise ? () => { setExercise(null); setFeedback(null); } : onBack,} )
-        , React.createElement('div', { style: { fontFamily: "'DM Serif Text',serif", fontSize: 18, color: C.onHeader },}
+        , React.createElement('div', { style: { fontFamily: "'DM Serif Text',serif", fontSize: 20, color: C.onHeader },}
           , immersion ? "Mes exercices" : "My exercises"
         )
       )
@@ -1648,7 +1861,7 @@ Output ONLY JSON: {"correct": true|false, "feedback": "brief feedback in ${lang}
       , !exercise ? (
         // Error list grouped by scenario
         React.createElement('div', { style: { flex: 1, overflowY: "auto" },}
-          , React.createElement('div', { style: { padding: "16px 20px 8px", fontFamily: "'DM Sans',sans-serif", fontWeight: 300, fontSize: 13, color: C.gray, lineHeight: 1.6 },}
+          , React.createElement('div', { style: { padding: "16px 20px 8px", fontFamily: "'DM Sans',sans-serif", fontWeight: 300, fontSize: 16, color: C.gray, lineHeight: 1.6 },}
             , immersion
               ? "Ces exercices sont générés à partir de vos erreurs dans les dialogues."
               : "These exercises are generated from mistakes made in your conversations."
@@ -1657,19 +1870,19 @@ Output ONLY JSON: {"correct": true|false, "feedback": "brief feedback in ${lang}
             const errors = getErrors(s.id);
             return (
               React.createElement('div', { key: s.id,}
-                , React.createElement('div', { style: { padding: "12px 20px 6px", fontFamily: "'DM Sans',sans-serif", fontWeight: 500, fontSize: 11, letterSpacing: 1.5, color: C.gray, textTransform: "uppercase" },}
+                , React.createElement('div', { style: { padding: "12px 20px 6px", fontFamily: "'DM Sans',sans-serif", fontWeight: 500, fontSize: 14, letterSpacing: 1.5, color: C.gray, textTransform: "uppercase" },}
                   , immersion ? s.title : s.titleEn
                 )
                 , errors.map((err, i) => (
-                  React.createElement('button', { key: i, onClick: () => { setActiveScenario(s.id); generateExercise(s.id, err); }, style: {
+                  React.createElement('button', { key: i, onClick: () => selectError(s.id, err), style: {
                     display: "flex", alignItems: "center", justifyContent: "space-between",
                     width: "100%", padding: "14px 20px",
                     background: "white", border: "none", borderBottom: `1px solid ${C.rule}`,
                     cursor: "pointer", textAlign: "left",
                   },}
                     , React.createElement('div', null
-                      , React.createElement('div', { style: { fontFamily: "'DM Sans',sans-serif", fontSize: 14, color: C.ink, marginBottom: 2 },}, err)
-                      , React.createElement('div', { style: { fontFamily: "'DM Sans',sans-serif", fontWeight: 300, fontSize: 12, color: C.gray },}
+                      , React.createElement('div', { style: { fontFamily: "'DM Sans',sans-serif", fontSize: 16, color: C.ink, marginBottom: 2 },}, err)
+                      , React.createElement('div', { style: { fontFamily: "'DM Sans',sans-serif", fontWeight: 300, fontSize: 15, color: C.gray },}
                         , immersion ? "Pratiquer →" : "Practise →"
                       )
                     )
@@ -1691,14 +1904,14 @@ Output ONLY JSON: {"correct": true|false, "feedback": "brief feedback in ${lang}
           ) : (
             React.createElement(React.Fragment, null
               , React.createElement('div', { style: { background: C.blueLight, borderLeft: `3px solid ${C.blue}`, borderRadius: "0 8px 8px 0", padding: "10px 14px" },}
-                , React.createElement('div', { style: { fontFamily: "'DM Sans',sans-serif", fontWeight: 500, fontSize: 11, letterSpacing: 1.5, color: C.blue, textTransform: "uppercase", marginBottom: 4 },}
+                , React.createElement('div', { style: { fontFamily: "'DM Sans',sans-serif", fontWeight: 500, fontSize: 14, letterSpacing: 1.5, color: C.blue, textTransform: "uppercase", marginBottom: 4 },}
                   , immersion ? "Point à travailler" : "Focus"
                 )
-                , React.createElement('div', { style: { fontFamily: "'DM Sans',sans-serif", fontSize: 14, color: C.inkMid },}, exercise.error)
+                , React.createElement('div', { style: { fontFamily: "'DM Sans',sans-serif", fontSize: 16, color: C.inkMid },}, exercise.error)
               )
 
               , exercise.instruction && (
-                React.createElement('div', { style: { fontFamily: "'DM Serif Text',serif", fontStyle: "italic", fontSize: 15, color: C.gray, lineHeight: 1.65 },}
+                React.createElement('div', { style: { fontFamily: "'DM Serif Text',serif", fontStyle: "italic", fontSize: 17, color: C.gray, lineHeight: 1.65 },}
                   , exercise.instruction
                 )
               )
@@ -1717,7 +1930,7 @@ Output ONLY JSON: {"correct": true|false, "feedback": "brief feedback in ${lang}
                 style: {
                   resize: "none", border: `1px solid ${C.rule}`, borderRadius: 8,
                   padding: "12px 14px", fontFamily: "'DM Serif Text',serif",
-                  fontSize: 16, color: C.ink, lineHeight: 1.6, background: "white",
+                  fontSize: 18, color: C.ink, lineHeight: 1.6, background: "white",
                 },}
               )
 
@@ -1727,14 +1940,14 @@ Output ONLY JSON: {"correct": true|false, "feedback": "brief feedback in ${lang}
                   background: feedback.correct ? C.greenLight : C.redLight,
                   borderRadius: "0 8px 8px 0", padding: "12px 14px",
                 },}
-                  , React.createElement('div', { style: { fontFamily: "'DM Sans',sans-serif", fontWeight: 500, fontSize: 12, color: feedback.correct ? C.green : C.red, marginBottom: 4 },}
+                  , React.createElement('div', { style: { fontFamily: "'DM Sans',sans-serif", fontWeight: 500, fontSize: 15, color: feedback.correct ? C.green : C.red, marginBottom: 4 },}
                     , feedback.correct ? (immersion ? "✓ Correct !" : "✓ Correct!") : (immersion ? "✗ Pas tout à fait" : "✗ Not quite")
                   )
-                  , React.createElement('div', { style: { fontFamily: "'DM Sans',sans-serif", fontWeight: 300, fontSize: 14, color: C.inkMid, lineHeight: 1.6 },}
+                  , React.createElement('div', { style: { fontFamily: "'DM Sans',sans-serif", fontWeight: 300, fontSize: 16, color: C.inkMid, lineHeight: 1.6 },}
                     , feedback.feedback
                   )
                   , exercise.explanation && (
-                    React.createElement('div', { style: { fontFamily: "'DM Sans',sans-serif", fontWeight: 300, fontSize: 13, color: C.gray, marginTop: 6, lineHeight: 1.5 },}
+                    React.createElement('div', { style: { fontFamily: "'DM Sans',sans-serif", fontWeight: 300, fontSize: 16, color: C.gray, marginTop: 6, lineHeight: 1.5 },}
                       , exercise.explanation
                     )
                   )
@@ -1772,7 +1985,7 @@ function ProfileScreen({ progress, immersion, userLevel, sessions, onBack, onRes
       , React.createElement('style', null, CSS)
       , React.createElement('div', { style: { background: C.header, padding: "24px 24px 20px", display: "flex", alignItems: "center", gap: 12 },}
         , React.createElement(BackBtn, { onClick: onBack,} )
-        , React.createElement('div', { style: { fontFamily: "'DM Serif Text',serif", fontSize: 18, color: C.onHeader },}, t.profile)
+        , React.createElement('div', { style: { fontFamily: "'DM Serif Text',serif", fontSize: 20, color: C.onHeader },}, t.profile)
       )
 
       , React.createElement('div', { style: { flex: 1, overflowY: "auto", padding: "24px" },}
@@ -1784,8 +1997,8 @@ function ProfileScreen({ progress, immersion, userLevel, sessions, onBack, onRes
             { value: sessions, label: immersion ? "Sessions" : "Sessions" },
           ].map((s, i) => (
             React.createElement('div', { key: i, style: { background: "white", borderRadius: 8, padding: "16px 12px", textAlign: "center", boxShadow: "0 1px 3px rgba(0,0,0,0.06)" },}
-              , React.createElement('div', { style: { fontFamily: "'DM Serif Display',serif", fontSize: 28, color: C.ink },}, s.value)
-              , React.createElement('div', { style: { fontFamily: "'DM Sans',sans-serif", fontWeight: 300, fontSize: 10, color: C.gray, marginTop: 2 },}, s.label)
+              , React.createElement('div', { style: { fontFamily: "'DM Serif Display',serif", fontSize: 30, color: C.ink },}, s.value)
+              , React.createElement('div', { style: { fontFamily: "'DM Sans',sans-serif", fontWeight: 300, fontSize: 13, color: C.gray, marginTop: 2 },}, s.label)
             )
           ))
         )
@@ -1793,17 +2006,17 @@ function ProfileScreen({ progress, immersion, userLevel, sessions, onBack, onRes
         /* Progress bar */
         , React.createElement('div', { style: { marginBottom: 28 },}
           , React.createElement('div', { style: { display: "flex", justifyContent: "space-between", marginBottom: 6 },}
-            , React.createElement('div', { style: { fontFamily: "'DM Sans',sans-serif", fontWeight: 500, fontSize: 10, letterSpacing: 1.5, color: C.gray, textTransform: "uppercase" },}
+            , React.createElement('div', { style: { fontFamily: "'DM Sans',sans-serif", fontWeight: 500, fontSize: 13, letterSpacing: 1.5, color: C.gray, textTransform: "uppercase" },}
               , immersion ? "Progression" : "Progress"
             )
-            , React.createElement('div', { style: { fontFamily: "'DM Sans',sans-serif", fontWeight: 300, fontSize: 10, color: C.gray },}
+            , React.createElement('div', { style: { fontFamily: "'DM Sans',sans-serif", fontWeight: 300, fontSize: 13, color: C.gray },}
               , totalStars, "/", maxStars, " ⭐"
             )
           )
           , React.createElement('div', { style: { height: 4, background: C.rule, borderRadius: 2 },}
             , React.createElement('div', { style: { height: "100%", background: C.star, borderRadius: 2, width: `${(totalStars / maxStars) * 100}%`, transition: "width 0.5s" },} )
           )
-          , React.createElement('div', { style: { fontFamily: "'DM Sans',sans-serif", fontWeight: 300, fontSize: 11, color: C.gray, marginTop: 6 },}
+          , React.createElement('div', { style: { fontFamily: "'DM Sans',sans-serif", fontWeight: 300, fontSize: 14, color: C.gray, marginTop: 6 },}
             , immersion ? `Niveau actuel : ${effectiveLevel}` : `Current level: ${effectiveLevel}`
           )
         )
@@ -1829,11 +2042,11 @@ function ProfileRow({ label, onClick, badge, danger }) {
       border: "none", borderBottom: `1px solid ${C.rule}`,
       cursor: "pointer", width: "100%", textAlign: "left",
     },}
-      , React.createElement('span', { style: { fontFamily: "'DM Sans',sans-serif", fontWeight: 300, fontSize: 14, color: danger ? C.red : C.ink },}
+      , React.createElement('span', { style: { fontFamily: "'DM Sans',sans-serif", fontWeight: 300, fontSize: 16, color: danger ? C.red : C.ink },}
         , label
       )
       , badge && (
-        React.createElement('span', { style: { fontFamily: "'DM Sans',sans-serif", fontWeight: 500, fontSize: 10, letterSpacing: 1, color: C.blue },}
+        React.createElement('span', { style: { fontFamily: "'DM Sans',sans-serif", fontWeight: 500, fontSize: 13, letterSpacing: 1, color: C.blue },}
           , badge
         )
       )
@@ -1850,7 +2063,7 @@ const primaryBtn = {
   width: "100%", padding: "15px",
   background: C.ink, color: "white",
   border: "none", cursor: "pointer",
-  fontFamily: "'DM Sans', sans-serif", fontWeight: 500, fontSize: 13,
+  fontFamily: "'DM Sans', sans-serif", fontWeight: 500, fontSize: 16,
   letterSpacing: 1, textTransform: "uppercase",
   borderRadius: 2,
 };
@@ -1859,7 +2072,7 @@ const ghostBtn = {
   width: "100%", padding: "14px",
   background: "none", color: C.gray,
   border: `1px solid ${C.rule}`, cursor: "pointer",
-  fontFamily: "'DM Sans', sans-serif", fontWeight: 300, fontSize: 13,
+  fontFamily: "'DM Sans', sans-serif", fontWeight: 300, fontSize: 16,
   borderRadius: 2,
 };
 
@@ -1931,7 +2144,8 @@ function App() {
             sessions: thisWeek,
             onSelect: s => { setScenario(s); recordSession(); go("scenario"); },
             onProfile: () => go("profile"),
-            onToggleMode: toggleImmersion,}
+            onToggleMode: toggleImmersion,
+            onExercises: () => go("diagnostics"),}
           )
         )
 
@@ -1971,7 +2185,7 @@ function App() {
             diag: diag,
             progress: progress,
             immersion: immersion,
-            onBack: () => go("profile"),}
+            onBack: () => go("home"),}
           )
         )
 
