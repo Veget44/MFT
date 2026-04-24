@@ -165,47 +165,30 @@ const LEVEL_CONTEXT = {
 // PROMPTS
 // ─────────────────────────────────────────────────────────────────────────────
 
-function TUTOR_PROMPT(immersion, cefrLevel, failCount = 0) {
-  const lvl = LEVEL_CONTEXT[cefrLevel] || LEVEL_CONTEXT.A1;
-  const ctx  = immersion ? lvl.fr : lvl.en;
-  const lang = immersion ? "français" : "English";
-  const modelAnswer = failCount >= 3
-    ? (immersion
-        ? "\n\n⚠️ L'élève a échoué 3 fois. Donne maintenant la réponse modèle complète en français."
-        : "\n\n⚠️ The student has struggled 3 times. Now give the complete model answer in French.")
+function TUTOR_PROMPT(immersion, cefrLevel, failCount) {
+  var lvl = LEVEL_CONTEXT[cefrLevel] || LEVEL_CONTEXT.A1;
+  var ctx  = immersion ? lvl.fr : lvl.en;
+  var lang = immersion ? "francais" : "English";
+  var f3   = (failCount || 0) >= 3
+    ? (immersion ? "\n⚠️ 3 echecs. Donne la reponse modele complete maintenant."
+                 : "\n⚠️ 3 failures. Give the complete model answer now.")
     : "";
-
-  return (
-    (immersion ? "Tu es professeur de français depuis 20 ans.\n\n" : "You are a French teacher with 20 years of experience.\n\n") +
-    `STUDENT LEVEL: ${ctx}\n\n` +
-    `ROLE: You simultaneously play the CHARACTER in the scene AND the TEACHER.\n\n` +
-    `FORMAT — always use this exact structure:\n` +
-    `[Your in-character French response]\n` +
-    `---\n` +
-    `[Teacher note in ${lang}: ONE correction or encouragement. Max 2 sentences. If no error, just say what was good.]` +
-    modelAnswer + `\n\n` +
-    `RULES:\n` +
-    `- Never open with "Bien !" or "Excellent !" — be genuine and specific\n` +
-    `- If French is correct: move the scene forward naturally, no correction needed\n` +
-    `- If wrong: correct ONE thing only, show the right phrase in quotes\n` +
-    `- If student asks a grammar question: answer it fully, then continue the scene\n` +
-    `- Always end with something that naturally invites the student to respond`
-  );
+  return (immersion ? "Professeur de francais (20 ans)." : "French teacher (20 years).")
+    + "\nLEVEL: " + ctx
+    + "\nROLE: Scene CHARACTER + brief TEACHER NOTE after each exchange."
+    + "\nFORMAT: [French reply]\n---\n[" + lang + " note: 1 correction max, 2 sentences]" + f3
+    + "\nRULES: No generic praise. Correct ONE thing in quotes if wrong. If correct: move scene forward. End with a natural prompt.";
 }
+
 
 function STAR_PROMPT(immersion, currentStars) {
-  const lang = immersion ? "français" : "English";
-  return (
-    `You are a French teacher. The student is replaying this scenario (current best: ${currentStars} ⭐).\n\n` +
-    `After your usual in-character + teacher response, add exactly this JSON on its own line:\n` +
-    `{"stars": 1|2|3}\n\n` +
-    `STAR CRITERIA:\n` +
-    `⭐ 1 — Completed. Significant errors or goal not achieved naturally.\n` +
-    `⭐⭐ 2 — Good. Goal achieved, appropriate register, no blocking errors.\n` +
-    `⭐⭐⭐ 3 — Excellent. Natural, idiomatic, clearly above the scenario level.\n\n` +
-    `Never downgrade from ${currentStars} stars. Respond in ${lang}.`
-  );
+  var lang = immersion ? "francais" : "English";
+  return "French teacher. Replay (best: " + currentStars + "★).\n"
+    + "Same FORMAT as usual, then add on its own line: {\"stars\": 1|2|3}\n"
+    + "1★=done with errors. 2★=goal achieved, good register. 3★=natural+idiomatic.\n"
+    + "Never downgrade. Reply in " + lang + ".";
 }
+
 
 const PREA1_PROMPT = (immersion) => {
   const lang = immersion ? "français" : "English";
@@ -1479,18 +1462,18 @@ function ScenarioScreen({ scenario: s, immersion, ttsEnabled, progress, onComple
           ? PREA1_PROMPT(immersion)
           : TUTOR_PROMPT(immersion, s.cefrLevel, failCount);
 
-      // Build full conversation history for context
-      const history = nm.map((m, i) => {
+
+      // History: first msg (scene context) + last 4 exchanges max
+      var MAX_H = 9;
+      var trimmed = nm.length > MAX_H ? [nm[0]].concat(nm.slice(-(MAX_H - 1))) : nm;
+      const history = trimmed.map((m, i) => {
         if (m.role === "user") {
           return { role: "user", content: i === 0
-            ? `Scenario: "${title}"\nContext: ${scene}\nGoal: ${goal}\nStudent: "${m.content}"`
-            : m.content
-          };
+            ? `Scenario: "${title}". Context: ${scene}. Goal: ${goal}. Student: "${m.content}"`
+            : m.content };
         }
-        // Strip teacher note from assistant messages - keep only in-character part
-        const inCharacter = m.content.split("\n---\n")[0];
-        return { role: "assistant", content: inCharacter };
-      });
+        return { role: "assistant", content: m.content.split("\n---\n")[0] };
+      })
 
       const d = await callBackend("/chat", {
         model: "claude-sonnet-4-20250514",
@@ -1540,8 +1523,9 @@ function ScenarioScreen({ scenario: s, immersion, ttsEnabled, progress, onComple
         setEarnedStars(isReturn ? newStars : 1);
       }
 
-      // Background diagnostic (fire and forget)
-      if (msg.trim().length > 8) {
+      // Background diagnostic — every 2nd message to save tokens
+      const _uc = nm.filter(m => m.role === "user").length;
+      if (msg.trim().length > 8 && _uc % 2 === 0) {
         callBackend("/chat", {
           model: "claude-sonnet-4-20250514",
           max_tokens: 200,
