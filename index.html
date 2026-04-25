@@ -244,7 +244,7 @@ const SCENARIOS = [
     goal_en: "Ask for the menu and order water.",
     hint_fr: "Vous avez besoin d'un document pour choisir votre repas — comment le demander poliment ?",
     hint_en: "You need a document to choose your meal — how do you politely ask for it?",
-    culture_fr: "L'eau du robinet est gratuite dans tous les restaurants français.",
+    culture_fr: "L'eau du robinet est gratuite dans tous les restaurants français — demandez 'une carafe d'eau'.",
     culture_en: "Tap water is free in all French restaurants — ask for 'une carafe d'eau'.",
   },
   {
@@ -286,8 +286,8 @@ const SCENARIOS = [
     scene_en: "There's only one baguette left. You arrive at the same time as another customer.",
     goal_fr: "Acheter la baguette et payer.",
     goal_en: "Buy the baguette and pay.",
-    hint_fr: "Deux étapes : obtenir la baguette, puis demander le prix. Dans quel ordre ?",
-    hint_en: "Two steps: get the baguette, then ask about the price. Think about the order.",
+    hint_fr: "En boulangerie, la politesse vient avant tout — même quand il y a urgence.",
+    hint_en: "In a French bakery, politeness comes before everything — even when there's competition.",
     culture_fr: "La baguette tradition est l'emblème du quotidien français.",
     culture_en: "The traditional baguette is a symbol of everyday French life.",
   },
@@ -302,8 +302,8 @@ const SCENARIOS = [
     scene_en: "You've been feeling unwell since yesterday. You walk into a pharmacy.",
     goal_fr: "Décrire vos symptômes et demander un médicament.",
     goal_en: "Describe your symptoms and ask for medicine.",
-    hint_fr: "Décrivez où vous avez mal avec 'j'ai mal à...' — votre corps parle pour vous.",
-    hint_en: "Describe where it hurts using 'j'ai mal à...' — your body does the talking.",
+    hint_fr: "Décrivez où vous avez mal avec 'j'ai mal à...' — c'est la formule de base en français.",
+    hint_en: "Describe where it hurts using 'j'ai mal à...' — it's the essential phrase in French.",
     culture_fr: "En France, le pharmacien est un professionnel de santé de premier recours.",
     culture_en: "In France, the pharmacist is a frontline healthcare professional.",
   },
@@ -326,7 +326,7 @@ const SCENARIOS = [
     place: "Marché · Aix-en-Provence",
     title: "Le prix du melon", titleEn: "The price of the melon",
     skills: ["shopping", "negotiation", "numbers"],
-    scene_fr: "10h au marché dominical. Un marchand vous tend une tranche de melon — délicieux. Il annonce 8 euros le kilo.",
+    scene_fr: "Il est 10h au marché du dimanche. Un marchand vous tend une tranche de melon — délicieux. Il annonce 8 euros le kilo.",
     scene_en: "10am at the Sunday market. A vendor hands you a slice of melon — delicious. He announces 8 euros a kilo.",
     goal_fr: "Dire que c'est un peu cher et négocier poliment.",
     goal_en: "Say it's a bit expensive and negotiate politely.",
@@ -375,7 +375,7 @@ const SCENARIOS = [
     goal_fr: "Soulever les deux problèmes calmement mais fermement.",
     goal_en: "Raise both issues calmly but firmly.",
     hint_fr: "Deux sujets, deux problèmes — abordez-les séparément et utilisez 'je' plutôt que 'tu'.",
-    hint_en: "Two topics, two problems — address them separately and lead with 'I feel' not 'you always'.",
+    hint_en: "Two separate problems — address each one clearly and lead with 'I feel' rather than 'you always'.",
     culture_fr: "En France, les conflits de colocation se règlent mieux en face à face qu'en message.",
     culture_en: "In France, flatmate conflicts are better handled face-to-face than by message.",
   },
@@ -386,8 +386,8 @@ const SCENARIOS = [
     skills: ["assertiveness", "formal register", "health"],
     scene_fr: "Vous aviez signalé votre allergie aux crustacés à la réservation. Le plat arrive avec des crevettes. Votre client en face vous regarde. Le chef de rang approche.",
     scene_en: "You flagged your shellfish allergy when booking. The dish arrives with shrimp. Your client is watching. The head waiter approaches.",
-    goal_fr: "Signaler le problème fermement mais avec tact.",
-    goal_en: "Flag the problem firmly but tactfully.",
+    goal_fr: "Signaler le problème fermement mais avec tact — sans indisposer votre client.",
+    goal_en: "Flag the problem firmly but tactfully — without unsettling your client.",
     hint_fr: "Le registre formel s'impose ici — pas d'émotion, juste des faits précis et calmes.",
     hint_en: "Formal register is required — no emotion, just precise and calm facts.",
     culture_fr: "Interpellez directement le chef de rang — c'est lui le responsable de la salle.",
@@ -428,8 +428,8 @@ const SCENARIOS = [
     place: "BNP Paribas · Paris",
     title: "Le document manquant", titleEn: "The missing document",
     skills: ["banking", "administrative French", "persuasion"],
-    scene_fr: "Votre conseiller bancaire refuse votre dossier à cause d'un document manquant. Vous avez tout fourni selon lui.",
-    scene_en: "Your bank advisor is rejecting your file because of a missing document. You've provided everything according to their list.",
+    scene_fr: "Votre conseiller bancaire refuse votre dossier à cause d'un document manquant. Vous êtes certain(e) d'avoir tout fourni selon la liste qu'il vous avait donnée.",
+    scene_en: "Your bank advisor is rejecting your file because of a missing document. You're certain you provided everything on the list they gave you.",
     goal_fr: "Défendre votre dossier et trouver une solution.",
     goal_en: "Defend your file and find a solution.",
     hint_fr: "Demandez à voir la liste exacte des pièces requises — par écrit si possible.",
@@ -470,7 +470,7 @@ const SCENARIOS = [
   {
     id: 15, cefrLevel: "C1",
     place: "France Inter · Paris",
-    title: "L'invité surprise", titleEn: "The surprise guest",
+    title: "L'invité surprise", titleEn: "The live debate",
     skills: ["media French", "debate", "argumentation"],
     scene_fr: "Débat en direct sur France Inter. Sujet : 'Les étrangers comprennent-ils vraiment la France ?' Un chroniqueur provocateur face à vous.",
     scene_en: "Live debate on France Inter. Topic: 'Do foreigners really understand France?' A provocative commentator faces you.",
@@ -976,179 +976,463 @@ function ModeScreen({ immersion, onSelect }) {
 
 function LevelTestScreen({ immersion, onComplete, onBack }) {
   const t = T(immersion);
-  const [phase, setPhase] = useState("intro"); // intro | test | loading | result | pick
-  const [input, setInput] = useState("");
-  const [result, setResult] = useState(null);
-  const [error, setError] = useState(null);
 
-  const testPrompt = immersion
-    ? `Tu es un examinateur de français (CECR). L'utilisateur va écrire 2-3 phrases en français.
-Évalue leur niveau et réponds UNIQUEMENT avec ce JSON :
-{"level":"A1"|"A2"|"B1"|"B2"|"C1","strengths":["..."],"focus":["..."],"encouragement":"..."}
-Sois précis et encourageant.`
-    : `You are a French level assessor (CEFR). The user will write 2-3 sentences in French.
-Assess their level and respond ONLY with this JSON:
-{"level":"A1"|"A2"|"B1"|"B2"|"C1","strengths":["..."],"focus":["..."],"encouragement":"..."}
-Be precise and encouraging.`;
+  // ── QCM — 8 questions, genuinely calibrated A1 → C1 ──────────────────
+  // Scoring: total correct → level (not consecutive, so one miss doesn't cascade)
+  const QUESTIONS = [
+    {
+      tag: "A1",
+      q_en: "The baker says 'Bonjour ! Vous désirez ?' — what's the natural reply?",
+      q_fr: "La boulangère dit 'Bonjour ! Vous désirez ?' — quelle est la réponse naturelle ?",
+      options_en: [
+        "Bonjour ! Une baguette tradition, s'il vous plaît.",
+        "Je veux une baguette.",
+        "Donnez-moi une baguette."
+      ],
+      options_fr: [
+        "Bonjour ! Une baguette tradition, s'il vous plaît.",
+        "Je veux une baguette.",
+        "Donnez-moi une baguette."
+      ],
+      correct: 0,
+      explain_en: "Always open with 'Bonjour' + polite form. 'Donnez-moi' is an order, not a request.",
+      explain_fr: "Toujours commencer par 'Bonjour' + forme polie. 'Donnez-moi' est un ordre, pas une demande.",
+    },
+    {
+      tag: "A1",
+      q_en: "You want to tell a French friend you visited Paris last summer. Which is correct?",
+      q_fr: "Vous voulez dire à un ami que vous avez visité Paris l'été dernier. Quelle phrase est correcte ?",
+      options_en: [
+        "L'été dernier, j'ai visité Paris pour la première fois.",
+        "L'été dernier, j'ai visiter Paris pour la première fois.",
+        "L'été dernier, je visitais Paris pour la première fois."
+      ],
+      options_fr: [
+        "L'été dernier, j'ai visité Paris pour la première fois.",
+        "L'été dernier, j'ai visiter Paris pour la première fois.",
+        "L'été dernier, je visitais Paris pour la première fois."
+      ],
+      correct: 0,
+      explain_en: "Passé composé for a completed one-time event. 'J'ai visiter' is an infinitive error. Imparfait is for ongoing states.",
+      explain_fr: "Passé composé pour un événement ponctuel achevé. 'J'ai visiter' est une erreur d'infinitif. L'imparfait est pour les états continus.",
+    },
+    {
+      tag: "A2",
+      q_en: "A French friend's mother offers you more food. You're full but want to be polite. Best response?",
+      q_fr: "La mère d'un ami vous propose encore à manger. Vous êtes rassasié(e) mais voulez rester poli(e). Meilleure réponse ?",
+      options_en: [
+        "Non merci, c'était vraiment délicieux, mais je n'ai vraiment plus faim.",
+        "Non, je suis plein(e).",
+        "Je ne veux plus rien."
+      ],
+      options_fr: [
+        "Non merci, c'était vraiment délicieux, mais je n'ai vraiment plus faim.",
+        "Non, je suis plein(e).",
+        "Je ne veux plus rien."
+      ],
+      correct: 0,
+      explain_en: "'Je suis plein(e)' is crude in French. Always compliment the food when declining.",
+      explain_fr: "'Je suis plein(e)' est familier voire grossier. Il faut toujours complimenter avant de refuser.",
+    },
+    {
+      tag: "A2",
+      q_en: "You missed the last metro and are late to your host's home. Most natural explanation?",
+      q_fr: "Vous avez raté le dernier métro et vous arrivez en retard chez votre hôte. Explication la plus naturelle ?",
+      options_en: [
+        "Je suis vraiment désolé(e) — j'ai raté le dernier métro et j'ai dû prendre un taxi.",
+        "Je suis en retard parce que le métro était fini.",
+        "Désolé, pas de métro."
+      ],
+      options_fr: [
+        "Je suis vraiment désolé(e) — j'ai raté le dernier métro et j'ai dû prendre un taxi.",
+        "Je suis en retard parce que le métro était fini.",
+        "Désolé, pas de métro."
+      ],
+      correct: 0,
+      explain_en: "Complete explanation with apology + cause + what you did. 'Le métro était fini' is unnatural.",
+      explain_fr: "Explication complète : excuse + cause + ce que vous avez fait. 'Le métro était fini' n'est pas naturel.",
+    },
+    {
+      tag: "B1",
+      q_en: "A colleague suggests a risky decision. You want to express concern politely. Which is correct?",
+      q_fr: "Un collègue propose une décision risquée. Vous voulez exprimer une réserve poliment. Quelle phrase est correcte ?",
+      options_en: [
+        "Il faudrait que tu réfléchisses avant de t'engager dans cette voie.",
+        "Il faudrait que tu réfléchis avant de t'engager dans cette voie.",
+        "Il faudrait tu réfléchisses avant de t'engager dans cette voie."
+      ],
+      options_fr: [
+        "Il faudrait que tu réfléchisses avant de t'engager dans cette voie.",
+        "Il faudrait que tu réfléchis avant de t'engager dans cette voie.",
+        "Il faudrait tu réfléchisses avant de t'engager dans cette voie."
+      ],
+      correct: 0,
+      explain_en: "'Il faudrait que' requires the subjunctive. 'Que' cannot be omitted.",
+      explain_fr: "'Il faudrait que' exige le subjonctif. Le 'que' ne peut pas être omis.",
+    },
+    {
+      tag: "B1",
+      q_en: "You're writing a formal complaint to a hotel. Which opening is most appropriate?",
+      q_fr: "Vous rédigez une réclamation formelle à un hôtel. Quelle introduction convient le mieux ?",
+      options_en: [
+        "Je me permets de vous contacter suite à mon séjour du 15 au 18 mars, durant lequel j'ai rencontré plusieurs problèmes.",
+        "Bonjour, j'ai eu des problèmes dans votre hôtel la semaine dernière.",
+        "Votre hôtel était vraiment décevant lors de ma dernière visite."
+      ],
+      options_fr: [
+        "Je me permets de vous contacter suite à mon séjour du 15 au 18 mars, durant lequel j'ai rencontré plusieurs problèmes.",
+        "Bonjour, j'ai eu des problèmes dans votre hôtel la semaine dernière.",
+        "Votre hôtel était vraiment décevant lors de ma dernière visite."
+      ],
+      correct: 0,
+      explain_en: "Formal complaint: 'Je me permets de...' + precise dates + neutral vocabulary. Avoid 'décevant' as an opener — it sounds aggressive.",
+      explain_fr: "Réclamation formelle : 'Je me permets de...' + dates précises + vocabulaire neutre. Éviter 'décevant' en ouverture — trop agressif.",
+    },
+    {
+      tag: "B2",
+      q_en: "A colleague challenges your proposal in a meeting. You disagree. Most professional response?",
+      q_fr: "Un collègue remet en question votre proposition en réunion. Vous n'êtes pas d'accord. Réponse la plus professionnelle ?",
+      options_en: [
+        "Je comprends votre point de vue ; cela dit, les données que j'ai analysées semblent indiquer une tendance différente.",
+        "Vous avez tort — regardez mes chiffres, ils parlent d'eux-mêmes.",
+        "Oui peut-être, mais moi je pense autrement."
+      ],
+      options_fr: [
+        "Je comprends votre point de vue ; cela dit, les données que j'ai analysées semblent indiquer une tendance différente.",
+        "Vous avez tort — regardez mes chiffres, ils parlent d'eux-mêmes.",
+        "Oui peut-être, mais moi je pense autrement."
+      ],
+      correct: 0,
+      explain_en: "Acknowledge first ('Je comprends'), then introduce your counter-argument with a hedged phrase ('semblent indiquer').",
+      explain_fr: "Reconnaître d'abord ('Je comprends'), puis introduire votre contre-argument avec une formule nuancée ('semblent indiquer').",
+    },
+    {
+      tag: "C1",
+      q_en: "You're writing an academic introduction on cultural identity. Which sentence fits the register?",
+      q_fr: "Vous rédigez une introduction académique sur l'identité culturelle. Quelle phrase correspond au registre attendu ?",
+      options_en: [
+        "Si l'on admet que la mondialisation recompose les identités culturelles, force est de constater que ce phénomène engendre des résistances aussi bien locales que transnationales.",
+        "La mondialisation change les cultures et beaucoup de gens ne sont pas contents.",
+        "Il est évident que la mondialisation a des effets sur les cultures, ce qui provoque des réactions négatives."
+      ],
+      options_fr: [
+        "Si l'on admet que la mondialisation recompose les identités culturelles, force est de constater que ce phénomène engendre des résistances aussi bien locales que transnationales.",
+        "La mondialisation change les cultures et beaucoup de gens ne sont pas contents.",
+        "Il est évident que la mondialisation a des effets sur les cultures, ce qui provoque des réactions négatives."
+      ],
+      correct: 0,
+      explain_en: "Academic French uses impersonal constructions ('Si l'on admet', 'force est de constater'), precise vocabulary ('transnationales'), and avoids 'il est évident' (considered weak).",
+      explain_fr: "Le français académique utilise des tournures impersonnelles ('Si l'on admet', 'force est de constater'), un vocabulaire précis ('transnationales'), et évite 'il est évident' (jugé faible).",
+    },
+  ];
 
-  async function analyse() {
-    if (!input.trim()) return;
-    setPhase("loading");
-    setError(null);
-    try {
-      const d = await callBackend("/chat", {
-        model: "claude-sonnet-4-20250514",
-        max_tokens: 300,
-        system: testPrompt,
-        messages: [{ role: "user", content: input }],
-      });
-      const text = _optionalChain([d, 'optionalAccess', _4 => _4.content, 'optionalAccess', _5 => _5[0], 'optionalAccess', _6 => _6.text]) || "";
-      const parsed = JSON.parse(text.replace(/```json|```/g, "").trim());
-      setResult(parsed);
-      setPhase("result");
-    } catch (e5) {
-      setError(t.errConnection);
-      setPhase("test");
+  const CEFR_LEVELS = ["0", "A1", "A2", "B1", "B2", "C1"];
+
+  const [phase,    setPhase]    = useState("intro");   // intro | qcm | open | loading | result
+  const [current,  setCurrent]  = useState(0);         // current question index
+  const [answers,  setAnswers]  = useState([]);         // array of chosen option indices
+  const [openText, setOpenText] = useState("");
+  const [result,   setResult]   = useState(null);
+  const [error,    setError]    = useState(null);
+
+  // Compute level from total score — fairer than consecutive
+  // Q0-1: A1 questions, Q2-3: A2, Q4-5: B1, Q6: B2, Q7: C1
+  function computeLevel(ans) {
+    const score = QUESTIONS.reduce((n, q, i) => n + (ans[i] === q.correct ? 1 : 0), 0);
+    if (score <= 1) return "A1";
+    if (score <= 3) return "A2";
+    if (score <= 5) return "B1";
+    if (score <= 6) return "B2";
+    return "C1";
+  }
+
+  const [feedback, setFeedback] = useState(null); // {correct, explain}
+
+  function handleChoice(idx) {
+    const q = QUESTIONS[current];
+    const isCorrect = idx === q.correct;
+    setFeedback({ correct: isCorrect, chosen: idx, explain: immersion ? q.explain_fr : q.explain_en });
+  }
+
+  function nextQuestion() {
+    const newAnswers = [...answers, feedback.chosen];
+    setAnswers(newAnswers);
+    setFeedback(null);
+    if (current < QUESTIONS.length - 1) {
+      setCurrent(current + 1);
+    } else {
+      setPhase("open");
     }
   }
 
+  async function finishWithOpen() {
+    const qcmLevel = computeLevel(answers);
+
+    if (!openText.trim()) {
+      // Skip open question — use QCM level directly
+      setResult({ level: qcmLevel, strengths: [], focus: [], encouragement: "" });
+      setPhase("result");
+      return;
+    }
+
+    setPhase("loading");
+    const refinePrompt = immersion
+      ? `Tu es examinateur CECR. Le QCM suggère le niveau ${qcmLevel}. L'élève a écrit : "${openText}". Confirme ou ajuste le niveau. Réponds UNIQUEMENT avec ce JSON (pas de markdown) : {"level":"A1"|"A2"|"B1"|"B2"|"C1","strengths":["..."],"focus":["..."],"encouragement":"..."}`
+      : `You are a CEFR examiner. The MCQ suggests level ${qcmLevel}. The student wrote: "${openText}". Confirm or adjust the level. Reply ONLY with this JSON (no markdown): {"level":"A1"|"A2"|"B1"|"B2"|"C1","strengths":["..."],"focus":["..."],"encouragement":"..."}`;
+
+    try {
+      const d = await callBackend("/chat", {
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 200,
+        system: refinePrompt,
+        messages: [{ role: "user", content: openText }],
+      });
+      const text = d?.content?.[0]?.text || "";
+      const parsed = JSON.parse(text.replace(/```json|```/g, "").trim());
+      setResult(parsed);
+      setPhase("result");
+    } catch {
+      // Fallback to QCM level
+      setResult({ level: qcmLevel, strengths: [], focus: [], encouragement: "" });
+      setPhase("result");
+    }
+  }
+
+  // ── INTRO ──
   if (phase === "intro") return (
-    React.createElement('div', { style: { height: "100%", display: "flex", flexDirection: "column", background: C.bg },}
-      , React.createElement('style', null, CSS)
-      , React.createElement('div', { style: { background: C.header, padding: "28px 24px 24px", display: "flex", alignItems: "center", gap: 12 },}
-        , React.createElement(BackBtn, { onClick: onBack,} )
-        , React.createElement('div', { style: { fontFamily: "'DM Serif Text',serif", fontSize: 20, color: C.onHeader },}, t.testTitle)
-      )
-
-      , React.createElement('div', { style: { flex: 1, overflowY: "auto", padding: "28px 24px" },}
-        /* Hero */
-        , React.createElement('div', { style: { marginBottom: 28 },}
-          , React.createElement('div', { style: { fontFamily: "'DM Serif Display',serif", fontStyle: "italic", fontSize: 32, color: C.ink, lineHeight: 1.2, marginBottom: 10 },}
-            , t.testTitle
-          )
-          , React.createElement('div', { style: { fontFamily: "'DM Sans',sans-serif", fontWeight: 300, fontSize: 16, color: C.gray, lineHeight: 1.7 },}
-            , t.testSub
-          )
+    React.createElement('div', { style: { height: "100%", display: "flex", flexDirection: "column", background: C.header },},
+      React.createElement('style', null, CSS),
+      React.createElement('div', { style: { padding: "52px 28px 32px", animation: "fadeIn 0.4s both" },},
+        React.createElement('div', { style: { display: "flex", alignItems: "center", gap: 12, marginBottom: 24 },},
+          React.createElement(BackBtn, { onClick: onBack,}),
+          React.createElement('div', { style: { height: 1, flex: 1, background: "rgba(255,255,255,0.08)" },})
+        ),
+        React.createElement('div', { style: { fontFamily: "'DM Serif Display',serif", fontStyle: "italic", fontSize: 36, color: C.onHeader, lineHeight: 1.1, marginBottom: 10 },},
+          t.testTitle
+        ),
+        React.createElement('div', { style: { fontFamily: "'DM Sans',sans-serif", fontWeight: 300, fontSize: 16, color: C.onHeaderDim, lineHeight: 1.6 },},
+          immersion ? "6 questions · moins d'une minute." : "6 questions · under a minute."
         )
-
-        /* Primary action */
-        , React.createElement('button', { onClick: () => setPhase("test"), style: { ...primaryBtn, marginBottom: 28 },}
-          , t.testTakeTest
-        )
-
-        /* Divider */
-        , React.createElement('div', { style: { display: "flex", alignItems: "center", gap: 12, marginBottom: 20 },}
-          , React.createElement('div', { style: { flex: 1, height: 1, background: C.rule },} )
-          , React.createElement('div', { style: { fontFamily: "'DM Sans',sans-serif", fontWeight: 300, fontSize: 13, color: C.grayMid },}
-            , t.testKnowLevel
+      ),
+      React.createElement('div', { style: { flex: 1, background: C.bg, borderRadius: "20px 20px 0 0", padding: "28px 24px", overflowY: "auto", animation: "slideUp 0.4s 0.1s both" },},
+        React.createElement('button', { onClick: () => setPhase("qcm"), style: {
+          width: "100%", padding: "20px", background: C.ink, color: "white",
+          border: "none", borderRadius: 12, cursor: "pointer",
+          display: "flex", alignItems: "center", gap: 16, marginBottom: 28, textAlign: "left",
+          boxShadow: "0 4px 16px rgba(15,17,24,0.2)",
+        },},
+          React.createElement('div', { style: { width: 44, height: 44, borderRadius: 10, background: "rgba(255,255,255,0.12)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 },}, "🎯"),
+          React.createElement('div', null,
+            React.createElement('div', { style: { fontFamily: "'DM Serif Text',serif", fontSize: 18, color: "white", marginBottom: 3 },},
+              t.testTakeTest
+            ),
+            React.createElement('div', { style: { fontFamily: "'DM Sans',sans-serif", fontWeight: 300, fontSize: 13, color: "rgba(255,255,255,0.55)" },},
+              immersion ? "6 questions à choix multiple + 1 optionnelle" : "6 multiple choice + 1 optional question"
+            )
           )
-          , React.createElement('div', { style: { flex: 1, height: 1, background: C.rule },} )
-        )
-
-        /* Level buttons */
-        , React.createElement('div', { style: { display: "flex", flexDirection: "column", gap: 8 },}
-          , CEFR_ORDER.filter(l => l !== "0").map(l => (
+        ),
+        React.createElement('div', { style: { display: "flex", alignItems: "center", gap: 12, marginBottom: 20 },},
+          React.createElement('div', { style: { flex: 1, height: 1, background: C.rule },}),
+          React.createElement('div', { style: { fontFamily: "'DM Sans',sans-serif", fontSize: 11, letterSpacing: 2, color: C.grayMid, textTransform: "uppercase" },},
+            t.testKnowLevel
+          ),
+          React.createElement('div', { style: { flex: 1, height: 1, background: C.rule },})
+        ),
+        React.createElement('div', { style: { display: "flex", flexDirection: "column", gap: 8 },},
+          CEFR_ORDER.filter(l => l !== "0").map(l =>
             React.createElement('button', { key: l, onClick: () => onComplete(l), style: {
               display: "flex", alignItems: "center", justifyContent: "space-between",
-              background: "white", border: `1.5px solid ${C.rule}`,
-              borderRadius: 8, padding: "14px 18px", cursor: "pointer",
-              boxShadow: "0 1px 4px rgba(20,22,32,0.05)",
-              transition: "border-color 0.15s",
-            },}
-              , React.createElement('div', { style: { display: "flex", alignItems: "center", gap: 12 },}
-                , React.createElement(LevelChip, { level: l,} )
-                , React.createElement('span', { style: { fontFamily: "'DM Sans',sans-serif", fontWeight: 300, fontSize: 16, color: C.gray },}
-                  , CEFR[l].name
+              padding: "14px 18px", background: "white",
+              border: `1px solid ${C.rule}`, borderRadius: 10,
+              cursor: "pointer", boxShadow: "0 1px 4px rgba(15,17,24,0.05)",
+            },},
+              React.createElement('div', { style: { display: "flex", alignItems: "center", gap: 14 },},
+                React.createElement(LevelChip, { level: l,}),
+                React.createElement('span', { style: { fontFamily: "'DM Serif Text',serif", fontSize: 17, color: C.ink },},
+                  immersion ? CEFR[l].nameFr : CEFR[l].name
                 )
+              ),
+              React.createElement('span', { style: { color: C.grayLight, fontSize: 18 },}, "›")
+            )
+          )
+        )
+      )
+    )
+  );
+
+  // ── QCM ──
+  if (phase === "qcm") {
+    const q = QUESTIONS[current];
+    const progress = (current / QUESTIONS.length) * 100;
+    return (
+      React.createElement('div', { style: { height: "100%", display: "flex", flexDirection: "column", background: C.header },},
+        React.createElement('style', null, CSS),
+        React.createElement('div', { style: { padding: "48px 28px 24px" },},
+          React.createElement('div', { style: { display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 },},
+            React.createElement('div', { style: { fontFamily: "'DM Sans',sans-serif", fontWeight: 300, fontSize: 13, color: C.onHeaderDim },},
+              `${current + 1} / ${QUESTIONS.length}`
+            ),
+            React.createElement(LevelChip, { level: q.level,})
+          ),
+          React.createElement('div', { style: { height: 3, background: "rgba(255,255,255,0.08)", borderRadius: 2, marginBottom: 24 },},
+            React.createElement('div', { style: { height: "100%", width: `${progress}%`, background: "white", borderRadius: 2, transition: "width 0.3s" },})
+          ),
+          React.createElement('div', { style: { fontFamily: "'DM Serif Display',serif", fontSize: 22, color: C.onHeader, lineHeight: 1.3 },},
+            immersion ? q.q_fr : q.q_en
+          )
+        ),
+        React.createElement('div', { style: { flex: 1, background: C.bg, borderRadius: "20px 20px 0 0", padding: "24px 20px", display: "flex", flexDirection: "column", gap: 12, animation: "slideUp 0.25s both" },},
+          !feedback ? (
+            (immersion ? q.options_fr : q.options_en).map((opt, i) =>
+              React.createElement('button', { key: i, onClick: () => handleChoice(i), style: {
+                padding: "18px 20px", background: "white",
+                border: `1.5px solid ${C.rule}`, borderRadius: 12,
+                cursor: "pointer", textAlign: "left",
+                fontFamily: "'DM Serif Text',serif", fontSize: 17, color: C.ink,
+                lineHeight: 1.45, boxShadow: "0 1px 4px rgba(15,17,24,0.05)",
+                display: "flex", alignItems: "center", gap: 14, transition: "all 0.15s",
+              },},
+                React.createElement('span', { style: {
+                  width: 30, height: 30, borderRadius: "50%", flexShrink: 0,
+                  background: C.blueLight, color: C.blue,
+                  fontFamily: "'DM Sans',sans-serif", fontSize: 13, fontWeight: 600,
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                },}, ["A","B","C"][i]),
+                opt
               )
-              , React.createElement('span', { style: { color: C.grayLight, fontSize: 18 },}, "›")
             )
-          ))
+          ) : React.createElement('div', { style: { display: "flex", flexDirection: "column", gap: 12 },},
+            (immersion ? q.options_fr : q.options_en).map((opt, i) => {
+              const isChosen = i === feedback.chosen;
+              const isCorrect = i === q.correct;
+              const bg = isCorrect ? C.greenLight : isChosen ? C.redLight : "white";
+              const border = isCorrect ? `1.5px solid ${C.green}` : isChosen ? `1.5px solid ${C.red}` : `1.5px solid ${C.rule}`;
+              const icon = isCorrect ? "✓" : isChosen ? "✗" : null;
+              return React.createElement('div', { key: i, style: {
+                padding: "16px 20px", background: bg,
+                border, borderRadius: 12, textAlign: "left",
+                fontFamily: "'DM Serif Text',serif", fontSize: 17,
+                color: isCorrect ? C.green : isChosen ? C.red : C.grayLight,
+                lineHeight: 1.45, display: "flex", alignItems: "center", gap: 14,
+              },},
+                React.createElement('span', { style: {
+                  width: 30, height: 30, borderRadius: "50%", flexShrink: 0,
+                  background: isCorrect ? C.greenLight : isChosen ? C.redLight : C.bgCard,
+                  color: isCorrect ? C.green : isChosen ? C.red : C.grayLight,
+                  fontFamily: "'DM Sans',sans-serif", fontSize: 13, fontWeight: 600,
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                },}, icon || ["A","B","C"][i]),
+                opt
+              );
+            }),
+            React.createElement('div', { style: {
+              background: feedback.correct ? C.greenLight : C.redLight,
+              border: `1px solid ${feedback.correct ? C.green : C.red}`,
+              borderRadius: 10, padding: "12px 16px", marginTop: 4,
+            },},
+              React.createElement('div', { style: {
+                fontFamily: "'DM Sans',sans-serif", fontWeight: 500, fontSize: 13,
+                color: feedback.correct ? C.green : C.red, marginBottom: 4,
+              },}, feedback.correct ? (immersion ? "✓ Correct !" : "✓ Correct!") : (immersion ? "✗ Pas tout à fait" : "✗ Not quite")),
+              React.createElement('div', { style: {
+                fontFamily: "'DM Sans',sans-serif", fontWeight: 300, fontSize: 14,
+                color: C.inkMid, lineHeight: 1.6,
+              },}, feedback.explain)
+            ),
+            React.createElement('button', { onClick: nextQuestion, style: primaryBtn,},
+              current < QUESTIONS.length - 1
+                ? (immersion ? "Question suivante →" : "Next question →")
+                : (immersion ? "Voir ma question bonus →" : "See bonus question →")
+            )
+          )
         )
       )
-    )
-  );
+    );
+  }
 
-  if (phase === "test") return (
-    React.createElement('div', { style: { height: "100%", display: "flex", flexDirection: "column", background: C.bg },}
-      , React.createElement('style', null, CSS)
-      , React.createElement('div', { style: { background: C.header, padding: "24px 24px 20px", display: "flex", alignItems: "center", gap: 12 },}
-        , React.createElement(BackBtn, { onClick: () => setPhase("intro"),} )
-        , React.createElement('div', { style: { fontFamily: "'DM Serif Text',serif", fontSize: 20, color: C.onHeader },}, t.testTitle)
-      )
-      , React.createElement('div', { style: { flex: 1, padding: "28px 24px", display: "flex", flexDirection: "column", gap: 16 },}
-        , React.createElement('div', { style: { fontFamily: "'DM Serif Text',serif", fontStyle: "italic", fontSize: 18, color: C.inkMid, lineHeight: 1.7 },}
-          , immersion
-            ? "Écrivez 2 ou 3 phrases en français — présentez-vous, dites ce que vous faites, ou parlez d'un endroit que vous aimez."
-            : "Write 2 or 3 sentences in French — introduce yourself, say what you do, or talk about a place you like."
+  // ── OPEN QUESTION ──
+  if (phase === "open") return (
+    React.createElement('div', { style: { height: "100%", display: "flex", flexDirection: "column", background: C.header },},
+      React.createElement('style', null, CSS),
+      React.createElement('div', { style: { padding: "48px 28px 24px" },},
+        React.createElement('div', { style: { fontFamily: "'DM Sans',sans-serif", fontWeight: 300, fontSize: 13, color: C.onHeaderDim, marginBottom: 12 },},
+          immersion ? "Question optionnelle" : "Optional question"
+        ),
+        React.createElement('div', { style: { fontFamily: "'DM Serif Display',serif", fontSize: 24, color: C.onHeader, lineHeight: 1.25 },},
+          immersion
+            ? "Écrivez 2 ou 3 phrases en français sur n'importe quel sujet."
+            : "Write 2 or 3 sentences in French about anything."
+        ),
+        React.createElement('div', { style: { marginTop: 10, fontFamily: "'DM Sans',sans-serif", fontWeight: 300, fontSize: 14, color: C.onHeaderDim, lineHeight: 1.6 },},
+          immersion
+            ? "Cela nous permet d'affiner votre niveau. Vous pouvez passer cette étape."
+            : "This helps us fine-tune your level. You can skip this step."
         )
-        , React.createElement('textarea', {
+      ),
+      React.createElement('div', { style: { flex: 1, background: C.bg, borderRadius: "20px 20px 0 0", padding: "24px 20px 32px", display: "flex", flexDirection: "column", gap: 14, animation: "slideUp 0.25s both" },},
+        React.createElement('textarea', {
           autoFocus: true,
-          value: input,
-          onChange: e => setInput(e.target.value),
+          value: openText,
+          onChange: e => setOpenText(e.target.value),
           placeholder: immersion ? "Écrivez en français…" : "Write in French…",
+          rows: 5,
           style: {
-            flex: 1, resize: "none", border: `1px solid ${C.rule}`,
-            borderRadius: 4, padding: "14px 16px",
-            fontFamily: "'DM Serif Text',serif", fontSize: 18, color: C.ink,
-            background: "white", lineHeight: 1.7,
-          },}
-        )
-        , error && React.createElement('div', { style: { color: C.red, fontSize: 13 },}, error)
-        , React.createElement('button', { onClick: analyse, disabled: !input.trim(), style: primaryBtn,}
-          , t.testStart
+            resize: "none", border: `1.5px solid ${openText.trim() ? C.ink : C.rule}`,
+            borderRadius: 12, padding: "14px 16px",
+            fontFamily: "'DM Serif Text',serif", fontSize: 17, color: C.ink,
+            background: "white", lineHeight: 1.7, transition: "border-color 0.15s",
+          },
+        }),
+        React.createElement('button', { onClick: finishWithOpen, style: primaryBtn,},
+          immersion ? "Voir mon niveau →" : "See my level →"
+        ),
+        React.createElement('button', { onClick: () => finishWithOpen(), style: { ...ghostBtn, fontSize: 14 },},
+          immersion ? "Passer cette étape" : "Skip this step"
         )
       )
     )
   );
 
+  // ── LOADING ──
   if (phase === "loading") return (
-    React.createElement('div', { style: { height: "100%", display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", gap: 20, background: C.bg },}
-      , React.createElement('style', null, CSS)
-      , React.createElement('div', { style: { width: 28, height: 28, border: `2px solid ${C.rule}`, borderTopColor: C.ink, borderRadius: "50%", animation: "spin 0.8s linear infinite" },} )
-      , React.createElement('div', { style: { fontFamily: "'DM Sans',sans-serif", fontWeight: 300, fontSize: 16, color: C.gray },}, t.testLoading)
+    React.createElement('div', { style: { height: "100%", display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", gap: 20, background: C.bg },},
+      React.createElement('style', null, CSS),
+      React.createElement('div', { style: { width: 28, height: 28, border: `2px solid ${C.rule}`, borderTopColor: C.ink, borderRadius: "50%", animation: "spin 0.8s linear infinite" },}),
+      React.createElement('div', { style: { fontFamily: "'DM Sans',sans-serif", fontWeight: 300, fontSize: 15, color: C.gray },}, t.testLoading)
     )
   );
 
+  // ── RESULT ──
   if (phase === "result" && result) return (
-    React.createElement('div', { style: { height: "100%", display: "flex", flexDirection: "column", background: C.bg },}
-      , React.createElement('style', null, CSS)
-      , React.createElement('div', { style: { background: C.header, padding: "32px 24px 24px" },}
-        , React.createElement(Tricolor, { height: 3, style: { marginBottom: 20 },} )
-        , React.createElement('div', { style: { fontFamily: "'DM Sans',sans-serif", fontWeight: 400, fontSize: 11, letterSpacing: 3, color: C.onHeaderDim, textTransform: "uppercase", marginBottom: 10 },}
-          , t.testYourLevel
-        )
-        , React.createElement('div', { style: { display: "flex", alignItems: "flex-end", gap: 14 },}
-          , React.createElement('div', { style: { fontFamily: "'DM Serif Display',serif", fontSize: 60, color: C.onHeader, lineHeight: 1 },}
-            , result.level
-          )
-          , React.createElement('div', { style: { paddingBottom: 6 },}
-            , React.createElement('div', { style: { fontFamily: "'DM Serif Text',serif", fontSize: 19, color: C.onHeader },}
-              , _optionalChain([CEFR, 'access', _7 => _7[result.level], 'optionalAccess', _8 => _8.name])
-            )
+    React.createElement('div', { style: { height: "100%", display: "flex", flexDirection: "column", background: C.header },},
+      React.createElement('style', null, CSS),
+      React.createElement('div', { style: { padding: "52px 28px 28px", animation: "fadeIn 0.4s both" },},
+        React.createElement('div', { style: { fontFamily: "'DM Sans',sans-serif", fontWeight: 300, fontSize: 11, letterSpacing: 3, color: C.onHeaderDim, textTransform: "uppercase", marginBottom: 10 },},
+          t.testYourLevel
+        ),
+        React.createElement('div', { style: { display: "flex", alignItems: "baseline", gap: 14, marginBottom: 8 },},
+          React.createElement('div', { style: { fontFamily: "'DM Serif Display',serif", fontSize: 64, color: C.onHeader, lineHeight: 1 },},
+            result.level
+          ),
+          React.createElement('div', { style: { fontFamily: "'DM Serif Text',serif", fontStyle: "italic", fontSize: 20, color: C.onHeaderDim },},
+            CEFR[result.level]?.nameFr || CEFR[result.level]?.name
           )
         )
-      )
-      , React.createElement('div', { style: { flex: 1, overflowY: "auto", padding: "24px" },}
-        , result.encouragement && (
-          React.createElement('div', { style: { fontFamily: "'DM Serif Text',serif", fontStyle: "italic", fontSize: 17, color: C.inkMid, lineHeight: 1.75, marginBottom: 24 },}
-            , result.encouragement
-          )
-        )
-        , _optionalChain([result, 'access', _9 => _9.strengths, 'optionalAccess', _10 => _10.length]) > 0 && (
-          React.createElement(Section, { title: immersion ? "Points forts" : "Strengths", color: C.green,}
-            , result.strengths.map((s, i) => React.createElement(Item, { key: i, text: s, color: C.green,} ))
-          )
-        )
-        , _optionalChain([result, 'access', _11 => _11.focus, 'optionalAccess', _12 => _12.length]) > 0 && (
-          React.createElement(Section, { title: immersion ? "À travailler" : "Focus on", color: C.blue,}
-            , result.focus.map((s, i) => React.createElement(Item, { key: i, text: s, color: C.blue,} ))
-          )
-        )
-      )
-      , React.createElement('div', { style: { padding: "16px 24px 32px" },}
-        , React.createElement('button', { onClick: () => onComplete(result.level), style: primaryBtn,}
-          , immersion ? "Voir mes scénarios →" : "See my scenarios →"
+      ),
+      React.createElement('div', { style: { flex: 1, background: C.bg, borderRadius: "20px 20px 0 0", padding: "28px 24px", overflowY: "auto", animation: "slideUp 0.4s 0.1s both" },},
+        result.encouragement ? React.createElement('div', { style: { fontFamily: "'DM Serif Text',serif", fontStyle: "italic", fontSize: 17, color: C.inkMid, lineHeight: 1.75, marginBottom: 24 },},
+          result.encouragement
+        ) : null,
+        result.strengths?.length > 0 ? React.createElement(Section, { title: immersion ? "Points forts" : "Strengths", color: C.green,},
+          result.strengths.map((s, i) => React.createElement(Item, { key: i, text: s, color: C.green,}))
+        ) : null,
+        result.focus?.length > 0 ? React.createElement(Section, { title: immersion ? "À travailler" : "Focus on", color: C.blue,},
+          result.focus.map((s, i) => React.createElement(Item, { key: i, text: s, color: C.blue,}))
+        ) : null
+      ),
+      React.createElement('div', { style: { padding: "16px 24px 40px", background: C.bg },},
+        React.createElement('button', { onClick: () => onComplete(result.level), style: primaryBtn,},
+          immersion ? "Voir mes scénarios →" : "See my scenarios →"
         )
       )
     )
@@ -1156,32 +1440,6 @@ Be precise and encouraging.`;
 
   return null;
 }
-
-function Section({ title, color, children }) {
-  return (
-    React.createElement('div', { style: { marginBottom: 20 },}
-      , React.createElement('div', { style: { fontFamily: "'DM Sans',sans-serif", fontWeight: 500, fontSize: 12, letterSpacing: 2, color, textTransform: "uppercase", marginBottom: 8 },}
-        , title
-      )
-      , children
-    )
-  );
-}
-
-function Item({ text, color }) {
-  return (
-    React.createElement('div', { style: { display: "flex", gap: 10, alignItems: "flex-start", marginBottom: 6 },}
-      , React.createElement('div', { style: { width: 4, height: 4, borderRadius: "50%", background: color, marginTop: 7, flexShrink: 0 },} )
-      , React.createElement('div', { style: { fontFamily: "'DM Sans',sans-serif", fontWeight: 300, fontSize: 16, color: C.inkMid, lineHeight: 1.6 },}
-        , text
-      )
-    )
-  );
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// SCREEN — HOME
-// ─────────────────────────────────────────────────────────────────────────────
 
 function HomeScreen({ progress, immersion, userLevel, sessions, onSelect, onProfile, onToggleMode, onExercises }) {
   const t = T(immersion);
@@ -1388,7 +1646,7 @@ function AssistantBubble({ content, immersion }) {
 // SCREEN — SCENARIO (conversation)
 // ─────────────────────────────────────────────────────────────────────────────
 
-function ScenarioScreen({ scenario: s, immersion, ttsEnabled, progress, onComplete, onDiag, onBack }) {
+function ScenarioScreen({ scenario: s, immersion, ttsEnabled, progress, onComplete, onDiag, onBack, onExercises }) {
   const t = T(immersion);
   const title = immersion ? s.title : s.titleEn;
   const scene = immersion ? s.scene_fr : s.scene_en;
@@ -1581,6 +1839,15 @@ function ScenarioScreen({ scenario: s, immersion, ttsEnabled, progress, onComple
         },}
           , isReturn ? (immersion ? "Réessayer" : "Try again") : (immersion ? "Rejouer" : "Replay")
         )
+        , onExercises ? React.createElement('button', { onClick: onExercises, style: {
+            width: "100%", padding: "13px", marginTop: 4,
+            background: "none", color: "rgba(255,255,255,0.4)",
+            border: "1px solid rgba(255,255,255,0.1)", borderRadius: 4,
+            cursor: "pointer", fontFamily: "'DM Sans',sans-serif",
+            fontWeight: 300, fontSize: 14,
+          },},
+          "📝 " + (immersion ? "Pratiquer mes erreurs" : "Practice my mistakes")
+        ) : null
       )
     )
   );
@@ -2267,6 +2534,7 @@ function App() {
             immersion: immersion,
             ttsEnabled: ttsEnabled,
             progress: progress,
+            onExercises: () => go("diagnostics"),
             onComplete: (id, stars) => {
               saveProgress({ ...progress, [id]: { stars: Math.max(getStars(progress[id]), stars || 1), visits: (_optionalChain([progress, 'access', _47 => _47[id], 'optionalAccess', _48 => _48.visits]) || 0) + 1 } });
               go("home");
