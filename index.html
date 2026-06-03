@@ -1442,7 +1442,7 @@ function LevelTestScreen({ immersion, onComplete, onBack }) {
   return null;
 }
 
-function HomeScreen({ progress, immersion, userLevel, sessions, onSelect, onProfile, onToggleMode, onExercises }) {
+function HomeScreen({ progress, immersion, userLevel, sessions, onSelect, onProfile, onToggleMode, onExercises, displayName, isLoggedIn }) {
   const t = T(immersion);
   const effectiveLevel = getUnlockedLevel(progress, userLevel);
 
@@ -2515,6 +2515,13 @@ async function cloudLoadProfile(uid) {
   const { data } = await sb.from("profiles").select("*").eq("id", uid).single();
   return data;
 }
+async function cloudSaveUsername(uid, username, number) {
+  await sb.from("profiles").upsert({ id: uid, username, username_number: number }, { onConflict: "id" });
+}
+async function isUsernameAvailable(username) {
+  const { data } = await sb.from("profiles").select("id").eq("username", username.trim());
+  return !data || data.length === 0;
+}
 
 // ─── AUTH SCREEN ─────────────────────────────────────────────────────────────
 function AuthScreen({ immersion, onAuth, onGuest }) {
@@ -2648,6 +2655,79 @@ function AuthScreen({ immersion, onAuth, onGuest }) {
   );
 }
 
+
+// ─── USERNAME SCREEN ─────────────────────────────────────────────────────────
+function UsernameScreen({ immersion, user, onDone }) {
+  const [name,    setName]    = useState(
+    (user?.user_metadata?.full_name || user?.email?.split("@")[0] || "").split(" ")[0]
+  );
+  const [loading, setLoading] = useState(false);
+  const [err,     setErr]     = useState(null);
+
+  function generateNumber() { return Math.floor(1000 + Math.random() * 9000); }
+
+  async function handleConfirm() {
+    const clean = name.trim().replace(/[^a-zA-Z0-9_\-\.àâäéèêëîïôùûüç ]/g, "").trim();
+    if (!clean || clean.length < 2) {
+      setErr(immersion ? "Au moins 2 caractères." : "At least 2 characters."); return;
+    }
+    setLoading(true); setErr(null);
+    const num = generateNumber();
+    try {
+      await cloudSaveUsername(user.id, clean, num);
+      onDone(clean, num);
+    } catch(e) { setErr(immersion ? "Erreur — réessayez." : "Error — please try again."); }
+    setLoading(false);
+  }
+
+  return React.createElement("div", { style: { height: "100%", display: "flex", flexDirection: "column", background: C.header }},
+    React.createElement("style", null, CSS),
+    React.createElement("div", { style: { padding: "52px 28px 28px" }},
+      React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 12, marginBottom: 28 }},
+        React.createElement(Flag, { h: 16, w: 28 }),
+        React.createElement("div", { style: { height: 1, flex: 1, background: "rgba(255,255,255,0.1)" }})
+      ),
+      React.createElement("div", { style: { fontFamily: "'DM Serif Display',serif", fontStyle: "italic", fontSize: 30, color: C.onHeader, lineHeight: 1.2, marginBottom: 8 }},
+        immersion ? "Choisissez votre pseudo" : "Choose your username"
+      ),
+      React.createElement("div", { style: { fontFamily: "'DM Sans',sans-serif", fontWeight: 300, fontSize: 14, color: C.onHeaderDim, lineHeight: 1.6 }},
+        immersion
+          ? "Un numéro unique sera ajouté automatiquement — ex. Pierre#4821"
+          : "A unique number will be added automatically — e.g. Pierre#4821"
+      )
+    ),
+    React.createElement("div", { style: { flex: 1, background: C.bg, borderRadius: "20px 20px 0 0", padding: "28px 24px 40px", display: "flex", flexDirection: "column", gap: 16 }},
+      React.createElement("div", null,
+        React.createElement("div", { style: { fontFamily: "'DM Sans',sans-serif", fontWeight: 500, fontSize: 12, letterSpacing: 1, color: C.gray, textTransform: "uppercase", marginBottom: 8 }},
+          immersion ? "Votre pseudo" : "Your username"
+        ),
+        React.createElement("input", {
+          value: name, maxLength: 20,
+          onChange: e => { setName(e.target.value); setErr(null); },
+          onKeyDown: e => { if (e.key === "Enter") handleConfirm(); },
+          placeholder: immersion ? "Pierre, Marie, Alex..." : "Your name here...",
+          style: { width: "100%", border: `1.5px solid ${err ? C.red : name.trim() ? C.ink : C.rule}`,
+            borderRadius: 10, padding: "14px 16px", fontSize: 17, fontFamily: "'DM Serif Text',serif",
+            color: C.ink, background: "white", outline: "none", boxSizing: "border-box",
+          }
+        }),
+        err && React.createElement("div", { style: { fontFamily: "'DM Sans',sans-serif", fontSize: 13, color: C.red, marginTop: 6 }}, err)
+      ),
+      React.createElement("div", { style: { background: C.bgCard, borderRadius: 10, padding: "14px 16px", display: "flex", alignItems: "center", gap: 12 }},
+        React.createElement("div", { style: { fontFamily: "'DM Serif Display',serif", fontSize: 22, color: C.ink }},
+          (name.trim() || (immersion ? "Vous" : "You")) + "#?????"
+        ),
+        React.createElement("div", { style: { fontFamily: "'DM Sans',sans-serif", fontWeight: 300, fontSize: 12, color: C.gray, lineHeight: 1.5 }},
+          immersion ? "Votre identifiant unique." : "Your unique identifier."
+        )
+      ),
+      React.createElement("button", { onClick: handleConfirm, disabled: loading || !name.trim(),
+        style: { ...primaryBtn, marginTop: 8, opacity: (!name.trim() || loading) ? 0.5 : 1, cursor: (!name.trim() || loading) ? "default" : "pointer" }
+      }, loading ? "…" : (immersion ? "Confirmer →" : "Confirm →"))
+    )
+  );
+}
+
 // ─── APP ─────────────────────────────────────────────────────────────────────
 function App() {
   const [screen,     setScreen]     = useState("auth");
@@ -2672,6 +2752,8 @@ function App() {
       if (Object.keys(diagData).length) { setDiag(diagData);             lsSet("mft_diag",      diagData); }
       if (profile?.level)               { setUserLevel(profile.level);   lsSet("mft_level",     profile.level); }
       if (profile?.immersion != null)   { setImmersion(profile.immersion); lsSet("mft_immersion", profile.immersion); }
+      if (profile?.username)            { setUsername(profile.username);   lsSet("mft_username",  profile.username); }
+      if (profile?.username_number)     { setUserNum(profile.username_number); lsSet("mft_usernum", profile.username_number); }
     } catch(e) { console.warn("Sync:", e); }
   }
 
@@ -2683,7 +2765,15 @@ function App() {
     if (Object.keys(localProg).length) await cloudSaveProgress(u.id, localProg).catch(() => {});
     if (localLevel) await cloudSaveProfile(u.id, localLevel, localImm).catch(() => {});
     await syncDown(u);
-    go(ls("mft_level", null) ? "home" : "splash");
+    // Check if username already set
+    const prof = await cloudLoadProfile(u.id).catch(() => null);
+    if (prof?.username) {
+      setUsername(prof.username); lsSet("mft_username", prof.username);
+      setUserNum(prof.username_number); lsSet("mft_usernum", prof.username_number);
+      go(ls("mft_level", null) ? "home" : "splash");
+    } else {
+      go("username");
+    }
   }
 
   // Handle Google OAuth redirect
@@ -2717,8 +2807,9 @@ function App() {
     });
   }
 
+  const displayName = username ? `${username}#${userNum}` : (user?.email?.split("@")[0] || "");
   const accountLabel = user
-    ? (immersion ? "Compte · " + user.email : "Account · " + user.email)
+    ? (immersion ? "Compte · " + displayName : "Account · " + displayName)
     : (immersion ? "Se connecter / Créer un compte" : "Log in / Create account");
 
   return React.createElement("div", { style: { width: "100%", height: "100%", display: "flex", flexDirection: "column" }},
@@ -2730,8 +2821,16 @@ function App() {
       screen === "leveltest"   && React.createElement(LevelTestScreen,   { immersion,
         onComplete: lvl => { setUserLevel(lvl); lsSet("mft_level", lvl); if (user) cloudSaveProfile(user.id, lvl, immersion).catch(() => {}); go("home"); },
         onBack: () => go("mode") }),
+      screen === "username"    && React.createElement(UsernameScreen,    { immersion, user,
+        onDone: (name, num) => {
+          setUsername(name); lsSet("mft_username", name);
+          setUserNum(num);   lsSet("mft_usernum", num);
+          go(ls("mft_level", null) ? "home" : "splash");
+        }
+      }),
       screen === "home"        && React.createElement(HomeScreen,        { progress, immersion, userLevel, sessions: thisWeek,
         onSelect: s => { setScenario(s); recordSession(); go("scenario"); },
+        displayName: displayName, isLoggedIn: !!user,
         onProfile: () => go("profile"), onToggleMode: toggleImmersion, onExercises: () => go("diagnostics") }),
       screen === "scenario" && scenario && React.createElement(ScenarioScreen, { scenario, immersion, ttsEnabled, progress,
         onExercises: () => go("diagnostics"),
