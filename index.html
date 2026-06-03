@@ -5,9 +5,9 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="theme-color" content="#0D1024">
+<meta name="theme-color" content="#0A0F1E">
 <title>My French Teacher</title>
-<style>*{margin:0;padding:0;box-sizing:border-box}html,body,#root{width:100%;height:100%;height:100dvh;overflow:hidden;background:#0D1024}</style>
+<style>*{margin:0;padding:0;box-sizing:border-box}html,body,#root{width:100%;height:100%;height:100dvh;overflow:hidden;background:#0A0F1E}</style>
 </head>
 <body>
 <div id="root"></div>
@@ -2483,6 +2483,16 @@ async function signIn(email, password) {
 
 async function signOut() { await sb.auth.signOut(); }
 
+async function signInWithGoogle() {
+  const { error } = await sb.auth.signInWithOAuth({
+    provider: "google",
+    options: {
+      redirectTo: "https://veget44.github.io/MFT/",
+    }
+  });
+  if (error) throw error;
+}
+
 async function cloudSaveProgress(userId, progress) {
   const rows = Object.entries(progress).map(([id, v]) => ({
     user_id: userId, scenario_id: parseInt(id),
@@ -2553,217 +2563,150 @@ function AuthScreen({ immersion, onAuth, onGuest }) {
     setLoading(false);
   }
 
+  async function handleGoogle() {
+    setLoading(true); setError(null);
+    try { await signInWithGoogle(); }
+    catch(e) { setError(immersion ? "Erreur Google — réessayez." : "Google error — please try again."); setLoading(false); }
+  }
+
+  var isSignUp = mode === "signup";
+
+  // Shared background with Paris photo
+  var bgStyle = { height: "100%", display: "flex", flexDirection: "column", position: "relative", overflow: "hidden", background: "#0A0F1E" };
+
+  function PhotoBg() {
+    return React.createElement("div", { style: { position: "absolute", inset: 0, zIndex: 0 }},
+      React.createElement("img", { src: "data:image/jpeg;base64,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",
+        style: { width: "100%", height: "100%", objectFit: "cover", objectPosition: "center 40%", display: "block" }
+      }),
+      React.createElement("div", { style: { position: "absolute", inset: 0,
+        background: "linear-gradient(to bottom, rgba(6,9,26,0.75) 0%, rgba(6,9,26,0.4) 40%, rgba(6,9,26,0.88) 100%)"
+      }})
+    );
+  }
+
   if (mode === "choice") return (
-    React.createElement("div", { style: { height: "100%", display: "flex", flexDirection: "column", background: C.header }},
+    React.createElement("div", { style: bgStyle },
       React.createElement("style", null, CSS),
-      React.createElement("div", { style: { flex: 1, display: "flex", flexDirection: "column", justifyContent: "space-between", padding: "52px 28px 48px" }},
-        React.createElement("div", { style: { animation: "fadeIn 0.5s both" }},
-          React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 12, marginBottom: 32 }},
-            React.createElement(Flag, { h: 18, w: 32 }),
-            React.createElement("div", { style: { height: 1, flex: 1, background: "rgba(255,255,255,0.08)" }})
-          ),
-          React.createElement("div", { style: { fontFamily: "'DM Serif Display',serif", fontStyle: "italic", fontSize: 36, color: C.onHeader, lineHeight: 1.1, marginBottom: 10 }}, "My French Teacher"),
-          React.createElement("div", { style: { fontFamily: "'DM Sans',sans-serif", fontWeight: 300, fontSize: 15, color: C.onHeaderDim, lineHeight: 1.7 }},
+      React.createElement(PhotoBg),
+      React.createElement("div", { style: { position: "relative", zIndex: 1, height: "100%", display: "flex", flexDirection: "column", justifyContent: "space-between", padding: "52px 28px 48px" }},
+        // Top — logo
+        React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 12, animation: "fadeIn 0.5s both" }},
+          React.createElement(Flag, { h: 18, w: 32 }),
+          React.createElement("div", { style: { height: 1, flex: 1, background: "rgba(255,255,255,0.15)" }})
+        ),
+        // Middle — title
+        React.createElement("div", { style: { animation: "fadeUp 0.7s 0.1s both" }},
+          React.createElement("div", { style: { fontFamily: "'DM Serif Display',serif", fontStyle: "italic", fontSize: 56, lineHeight: 0.92, color: "white", letterSpacing: -1, textShadow: "0 2px 20px rgba(0,0,0,0.5)", marginBottom: 4 }}, "My French"),
+          React.createElement("div", { style: { fontFamily: "'DM Serif Display',serif", fontSize: 56, lineHeight: 0.92, color: "white", letterSpacing: -1, textShadow: "0 2px 20px rgba(0,0,0,0.5)", marginBottom: 20 }}, "Teacher"),
+          React.createElement("div", { style: { height: 1, background: "rgba(255,255,255,0.2)", marginBottom: 14 }}),
+          React.createElement("div", { style: { fontFamily: "'DM Sans',sans-serif", fontWeight: 300, fontSize: 16, color: "rgba(255,255,255,0.65)", lineHeight: 1.6, textShadow: "0 1px 8px rgba(0,0,0,0.6)" }},
             immersion
-              ? "Sauvegardez votre progression et accédez à l'app depuis n'importe quel appareil."
-              : "Save your progress and access the app from any device."
+              ? "Sauvegardez votre progression sur tous vos appareils."
+              : "Save your progress across all your devices."
           )
         ),
-        React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 12, animation: "fadeUp 0.6s 0.15s both" }},
-          React.createElement("div", { style: { display: "flex", height: 3, borderRadius: 2, overflow: "hidden", marginBottom: 4 }},
+        // Bottom — buttons
+        React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 10, animation: "fadeUp 0.7s 0.2s both" }},
+          // Tricolor bar
+          React.createElement("div", { style: { display: "flex", height: 3, borderRadius: 2, overflow: "hidden", marginBottom: 6 }},
             React.createElement("div", { style: { flex: 1, background: C.blue }}),
             React.createElement("div", { style: { flex: 1, background: "white" }}),
             React.createElement("div", { style: { flex: 1, background: C.red }})
           ),
+          // Google button
+          React.createElement("button", { onClick: handleGoogle, disabled: loading, style: {
+            width: "100%", padding: "15px 20px",
+            background: "white", color: "#3C3C3C",
+            border: "none", borderRadius: 4, cursor: loading ? "default" : "pointer",
+            fontFamily: "'DM Sans',sans-serif", fontWeight: 500, fontSize: 15,
+            display: "flex", alignItems: "center", justifyContent: "center", gap: 10,
+            boxShadow: "0 2px 12px rgba(0,0,0,0.3)",
+          }},
+            React.createElement("svg", { width: 18, height: 18, viewBox: "0 0 18 18" },
+              React.createElement("path", { d: "M17.64 9.205c0-.639-.057-1.252-.164-1.841H9v3.481h4.844a4.14 4.14 0 01-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z", fill: "#4285F4"}),
+              React.createElement("path", { d: "M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 009 18z", fill: "#34A853"}),
+              React.createElement("path", { d: "M3.964 10.71A5.41 5.41 0 013.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 000 9c0 1.452.348 2.827.957 4.042l3.007-2.332z", fill: "#FBBC05"}),
+              React.createElement("path", { d: "M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 00.957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z", fill: "#EA4335"})
+            ),
+            loading ? "…" : (immersion ? "Continuer avec Google" : "Continue with Google")
+          ),
+          // Email button
           React.createElement("button", { onClick: () => setMode("signup"), style: {
-            width: "100%", padding: "17px", background: "white", color: C.ink,
-            border: "none", borderRadius: 4, cursor: "pointer",
-            fontFamily: "'DM Sans',sans-serif", fontWeight: 600, fontSize: 15,
-          }}, immersion ? "Créer un compte" : "Create an account"),
-          React.createElement("button", { onClick: () => setMode("signin"), style: {
-            width: "100%", padding: "16px", background: "none", color: C.onHeader,
-            border: "1px solid rgba(255,255,255,0.2)", borderRadius: 4, cursor: "pointer",
+            width: "100%", padding: "14px",
+            background: "rgba(255,255,255,0.1)", color: "white",
+            border: "1px solid rgba(255,255,255,0.25)", borderRadius: 4, cursor: "pointer",
             fontFamily: "'DM Sans',sans-serif", fontWeight: 400, fontSize: 15,
-          }}, immersion ? "Se connecter" : "Log in"),
+          }}, immersion ? "Continuer avec email" : "Continue with email"),
+          // Log in link
+          React.createElement("button", { onClick: () => setMode("signin"), style: {
+            background: "none", border: "none", cursor: "pointer",
+            fontFamily: "'DM Sans',sans-serif", fontWeight: 300, fontSize: 14,
+            color: "rgba(255,255,255,0.5)", padding: "4px 0",
+          }}, immersion ? "Déjà un compte ? Se connecter" : "Already have an account? Log in"),
+          // Guest
           React.createElement("button", { onClick: onGuest, style: {
-            width: "100%", padding: "14px", background: "none", color: C.onHeaderDim,
-            border: "none", cursor: "pointer",
+            background: "none", border: "none", cursor: "pointer",
             fontFamily: "'DM Sans',sans-serif", fontWeight: 300, fontSize: 13,
+            color: "rgba(255,255,255,0.35)",
           }}, immersion ? "Continuer sans compte →" : "Continue without account →")
         )
       )
     )
   );
 
-  var isSignUp = mode === "signup";
+  // Email form (signup or signin)
   return (
-    React.createElement("div", { style: { height: "100%", display: "flex", flexDirection: "column", background: C.header }},
+    React.createElement("div", { style: bgStyle },
       React.createElement("style", null, CSS),
-      React.createElement("div", { style: { padding: "48px 28px 24px" }},
-        React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 12, marginBottom: 28 }},
-          React.createElement("button", { onClick: () => { setMode("choice"); setError(null); }, style: {
-            background: "none", border: "none", cursor: "pointer", color: C.onHeaderDim, fontSize: 20, padding: "4px 8px 4px 0",
-          }}, "←"),
-          React.createElement("div", { style: { height: 1, flex: 1, background: "rgba(255,255,255,0.08)" }})
+      React.createElement(PhotoBg),
+      React.createElement("div", { style: { position: "relative", zIndex: 1, height: "100%", display: "flex", flexDirection: "column" }},
+        // Header
+        React.createElement("div", { style: { padding: "48px 28px 0" }},
+          React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 12, marginBottom: 24 }},
+            React.createElement("button", { onClick: () => { setMode("choice"); setError(null); }, style: {
+              background: "none", border: "none", cursor: "pointer", color: "rgba(255,255,255,0.6)", fontSize: 22, padding: "4px 8px 4px 0",
+            }}, "←"),
+            React.createElement("div", { style: { height: 1, flex: 1, background: "rgba(255,255,255,0.12)" }})
+          ),
+          React.createElement("div", { style: { fontFamily: "'DM Serif Display',serif", fontSize: 32, color: "white", lineHeight: 1.2, textShadow: "0 2px 12px rgba(0,0,0,0.5)" }},
+            isSignUp ? (immersion ? "Créer un compte" : "Create an account") : (immersion ? "Se connecter" : "Log in")
+          )
         ),
-        React.createElement("div", { style: { fontFamily: "'DM Serif Display',serif", fontSize: 30, color: C.onHeader, lineHeight: 1.2 }},
-          isSignUp ? (immersion ? "Créer un compte" : "Create an account") : (immersion ? "Se connecter" : "Log in")
+        // Form panel
+        React.createElement("div", { style: { flex: 1, display: "flex", flexDirection: "column", justifyContent: "flex-end", padding: "0 24px 48px" }},
+          React.createElement("div", { style: { background: "rgba(255,255,255,0.06)", backdropFilter: "blur(12px)", borderRadius: 16, padding: "24px 20px", border: "1px solid rgba(255,255,255,0.1)", display: "flex", flexDirection: "column", gap: 12 }},
+            React.createElement("input", {
+              type: "email", value: email, onChange: function(e){ setEmail(e.target.value); },
+              placeholder: "Email",
+              style: { border: "1px solid rgba(255,255,255,0.15)", borderRadius: 8, padding: "14px 16px", fontSize: 16, fontFamily: "'DM Sans',sans-serif", color: "white", background: "rgba(255,255,255,0.08)", outline: "none" }
+            }),
+            React.createElement("input", {
+              type: "password", value: password,
+              onChange: function(e){ setPassword(e.target.value); },
+              onKeyDown: function(e){ if (e.key === "Enter") isSignUp ? handleSignUp() : handleSignIn(); },
+              placeholder: immersion ? "Mot de passe" : "Password",
+              style: { border: "1px solid rgba(255,255,255,0.15)", borderRadius: 8, padding: "14px 16px", fontSize: 16, fontFamily: "'DM Sans',sans-serif", color: "white", background: "rgba(255,255,255,0.08)", outline: "none" }
+            }),
+            error && React.createElement("div", { style: { fontFamily: "'DM Sans',sans-serif", fontSize: 13, color: "#FF8080", lineHeight: 1.5 }}, error),
+            React.createElement("button", {
+              onClick: isSignUp ? handleSignUp : handleSignIn,
+              disabled: loading,
+              style: { width: "100%", padding: "15px", background: "white", color: C.ink, border: "none", borderRadius: 4, cursor: loading ? "default" : "pointer", fontFamily: "'DM Sans',sans-serif", fontWeight: 600, fontSize: 15, opacity: loading ? 0.7 : 1 }
+            }, loading ? "…" : (isSignUp ? (immersion ? "Créer →" : "Create →") : (immersion ? "Se connecter →" : "Log in →"))),
+            React.createElement("button", { onClick: onGuest, style: {
+              background: "none", border: "none", cursor: "pointer",
+              fontFamily: "'DM Sans',sans-serif", fontWeight: 300, fontSize: 13,
+              color: "rgba(255,255,255,0.4)", marginTop: 2,
+            }}, immersion ? "Continuer sans compte" : "Continue without account")
+          )
         )
-      ),
-      React.createElement("div", { style: { flex: 1, background: C.bg, borderRadius: "20px 20px 0 0", padding: "28px 24px 32px", display: "flex", flexDirection: "column", gap: 14, animation: "slideUp 0.35s both" }},
-        React.createElement("input", {
-          type: "email", value: email, onChange: function(e){ setEmail(e.target.value); },
-          placeholder: "Email",
-          style: { border: "1.5px solid " + C.rule, borderRadius: 10, padding: "13px 16px", fontSize: 16, fontFamily: "'DM Sans',sans-serif", color: C.ink, background: "white", outline: "none" }
-        }),
-        React.createElement("input", {
-          type: "password", value: password,
-          onChange: function(e){ setPassword(e.target.value); },
-          onKeyDown: function(e){ if (e.key === "Enter") isSignUp ? handleSignUp() : handleSignIn(); },
-          placeholder: immersion ? "Mot de passe" : "Password",
-          style: { border: "1.5px solid " + C.rule, borderRadius: 10, padding: "13px 16px", fontSize: 16, fontFamily: "'DM Sans',sans-serif", color: C.ink, background: "white", outline: "none" }
-        }),
-        error && React.createElement("div", { style: { fontFamily: "'DM Sans',sans-serif", fontSize: 13, color: C.red, lineHeight: 1.5 }}, error),
-        React.createElement("button", {
-          onClick: isSignUp ? handleSignUp : handleSignIn,
-          disabled: loading,
-          style: Object.assign({}, primaryBtn, { opacity: loading ? 0.6 : 1 })
-        }, loading ? "…" : (isSignUp ? (immersion ? "Créer →" : "Create →") : (immersion ? "Se connecter →" : "Log in →"))),
-        React.createElement("button", { onClick: onGuest, style: {
-          background: "none", border: "none", cursor: "pointer",
-          fontFamily: "'DM Sans',sans-serif", fontWeight: 300, fontSize: 13, color: C.gray, marginTop: 4,
-        }}, immersion ? "Continuer sans compte" : "Continue without account")
       )
     )
   );
 }
 
-function App() {
-  var _s0  = useState("auth"),     screen    = _s0[0],   setScreen    = _s0[1];
-  var _s1  = useState(null),       scenario  = _s1[0],   setScenario  = _s1[1];
-  var _s2  = useState(function(){ return ls("mft_progress", {}); }), progress = _s2[0], setProgress = _s2[1];
-  var _s3  = useState(function(){ return ls("mft_diag", {}); }),     diag     = _s3[0], setDiag     = _s3[1];
-  var _s4  = useState(function(){ return ls("mft_immersion", false);}),immersion=_s4[0],setImmersion=_s4[1];
-  var _s5  = useState(function(){ return ls("mft_level", null); }), userLevel = _s5[0], setUserLevel= _s5[1];
-  var _s6  = useState(false),      ttsEnabled=_s6[0],   setTtsEnabled=_s6[1];
-  var _s7  = useState(null),       user      = _s7[0],   setUser      = _s7[1];
 
-  var st = useSessionTracker();
-  var thisWeek = st.thisWeek, recordSession = st.recordSession;
-  function go(s) { setScreen(s); }
-
-  async function syncDown(u) {
-    if (!u) return;
-    try {
-      var prog = await cloudLoadProgress(u.id);
-      var diagData = await cloudLoadDiag(u.id);
-      var profile = await cloudLoadProfile(u.id);
-      if (Object.keys(prog).length > 0) { setProgress(prog); lsSet("mft_progress", prog); }
-      if (Object.keys(diagData).length > 0) { setDiag(diagData); lsSet("mft_diag", diagData); }
-      if (profile && profile.level) { setUserLevel(profile.level); lsSet("mft_level", profile.level); }
-      if (profile && profile.immersion !== undefined) { setImmersion(profile.immersion); lsSet("mft_immersion", profile.immersion); }
-    } catch(e) { console.warn("Sync failed:", e); }
-  }
-
-  async function handleAuth(u) {
-    setUser(u);
-    var localProg  = ls("mft_progress", {});
-    var localLevel = ls("mft_level", null);
-    var localImm   = ls("mft_immersion", false);
-    if (Object.keys(localProg).length > 0) await cloudSaveProgress(u.id, localProg).catch(function(){});
-    if (localLevel) await cloudSaveProfile(u.id, localLevel, localImm).catch(function(){});
-    await syncDown(u);
-    go(ls("mft_level", null) ? "home" : "splash");
-  }
-
-  function handleGuest() { setUser(null); go("splash"); }
-
-  function saveProgress(p) {
-    setProgress(p); lsSet("mft_progress", p);
-    if (user) cloudSaveProgress(user.id, p).catch(function(){});
-  }
-
-  function saveDiag(scenId, d) {
-    setDiag(function(prev) {
-      var updated = Object.assign({}, prev, { [scenId]: (prev[scenId] || []).concat([d]).slice(-10) });
-      lsSet("mft_diag", updated);
-      if (user) cloudSaveDiag(user.id, updated).catch(function(){});
-      return updated;
-    });
-  }
-
-  function toggleImmersion() {
-    setImmersion(function(v) {
-      lsSet("mft_immersion", !v);
-      if (user) cloudSaveProfile(user.id, userLevel, !v).catch(function(){});
-      return !v;
-    });
-  }
-
-  var accountLabel = user
-    ? (immersion ? "Compte · " + user.email : "Account · " + user.email)
-    : (immersion ? "Se connecter / Créer un compte" : "Log in / Create account");
-
-  return React.createElement("div", { style: { width: "100%", height: "100%", fontFamily: "'DM Sans', sans-serif", display: "flex", flexDirection: "column" }},
-    React.createElement("style", null, CSS),
-    React.createElement("div", { style: { flex: 1, overflow: "hidden" }},
-
-      screen === "auth" && React.createElement(AuthScreen, { immersion: immersion, onAuth: handleAuth, onGuest: handleGuest }),
-
-      screen === "splash" && React.createElement(SplashScreen, { immersion: immersion, onEnter: function(){ go("mode"); } }),
-
-      screen === "mode" && React.createElement(ModeScreen, { immersion: immersion,
-        onSelect: function(isImm) { setImmersion(isImm); lsSet("mft_immersion", isImm); go("leveltest"); }
-      }),
-
-      screen === "leveltest" && React.createElement(LevelTestScreen, { immersion: immersion,
-        onComplete: function(lvl) {
-          setUserLevel(lvl); lsSet("mft_level", lvl);
-          if (user) cloudSaveProfile(user.id, lvl, immersion).catch(function(){});
-          go("home");
-        },
-        onBack: function(){ go("mode"); }
-      }),
-
-      screen === "home" && React.createElement(HomeScreen, {
-        progress: progress, immersion: immersion, userLevel: userLevel, sessions: thisWeek,
-        onSelect: function(s){ setScenario(s); recordSession(); go("scenario"); },
-        onProfile: function(){ go("profile"); },
-        onToggleMode: toggleImmersion,
-        onExercises: function(){ go("diagnostics"); }
-      }),
-
-      screen === "scenario" && scenario && React.createElement(ScenarioScreen, {
-        scenario: scenario, immersion: immersion, ttsEnabled: ttsEnabled, progress: progress,
-        onExercises: function(){ go("diagnostics"); },
-        onComplete: function(id, stars) {
-          saveProgress(Object.assign({}, progress, { [id]: { stars: Math.max(getStars(progress[id]), stars || 1), visits: ((progress[id] && progress[id].visits) || 0) + 1 }}));
-          go("home");
-        },
-        onDiag: saveDiag,
-        onBack: function(){ go("home"); }
-      }),
-
-      screen === "profile" && React.createElement(ProfileScreen, {
-        progress: progress, immersion: immersion, userLevel: userLevel,
-        sessions: thisWeek, ttsEnabled: ttsEnabled,
-        user: user, accountLabel: accountLabel,
-        onBack: function(){ go("home"); },
-        onReset: function(){ saveProgress({}); setDiag({}); lsSet("mft_diag", {}); go("home"); },
-        onToggleMode: toggleImmersion,
-        onToggleTTS: function(){ setTtsEnabled(function(v){ return !v; }); },
-        onRetakeTest: function(){ go("leveltest"); },
-        onDiagnostics: function(){ go("diagnostics"); },
-        onSignOut: async function(){ await signOut(); setUser(null); go("auth"); },
-        onAccount: function(){ go("auth"); }
-      }),
-
-      screen === "diagnostics" && React.createElement(DiagnosticsScreen, {
-        diag: diag, progress: progress, immersion: immersion, onBack: function(){ go("home"); }
-      })
-    )
-  );
-}
 
 const root=ReactDOM.createRoot(document.getElementById("root"));
 root.render(React.createElement(App));
