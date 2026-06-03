@@ -12,6 +12,7 @@
 <body>
 <div id="root"></div>
 <script>window.MFT_API_BASE="https://mftbackend-production.up.railway.app";</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://unpkg.com/react@18.3.1/umd/react.production.min.js" crossorigin></script>
 <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js" crossorigin></script>
 <script>
@@ -2344,7 +2345,7 @@ Output ONLY JSON: {"correct": true|false, "feedback": "brief feedback in ${lang}
 // SCREEN — PROFILE
 // ─────────────────────────────────────────────────────────────────────────────
 
-function ProfileScreen({ progress, immersion, userLevel, sessions, onBack, onReset, onToggleMode, onRetakeTest, ttsEnabled, onToggleTTS, onDiagnostics }) {
+function ProfileScreen({ progress, immersion, userLevel, sessions, onBack, onReset, onToggleMode, onRetakeTest, ttsEnabled, onToggleTTS, onDiagnostics, user, accountLabel, onSignOut, onAccount }) {
   const t = T(immersion);
   const effectiveLevel = getUnlockedLevel(progress, userLevel);
   const totalStars = SCENARIOS.reduce((sum, s) => sum + getStars(progress[s.id]), 0);
@@ -2459,117 +2460,307 @@ const ghostBtn = {
 // APP — root component + routing
 // ─────────────────────────────────────────────────────────────────────────────
 
+
+// ─────────────────────────────────────────────────────────────────────────────
+// SUPABASE — auth + cloud sync
+// ─────────────────────────────────────────────────────────────────────────────
+
+const SB_URL = "https://pdxpggaerjdnaalgevwn.supabase.co";
+const SB_KEY = "sb_publishable_-9Ph7Az-UKSsaINwpv52fw_L-VcN4f3";
+const sb = supabase.createClient(SB_URL, SB_KEY);
+
+async function signUp(email, password) {
+  const { data, error } = await sb.auth.signUp({ email, password });
+  if (error) throw error;
+  return data.user;
+}
+
+async function signIn(email, password) {
+  const { data, error } = await sb.auth.signInWithPassword({ email, password });
+  if (error) throw error;
+  return data.user;
+}
+
+async function signOut() { await sb.auth.signOut(); }
+
+async function cloudSaveProgress(userId, progress) {
+  const rows = Object.entries(progress).map(([id, v]) => ({
+    user_id: userId, scenario_id: parseInt(id),
+    stars: v?.stars || 0, visits: v?.visits || 0,
+    updated_at: new Date().toISOString(),
+  }));
+  if (!rows.length) return;
+  await sb.from("user_progress").upsert(rows, { onConflict: "user_id,scenario_id" });
+}
+
+async function cloudLoadProgress(userId) {
+  const { data } = await sb.from("user_progress").select("*").eq("user_id", userId);
+  if (!data) return {};
+  const out = {};
+  data.forEach(r => { out[r.scenario_id] = { stars: r.stars, visits: r.visits }; });
+  return out;
+}
+
+async function cloudSaveDiag(userId, diag) {
+  const rows = Object.entries(diag).map(([id, v]) => ({
+    user_id: userId, scenario_id: parseInt(id), data: v,
+    updated_at: new Date().toISOString(),
+  }));
+  if (!rows.length) return;
+  await sb.from("user_diagnostics").upsert(rows, { onConflict: "user_id,scenario_id" });
+}
+
+async function cloudLoadDiag(userId) {
+  const { data } = await sb.from("user_diagnostics").select("*").eq("user_id", userId);
+  if (!data) return {};
+  const out = {};
+  data.forEach(r => { out[r.scenario_id] = r.data; });
+  return out;
+}
+
+async function cloudSaveProfile(userId, level, immersion) {
+  await sb.from("profiles").upsert({ id: userId, level, immersion }, { onConflict: "id" });
+}
+
+async function cloudLoadProfile(userId) {
+  const { data } = await sb.from("profiles").select("*").eq("id", userId).single();
+  return data;
+}
+
+
+function AuthScreen({ immersion, onAuth, onGuest }) {
+  var _s0 = useState("choice"), mode = _s0[0], setMode = _s0[1];
+  var _s1 = useState(""),  email    = _s1[0], setEmail    = _s1[1];
+  var _s2 = useState(""),  password = _s2[0], setPassword = _s2[1];
+  var _s3 = useState(false),loading = _s3[0], setLoading  = _s3[1];
+  var _s4 = useState(null), error   = _s4[0], setError    = _s4[1];
+
+  async function handleSignUp() {
+    if (!email.trim() || password.length < 6) {
+      setError(immersion ? "Email invalide ou mot de passe trop court (6 caractères min)." : "Invalid email or password too short (6 chars min).");
+      return;
+    }
+    setLoading(true); setError(null);
+    try { var user = await signUp(email.trim(), password); onAuth(user); }
+    catch(e) { setError(e.message || (immersion ? "Erreur — réessayez." : "Error — please try again.")); }
+    setLoading(false);
+  }
+
+  async function handleSignIn() {
+    setLoading(true); setError(null);
+    try { var user = await signIn(email.trim(), password); onAuth(user); }
+    catch(e) { setError(immersion ? "Email ou mot de passe incorrect." : "Incorrect email or password."); }
+    setLoading(false);
+  }
+
+  if (mode === "choice") return (
+    React.createElement("div", { style: { height: "100%", display: "flex", flexDirection: "column", background: C.header }},
+      React.createElement("style", null, CSS),
+      React.createElement("div", { style: { flex: 1, display: "flex", flexDirection: "column", justifyContent: "space-between", padding: "52px 28px 48px" }},
+        React.createElement("div", { style: { animation: "fadeIn 0.5s both" }},
+          React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 12, marginBottom: 32 }},
+            React.createElement(Flag, { h: 18, w: 32 }),
+            React.createElement("div", { style: { height: 1, flex: 1, background: "rgba(255,255,255,0.08)" }})
+          ),
+          React.createElement("div", { style: { fontFamily: "'DM Serif Display',serif", fontStyle: "italic", fontSize: 36, color: C.onHeader, lineHeight: 1.1, marginBottom: 10 }}, "My French Teacher"),
+          React.createElement("div", { style: { fontFamily: "'DM Sans',sans-serif", fontWeight: 300, fontSize: 15, color: C.onHeaderDim, lineHeight: 1.7 }},
+            immersion
+              ? "Sauvegardez votre progression et accédez à l'app depuis n'importe quel appareil."
+              : "Save your progress and access the app from any device."
+          )
+        ),
+        React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 12, animation: "fadeUp 0.6s 0.15s both" }},
+          React.createElement("div", { style: { display: "flex", height: 3, borderRadius: 2, overflow: "hidden", marginBottom: 4 }},
+            React.createElement("div", { style: { flex: 1, background: C.blue }}),
+            React.createElement("div", { style: { flex: 1, background: "white" }}),
+            React.createElement("div", { style: { flex: 1, background: C.red }})
+          ),
+          React.createElement("button", { onClick: () => setMode("signup"), style: {
+            width: "100%", padding: "17px", background: "white", color: C.ink,
+            border: "none", borderRadius: 4, cursor: "pointer",
+            fontFamily: "'DM Sans',sans-serif", fontWeight: 600, fontSize: 15,
+          }}, immersion ? "Créer un compte" : "Create an account"),
+          React.createElement("button", { onClick: () => setMode("signin"), style: {
+            width: "100%", padding: "16px", background: "none", color: C.onHeader,
+            border: "1px solid rgba(255,255,255,0.2)", borderRadius: 4, cursor: "pointer",
+            fontFamily: "'DM Sans',sans-serif", fontWeight: 400, fontSize: 15,
+          }}, immersion ? "Se connecter" : "Log in"),
+          React.createElement("button", { onClick: onGuest, style: {
+            width: "100%", padding: "14px", background: "none", color: C.onHeaderDim,
+            border: "none", cursor: "pointer",
+            fontFamily: "'DM Sans',sans-serif", fontWeight: 300, fontSize: 13,
+          }}, immersion ? "Continuer sans compte →" : "Continue without account →")
+        )
+      )
+    )
+  );
+
+  var isSignUp = mode === "signup";
+  return (
+    React.createElement("div", { style: { height: "100%", display: "flex", flexDirection: "column", background: C.header }},
+      React.createElement("style", null, CSS),
+      React.createElement("div", { style: { padding: "48px 28px 24px" }},
+        React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 12, marginBottom: 28 }},
+          React.createElement("button", { onClick: () => { setMode("choice"); setError(null); }, style: {
+            background: "none", border: "none", cursor: "pointer", color: C.onHeaderDim, fontSize: 20, padding: "4px 8px 4px 0",
+          }}, "←"),
+          React.createElement("div", { style: { height: 1, flex: 1, background: "rgba(255,255,255,0.08)" }})
+        ),
+        React.createElement("div", { style: { fontFamily: "'DM Serif Display',serif", fontSize: 30, color: C.onHeader, lineHeight: 1.2 }},
+          isSignUp ? (immersion ? "Créer un compte" : "Create an account") : (immersion ? "Se connecter" : "Log in")
+        )
+      ),
+      React.createElement("div", { style: { flex: 1, background: C.bg, borderRadius: "20px 20px 0 0", padding: "28px 24px 32px", display: "flex", flexDirection: "column", gap: 14, animation: "slideUp 0.35s both" }},
+        React.createElement("input", {
+          type: "email", value: email, onChange: function(e){ setEmail(e.target.value); },
+          placeholder: "Email",
+          style: { border: "1.5px solid " + C.rule, borderRadius: 10, padding: "13px 16px", fontSize: 16, fontFamily: "'DM Sans',sans-serif", color: C.ink, background: "white", outline: "none" }
+        }),
+        React.createElement("input", {
+          type: "password", value: password,
+          onChange: function(e){ setPassword(e.target.value); },
+          onKeyDown: function(e){ if (e.key === "Enter") isSignUp ? handleSignUp() : handleSignIn(); },
+          placeholder: immersion ? "Mot de passe" : "Password",
+          style: { border: "1.5px solid " + C.rule, borderRadius: 10, padding: "13px 16px", fontSize: 16, fontFamily: "'DM Sans',sans-serif", color: C.ink, background: "white", outline: "none" }
+        }),
+        error && React.createElement("div", { style: { fontFamily: "'DM Sans',sans-serif", fontSize: 13, color: C.red, lineHeight: 1.5 }}, error),
+        React.createElement("button", {
+          onClick: isSignUp ? handleSignUp : handleSignIn,
+          disabled: loading,
+          style: Object.assign({}, primaryBtn, { opacity: loading ? 0.6 : 1 })
+        }, loading ? "…" : (isSignUp ? (immersion ? "Créer →" : "Create →") : (immersion ? "Se connecter →" : "Log in →"))),
+        React.createElement("button", { onClick: onGuest, style: {
+          background: "none", border: "none", cursor: "pointer",
+          fontFamily: "'DM Sans',sans-serif", fontWeight: 300, fontSize: 13, color: C.gray, marginTop: 4,
+        }}, immersion ? "Continuer sans compte" : "Continue without account")
+      )
+    )
+  );
+}
+
 function App() {
-  const [screen,    setScreen]    = useState("splash");
-  const [scenario,  setScenario]  = useState(null);
-  const [progress,  setProgress]  = useState(() => ls("mft_progress", {}));
-  const [diag,      setDiag]      = useState(() => ls("mft_diag", {}));
-  const [prevScreen, setPrevScreen] = useState("home");
-  const [immersion, setImmersion] = useState(() => ls("mft_immersion", false));
-  const [userLevel, setUserLevel] = useState(() => ls("mft_level", null));
-  const [ttsEnabled,setTtsEnabled]= useState(false);
+  var _s0  = useState("auth"),     screen    = _s0[0],   setScreen    = _s0[1];
+  var _s1  = useState(null),       scenario  = _s1[0],   setScenario  = _s1[1];
+  var _s2  = useState(function(){ return ls("mft_progress", {}); }), progress = _s2[0], setProgress = _s2[1];
+  var _s3  = useState(function(){ return ls("mft_diag", {}); }),     diag     = _s3[0], setDiag     = _s3[1];
+  var _s4  = useState(function(){ return ls("mft_immersion", false);}),immersion=_s4[0],setImmersion=_s4[1];
+  var _s5  = useState(function(){ return ls("mft_level", null); }), userLevel = _s5[0], setUserLevel= _s5[1];
+  var _s6  = useState(false),      ttsEnabled=_s6[0],   setTtsEnabled=_s6[1];
+  var _s7  = useState(null),       user      = _s7[0],   setUser      = _s7[1];
 
-  const { thisWeek, recordSession } = useSessionTracker();
-  const go = s => setScreen(s);
+  var st = useSessionTracker();
+  var thisWeek = st.thisWeek, recordSession = st.recordSession;
+  function go(s) { setScreen(s); }
 
-  function saveProgress(p) { setProgress(p); lsSet("mft_progress", p); }
+  async function syncDown(u) {
+    if (!u) return;
+    try {
+      var prog = await cloudLoadProgress(u.id);
+      var diagData = await cloudLoadDiag(u.id);
+      var profile = await cloudLoadProfile(u.id);
+      if (Object.keys(prog).length > 0) { setProgress(prog); lsSet("mft_progress", prog); }
+      if (Object.keys(diagData).length > 0) { setDiag(diagData); lsSet("mft_diag", diagData); }
+      if (profile && profile.level) { setUserLevel(profile.level); lsSet("mft_level", profile.level); }
+      if (profile && profile.immersion !== undefined) { setImmersion(profile.immersion); lsSet("mft_immersion", profile.immersion); }
+    } catch(e) { console.warn("Sync failed:", e); }
+  }
+
+  async function handleAuth(u) {
+    setUser(u);
+    var localProg  = ls("mft_progress", {});
+    var localLevel = ls("mft_level", null);
+    var localImm   = ls("mft_immersion", false);
+    if (Object.keys(localProg).length > 0) await cloudSaveProgress(u.id, localProg).catch(function(){});
+    if (localLevel) await cloudSaveProfile(u.id, localLevel, localImm).catch(function(){});
+    await syncDown(u);
+    go(ls("mft_level", null) ? "home" : "splash");
+  }
+
+  function handleGuest() { setUser(null); go("splash"); }
+
+  function saveProgress(p) {
+    setProgress(p); lsSet("mft_progress", p);
+    if (user) cloudSaveProgress(user.id, p).catch(function(){});
+  }
+
   function saveDiag(scenId, d) {
-    setDiag(prev => {
-      const updated = { ...prev, [scenId]: [...(prev[scenId] || []), d].slice(-10) };
+    setDiag(function(prev) {
+      var updated = Object.assign({}, prev, { [scenId]: (prev[scenId] || []).concat([d]).slice(-10) });
       lsSet("mft_diag", updated);
+      if (user) cloudSaveDiag(user.id, updated).catch(function(){});
       return updated;
     });
   }
+
   function toggleImmersion() {
-    setImmersion(v => { lsSet("mft_immersion", !v); return !v; });
+    setImmersion(function(v) {
+      lsSet("mft_immersion", !v);
+      if (user) cloudSaveProfile(user.id, userLevel, !v).catch(function(){});
+      return !v;
+    });
   }
 
-  return (
-    React.createElement('div', { style: { width: "100%", height: "100%", fontFamily: "'DM Sans', sans-serif", display: "flex", flexDirection: "column" },}
-      , React.createElement('style', null, CSS)
-      , React.createElement('div', { style: { flex: 1, overflow: "hidden" },}
+  var accountLabel = user
+    ? (immersion ? "Compte · " + user.email : "Account · " + user.email)
+    : (immersion ? "Se connecter / Créer un compte" : "Log in / Create account");
 
-        , screen === "splash" && (
-          React.createElement(SplashScreen, {
-            immersion: immersion,
-            onEnter: () => go("mode"),}
-          )
-        )
+  return React.createElement("div", { style: { width: "100%", height: "100%", fontFamily: "'DM Sans', sans-serif", display: "flex", flexDirection: "column" }},
+    React.createElement("style", null, CSS),
+    React.createElement("div", { style: { flex: 1, overflow: "hidden" }},
 
-        , screen === "mode" && (
-          React.createElement(ModeScreen, {
-            immersion: immersion,
-            onSelect: isImm => {
-              setImmersion(isImm);
-              lsSet("mft_immersion", isImm);
-              go("leveltest");
-            },}
-          )
-        )
+      screen === "auth" && React.createElement(AuthScreen, { immersion: immersion, onAuth: handleAuth, onGuest: handleGuest }),
 
-        , screen === "leveltest" && (
-          React.createElement(LevelTestScreen, {
-            immersion: immersion,
-            onComplete: lvl => { setUserLevel(lvl); lsSet("mft_level", lvl); go("home"); },
-            onBack: () => go("mode"),}
-          )
-        )
+      screen === "splash" && React.createElement(SplashScreen, { immersion: immersion, onEnter: function(){ go("mode"); } }),
 
-        , screen === "home" && (
-          React.createElement(HomeScreen, {
-            progress: progress,
-            immersion: immersion,
-            userLevel: userLevel,
-            sessions: thisWeek,
-            onSelect: s => { setScenario(s); recordSession(); go("scenario"); },
-            onProfile: () => go("profile"),
-            onToggleMode: toggleImmersion,
-            onExercises: () => go("diagnostics"),}
-          )
-        )
+      screen === "mode" && React.createElement(ModeScreen, { immersion: immersion,
+        onSelect: function(isImm) { setImmersion(isImm); lsSet("mft_immersion", isImm); go("leveltest"); }
+      }),
 
-        , screen === "scenario" && scenario && (
-          React.createElement(ScenarioScreen, {
-            scenario: scenario,
-            immersion: immersion,
-            ttsEnabled: ttsEnabled,
-            progress: progress,
-            onExercises: () => go("diagnostics"),
-            onComplete: (id, stars) => {
-              saveProgress({ ...progress, [id]: { stars: Math.max(getStars(progress[id]), stars || 1), visits: (_optionalChain([progress, 'access', _47 => _47[id], 'optionalAccess', _48 => _48.visits]) || 0) + 1 } });
-              go("home");
-            },
-            onDiag: saveDiag,
-            onBack: () => go("home"),}
-          )
-        )
+      screen === "leveltest" && React.createElement(LevelTestScreen, { immersion: immersion,
+        onComplete: function(lvl) {
+          setUserLevel(lvl); lsSet("mft_level", lvl);
+          if (user) cloudSaveProfile(user.id, lvl, immersion).catch(function(){});
+          go("home");
+        },
+        onBack: function(){ go("mode"); }
+      }),
 
-        , screen === "profile" && (
-          React.createElement(ProfileScreen, {
-            progress: progress,
-            immersion: immersion,
-            userLevel: userLevel,
-            sessions: thisWeek,
-            ttsEnabled: ttsEnabled,
-            onBack: () => go("home"),
-            onReset: () => { saveProgress({}); setDiag({}); lsSet("mft_diag", {}); go("home"); },
-            onToggleMode: toggleImmersion,
-            onToggleTTS: () => setTtsEnabled(v => !v),
-            onRetakeTest: () => go("leveltest"),
-            onDiagnostics: () => go("diagnostics"),}
-          )
-        )
+      screen === "home" && React.createElement(HomeScreen, {
+        progress: progress, immersion: immersion, userLevel: userLevel, sessions: thisWeek,
+        onSelect: function(s){ setScenario(s); recordSession(); go("scenario"); },
+        onProfile: function(){ go("profile"); },
+        onToggleMode: toggleImmersion,
+        onExercises: function(){ go("diagnostics"); }
+      }),
 
-        , screen === "diagnostics" && (
-          React.createElement(DiagnosticsScreen, {
-            diag: diag,
-            progress: progress,
-            immersion: immersion,
-            onBack: () => go("home"),}
-          )
-        )
+      screen === "scenario" && scenario && React.createElement(ScenarioScreen, {
+        scenario: scenario, immersion: immersion, ttsEnabled: ttsEnabled, progress: progress,
+        onExercises: function(){ go("diagnostics"); },
+        onComplete: function(id, stars) {
+          saveProgress(Object.assign({}, progress, { [id]: { stars: Math.max(getStars(progress[id]), stars || 1), visits: ((progress[id] && progress[id].visits) || 0) + 1 }}));
+          go("home");
+        },
+        onDiag: saveDiag,
+        onBack: function(){ go("home"); }
+      }),
 
-      )
+      screen === "profile" && React.createElement(ProfileScreen, {
+        progress: progress, immersion: immersion, userLevel: userLevel,
+        sessions: thisWeek, ttsEnabled: ttsEnabled,
+        user: user, accountLabel: accountLabel,
+        onBack: function(){ go("home"); },
+        onReset: function(){ saveProgress({}); setDiag({}); lsSet("mft_diag", {}); go("home"); },
+        onToggleMode: toggleImmersion,
+        onToggleTTS: function(){ setTtsEnabled(function(v){ return !v; }); },
+        onRetakeTest: function(){ go("leveltest"); },
+        onDiagnostics: function(){ go("diagnostics"); },
+        onSignOut: async function(){ await signOut(); setUser(null); go("auth"); },
+        onAccount: function(){ go("auth"); }
+      }),
+
+      screen === "diagnostics" && React.createElement(DiagnosticsScreen, {
+        diag: diag, progress: progress, immersion: immersion, onBack: function(){ go("home"); }
+      })
     )
   );
 }
