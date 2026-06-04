@@ -2738,6 +2738,8 @@ function App() {
   const [userLevel,  setUserLevel]  = useState(() => ls("mft_level",     null));
   const [ttsEnabled, setTtsEnabled] = useState(false);
   const [user,       setUser]       = useState(null);
+  const [username,   setUsername]  = useState(() => ls("mft_username", null));
+  const [userNum,    setUserNum]   = useState(() => ls("mft_usernum",  null));
 
   const { thisWeek, recordSession } = useSessionTracker();
   const go = s => setScreen(s);
