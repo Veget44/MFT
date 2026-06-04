@@ -2453,7 +2453,20 @@ function ProfileScreen({ progress, immersion, userLevel, sessions, onBack, onRes
 
       // ── Stats ─────────────────────────────────────────────────────────────────
       React.createElement("div", { style: { flex: 1, overflowY: "auto" }},
-        React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10, padding: "16px 16px 0" }},
+        React.createElement("div",{style:{background:"white",borderRadius:12,padding:"16px 18px",marginBottom:10,display:"flex",alignItems:"center",justifyContent:"space-between",border:"1px solid "+C.rule}},
+        React.createElement("div",null,
+          React.createElement("div",{style:{fontFamily:"'DM Sans',sans-serif",fontWeight:300,fontSize:11,color:C.gray,marginBottom:6,letterSpacing:1,textTransform:"uppercase"}},
+            immersion?"Serie":"Streak"
+          ),
+          React.createElement("div",{style:{fontFamily:"'DM Serif Display',serif",fontSize:38,color:(streak||0)>0?"#FF8C00":C.grayLight,lineHeight:1}},
+            "🔥 "+(streak||0)+" "+(immersion?((streak||0)===1?"jour":"jours"):((streak||0)===1?"day":"days"))
+          )
+        ),
+        (streak||0)>0&&React.createElement("div",{style:{fontFamily:"'DM Sans',sans-serif",fontSize:11,fontWeight:600,color:"#FF8C00",background:"rgba(255,140,0,0.1)",padding:"5px 12px",borderRadius:20}},
+          immersion?"En feu !":"On fire!"
+        )
+      ),
+      React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10, padding: "16px 16px 0" }},
           ...[
             { value: done,        label: immersion ? "Complétés" : "Done",     accent: C.blue  },
             { value: totalStars,  label: immersion ? "Étoiles"   : "Stars",    accent: C.gold  },
@@ -2579,6 +2592,57 @@ async function sbSaveProfile(uid, level, immersion, username, userNum) {
 async function sbLoadProfile(uid) {
   const {data} = await sb.from("profiles").select("*").eq("id",uid).single();
   return data||null;
+}
+
+
+// ─── ONBOARDING ──────────────────────────────────────────────────────────────
+function OnboardingScreen({immersion, onDone}) {
+  const [step, setStep] = useState(0);
+  const slides = [
+    { emoji:"🗣️",
+      title: immersion?"De vraies conversations":"Real conversations",
+      body:  immersion
+        ?"Pas de leçons. Vous êtes plongé dans une situation réelle — un café, une pharmacie, un entretien — et vous parlez."
+        :"No lessons. You're dropped into a real French situation — a café, a pharmacy, an interview — and you just speak." },
+    { emoji:"✏️",
+      title: immersion?"Corrigé sur le vif":"Corrected instantly",
+      body:  immersion
+        ?"Après chaque échange, le professeur vous donne une correction précise — une seule, pour que vous la reteniez vraiment."
+        :"After every exchange, the teacher gives you one precise correction — just one, so it actually sticks." },
+    { emoji:"📈",
+      title: immersion?"Adapté à vos erreurs":"Built around your mistakes",
+      body:  immersion
+        ?"L'app détecte vos erreurs récurrentes et génère des exercices personnalisés. Vous travaillez ce dont vous avez besoin."
+        :"The app tracks your recurring mistakes and builds exercises around them. You practice what you actually need." },
+  ];
+  const slide = slides[step];
+  const isLast = step === slides.length - 1;
+
+  return React.createElement("div",{style:{height:"100%",display:"flex",flexDirection:"column",background:C.header,position:"relative"}},
+    React.createElement("style",null,CSS),
+    React.createElement("button",{onClick:onDone,style:{position:"absolute",top:20,right:20,zIndex:10,background:"none",border:"none",cursor:"pointer",fontFamily:"'DM Sans',sans-serif",fontWeight:300,fontSize:13,color:"rgba(255,255,255,0.4)",padding:"8px"}},
+      immersion?"Passer":"Skip"
+    ),
+    React.createElement("div",{style:{flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:"40px 32px",textAlign:"center"}},
+      React.createElement("div",{style:{fontSize:72,marginBottom:32,lineHeight:1,animation:"fadeIn 0.4s both"}}, slide.emoji),
+      React.createElement("div",{style:{fontFamily:"'DM Serif Display',serif",fontSize:28,color:"white",lineHeight:1.2,marginBottom:16,animation:"fadeUp 0.5s 0.1s both"}}, slide.title),
+      React.createElement("div",{style:{fontFamily:"'DM Sans',sans-serif",fontWeight:300,fontSize:16,color:"rgba(255,255,255,0.65)",lineHeight:1.75,maxWidth:320,animation:"fadeUp 0.5s 0.2s both"}}, slide.body)
+    ),
+    React.createElement("div",{style:{padding:"0 28px 52px",display:"flex",flexDirection:"column",gap:20,alignItems:"center"}},
+      React.createElement("div",{style:{display:"flex",gap:8}},
+        slides.map(function(_,i){ return React.createElement("div",{key:i,style:{width:i===step?24:8,height:8,borderRadius:4,transition:"all 0.3s",background:i===step?"white":"rgba(255,255,255,0.25)"}});})
+      ),
+      React.createElement("div",{style:{display:"flex",height:3,borderRadius:2,overflow:"hidden",width:"100%"}},
+        React.createElement("div",{style:{flex:1,background:C.blue}}),
+        React.createElement("div",{style:{flex:1,background:"white"}}),
+        React.createElement("div",{style:{flex:1,background:C.red}})
+      ),
+      React.createElement("button",{
+        onClick: isLast ? onDone : function(){ setStep(function(s){return s+1;}); },
+        style:{width:"100%",padding:"17px",background:"white",color:C.ink,border:"none",borderRadius:4,cursor:"pointer",fontFamily:"'DM Sans',sans-serif",fontWeight:600,fontSize:15}
+      }, isLast?(immersion?"C'est parti →":"Let's go →"):(immersion?"Suivant →":"Next →"))
+    )
+  );
 }
 
 // ─── AUTH SCREEN ─────────────────────────────────────────────────────────────
@@ -2714,7 +2778,7 @@ function UsernameScreen({immersion, user, onDone}) {
 
 // ─── APP ─────────────────────────────────────────────────────────────────────
 function App() {
-  const [screen,     setScreen]     = useState("auth");
+  const [screen,     setScreen]     = useState(function(){ return ls("mft_onboarded","") ? "auth" : "onboarding"; });
   const [scenario,   setScenario]   = useState(null);
   const [progress,   setProgress]   = useState(() => ls("mft_progress",  {}));
   const [diag,       setDiag]       = useState(() => ls("mft_diag",      {}));
@@ -2782,6 +2846,7 @@ function App() {
   return React.createElement("div", {style:{width:"100%",height:"100%",display:"flex",flexDirection:"column"}},
     React.createElement("style", null, CSS),
     React.createElement("div", {style:{flex:1,overflow:"hidden"}},
+      screen==="onboarding" && React.createElement(OnboardingScreen, {immersion, onDone:function(){lsSet("mft_onboarded","1");go("auth");}}),
       screen==="auth"      && React.createElement(AuthScreen,     {immersion, onAuth:handleAuth, onGuest:handleGuest}),
       screen==="username"  && React.createElement(UsernameScreen, {immersion, user, onDone:(n,num)=>{setUsername(n);lsSet("mft_username",n);setUserNum(num);lsSet("mft_usernum",num);go(ls("mft_level",null)?"home":"splash");}}),
       screen==="splash"    && React.createElement(SplashScreen,   {immersion, onEnter:()=>go("mode")}),
@@ -2798,7 +2863,7 @@ function App() {
         onComplete:(id,stars)=>{saveProgress({...progress,[id]:{stars:Math.max(getStars(progress[id]),stars||1),visits:((progress[id]?.visits)||0)+1}});go("home");},
         onDiag:saveDiag, onBack:()=>go("home")}),
       screen==="profile"   && React.createElement(ProfileScreen,  {progress,immersion,userLevel,sessions:thisWeek,ttsEnabled,
-        user, username, userNum,
+        user, username, userNum, streak,
         onBack:()=>go("home"),
         onReset:()=>{saveProgress({});setDiag({});lsSet("mft_diag",{});go("home");},
         onToggleMode:toggleImmersion, onToggleTTS:()=>setTtsEnabled(v=>!v),
