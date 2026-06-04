@@ -642,18 +642,47 @@ function useVoice({ onResult, onError }) {
 
 function useSessionTracker() {
   const [sessions, setSessions] = useState(() => ls("mft_sessions", {}));
+  const [streak,   setStreak]   = useState(() => ls("mft_streak",   0));
+  const [lastDay,  setLastDay]  = useState(() => ls("mft_lastday",  null));
+
+  function getTodayKey() {
+    const d = new Date();
+    return `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`;
+  }
+  function getYesterdayKey() {
+    const d = new Date(); d.setDate(d.getDate()-1);
+    return `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`;
+  }
+
+  // Reset streak if user missed a day
+  useEffect(() => {
+    const today = getTodayKey();
+    const yesterday = getYesterdayKey();
+    const saved = ls("mft_lastday", null);
+    if (saved && saved !== today && saved !== yesterday) {
+      setStreak(0); lsSet("mft_streak", 0);
+    }
+  }, []);
 
   const recordSession = useCallback(() => {
-    const week = getWeekKey();
+    const week  = getWeekKey();
+    const today = getTodayKey();
     setSessions(prev => {
       const updated = { ...prev, [week]: (prev[week] || 0) + 1 };
       lsSet("mft_sessions", updated);
       return updated;
     });
+    const saved = ls("mft_lastday", null);
+    if (saved !== today) {
+      const yesterday = getYesterdayKey();
+      const newStreak = saved === yesterday ? (ls("mft_streak", 0) + 1) : 1;
+      setStreak(newStreak);  lsSet("mft_streak",  newStreak);
+      setLastDay(today);     lsSet("mft_lastday", today);
+    }
   }, []);
 
   const week = getWeekKey();
-  return { thisWeek: sessions[week] || 0, recordSession };
+  return { thisWeek: sessions[week] || 0, recordSession, streak };
 }
 
 function getWeekKey() {
@@ -1442,7 +1471,7 @@ function LevelTestScreen({ immersion, onComplete, onBack }) {
   return null;
 }
 
-function HomeScreen({ progress, immersion, userLevel, sessions, onSelect, onProfile, onToggleMode, onExercises, displayName, isLoggedIn }) {
+function HomeScreen({ progress, immersion, userLevel, sessions, onSelect, onProfile, onToggleMode, onExercises, displayName, isLoggedIn, streak }) {
   const t = T(immersion);
   const effectiveLevel = getUnlockedLevel(progress, userLevel);
 
@@ -1479,7 +1508,7 @@ function HomeScreen({ progress, immersion, userLevel, sessions, onSelect, onProf
           , React.createElement('div', { style: { display: "flex", gap: 0, background: "rgba(255,255,255,0.05)", borderRadius: 10, overflow: "hidden" },}
             , React.createElement(Stat, { value: totalDone, label: t.completed,} )
             , React.createElement('div', { style: { width: 1, background: "rgba(255,255,255,0.08)", margin: "10px 0" },} )
-            , React.createElement(Stat, { value: sessions, label: t.sessionsWeek,} )
+            , React.createElement(Stat, { value: (streak||0)>0 ? ('🔥'+streak) : sessions, label: (streak||0)>0 ? (immersion?'jours':'days') : t.sessionsWeek, isStreak: (streak||0)>0,} )
             , React.createElement('div', { style: { width: 1, background: "rgba(255,255,255,0.08)", margin: "10px 0" },} )
             , React.createElement(Stat, { value: effectiveLevel, label: immersion ? "Niveau" : "Level", isLevel: true,} )
           )
@@ -1586,11 +1615,11 @@ function HomeScreen({ progress, immersion, userLevel, sessions, onSelect, onProf
   );
 }
 
-function Stat({ value, label, isLevel }) {
+function Stat({ value, label, isLevel, isStreak }) {
   return (
-    React.createElement('div', { style: { flex: 1, padding: "12px 14px", textAlign: "center" },}
-      , React.createElement('div', { style: { fontFamily: isLevel ? "'DM Sans',sans-serif" : "'DM Serif Display',serif", fontSize: isLevel ? 18 : 28, fontWeight: isLevel ? 700 : 400, color: C.onHeader, lineHeight: 1, marginBottom: 4 },}, value)
-      , React.createElement('div', { style: { fontFamily: "'DM Sans',sans-serif", fontWeight: 300, fontSize: 10, letterSpacing: 0.5, color: C.onHeaderDim },}, label)
+    React.createElement('div', { style: { flex: 1, padding: "12px 14px", textAlign: "center", background: isStreak ? "rgba(255,140,0,0.1)" : "none" },}
+      , React.createElement('div', { style: { fontFamily: isLevel ? "'DM Sans',sans-serif" : "'DM Serif Display',serif", fontSize: isLevel ? 18 : 28, fontWeight: isLevel ? 700 : 400, color: isStreak ? "#FF8C00" : C.onHeader, lineHeight: 1, marginBottom: 4, fontSize: isStreak ? 20 : (isLevel ? 18 : 28), animation: isStreak ? "pulse 2s ease-in-out infinite" : "none" },}, value)
+      , React.createElement('div', { style: { fontFamily: "'DM Sans',sans-serif", fontWeight: 300, fontSize: 10, letterSpacing: 0.5, color: isStreak ? "#FF8C00" : C.onHeaderDim },}, label)
     )
   );
 }
@@ -2696,7 +2725,7 @@ function App() {
   const [username,   setUsername]   = useState(() => ls("mft_username",  null));
   const [userNum,    setUserNum]    = useState(() => ls("mft_usernum",   null));
 
-  const { thisWeek, recordSession } = useSessionTracker();
+  const { thisWeek, recordSession, streak } = useSessionTracker();
   const go = s => setScreen(s);
 
   async function syncDown(u) {
@@ -2761,7 +2790,7 @@ function App() {
         onComplete:lvl=>{setUserLevel(lvl);lsSet("mft_level",lvl);if(user)sbSaveProfile(user.id,lvl,immersion,username,userNum).catch(()=>{});go("home");},
         onBack:()=>go("mode")}),
       screen==="home"      && React.createElement(HomeScreen,     {progress,immersion,userLevel,sessions:thisWeek,
-        displayName, isLoggedIn:!!user,
+        displayName, isLoggedIn:!!user, streak,
         onSelect:s=>{setScenario(s);recordSession();go("scenario");},
         onProfile:()=>go("profile"), onToggleMode:toggleImmersion, onExercises:()=>go("diagnostics")}),
       screen==="scenario"&&scenario && React.createElement(ScenarioScreen,{scenario,immersion,ttsEnabled,progress,
