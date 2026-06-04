@@ -2345,185 +2345,143 @@ Output ONLY JSON: {"correct": true|false, "feedback": "brief feedback in ${lang}
 // SCREEN — PROFILE
 // ─────────────────────────────────────────────────────────────────────────────
 
-function ProfileScreen({ progress, immersion, userLevel, sessions, onBack, onReset, onToggleMode, onRetakeTest, ttsEnabled, onToggleTTS, onDiagnostics, user, accountLabel, onSignOut, onAccount }) {
+function ProfileScreen({ progress, immersion, userLevel, sessions, onBack, onReset,
+    onToggleMode, onRetakeTest, ttsEnabled, onToggleTTS, onDiagnostics,
+    user, accountLabel, onSignOut, onAccount, username, userNum }) {
+
   const t = T(immersion);
-  const effectiveLevel = getUnlockedLevel(progress, userLevel);
-  const totalStars = SCENARIOS.reduce((sum, s) => sum + getStars(progress[s.id]), 0);
-  const maxStars = SCENARIOS.length * 3;
-  const done = SCENARIOS.filter(s => getStars(progress[s.id]) > 0).length;
+  const done       = Object.values(progress).filter(p => (p?.stars||0) > 0).length;
+  const totalStars = Object.values(progress).reduce((s,p) => s + (p?.stars||0), 0);
+  const effectiveLevel = userLevel || "A1";
+  const [confirmReset, setConfirmReset] = useState(false);
+
+  // Avatar initial
+  const avatarLetter = username ? username[0].toUpperCase() : (user?.email?.[0]?.toUpperCase() || "?");
+  const displayName  = username ? `${username}#${userNum || "????"}` : null;
 
   return (
-    React.createElement('div', { style: { height: "100%", display: "flex", flexDirection: "column", background: C.bg },}
-      , React.createElement('style', null, CSS)
-      , React.createElement('div', { style: { background: C.header, padding: "24px 24px 20px", display: "flex", alignItems: "center", gap: 12 },}
-        , React.createElement(BackBtn, { onClick: onBack,} )
-        , React.createElement('div', { style: { fontFamily: "'DM Serif Text',serif", fontSize: 20, color: C.onHeader },}, t.profile)
-      )
+    React.createElement("div", { style: { height: "100%", display: "flex", flexDirection: "column", background: C.bg }},
+      React.createElement("style", null, CSS),
 
-      , React.createElement('div', { style: { flex: 1, overflowY: "auto" },}
-        /* Stats strip */
-        , React.createElement('div', { style: { display: "flex", background: C.bgDeep, borderBottom: `1px solid ${C.rule}` },}
-          , [
-            { value: done, label: immersion ? "Complétés" : "Done", accent: C.blue },
-            { value: totalStars, label: immersion ? "Étoiles" : "Stars", accent: C.gold },
-            { value: sessions, label: immersion ? "Sessions" : "Sessions", accent: C.green },
-          ].map((s, i) => (
-            React.createElement('div', { key: i, style: { flex: 1, padding: "20px 12px", textAlign: "center", borderRight: i < 2 ? `1px solid ${C.rule}` : "none" },}
-              , React.createElement('div', { style: { fontFamily: "'DM Serif Display',serif", fontSize: 34, color: s.accent, lineHeight: 1 },}, s.value)
-              , React.createElement('div', { style: { fontFamily: "'DM Sans',sans-serif", fontWeight: 300, fontSize: 12, color: C.gray, marginTop: 4 },}, s.label)
+      // ── Header dark ──────────────────────────────────────────────────────────
+      React.createElement("div", { style: { background: C.header, flexShrink: 0 }},
+        React.createElement(Tricolor, { height: 3 }),
+        React.createElement("div", { style: { padding: "16px 20px 20px", display: "flex", alignItems: "center", gap: 14 }},
+          React.createElement(BackBtn, { onClick: onBack }),
+          React.createElement("div", { style: { fontFamily: "'DM Serif Text',serif", fontSize: 18, color: C.onHeader }},
+            immersion ? "Mon profil" : "My profile"
+          )
+        ),
+
+        // ── User card inside header ───────────────────────────────────────────
+        React.createElement("div", { style: { margin: "0 20px 20px", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 14, padding: "16px 18px", display: "flex", alignItems: "center", gap: 14 }},
+          // Avatar
+          React.createElement("div", { style: {
+            width: 48, height: 48, borderRadius: "50%", flexShrink: 0,
+            background: user ? C.blue : "rgba(255,255,255,0.12)",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            fontFamily: "'DM Serif Display',serif", fontSize: 20, color: "white",
+            border: user ? "2px solid rgba(255,255,255,0.3)" : "2px solid rgba(255,255,255,0.1)",
+          }}, avatarLetter),
+
+          // Info
+          React.createElement("div", { style: { flex: 1, minWidth: 0 }},
+            user ? (
+              React.createElement("div", null,
+                displayName && React.createElement("div", { style: { fontFamily: "'DM Serif Text',serif", fontSize: 17, color: C.onHeader, marginBottom: 2 }}, displayName),
+                React.createElement("div", { style: { fontFamily: "'DM Sans',sans-serif", fontWeight: 300, fontSize: 13, color: C.onHeaderDim, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}, user.email)
+              )
+            ) : (
+              React.createElement("div", null,
+                React.createElement("div", { style: { fontFamily: "'DM Serif Text',serif", fontSize: 16, color: C.onHeader, marginBottom: 2 }},
+                  immersion ? "Invité" : "Guest"
+                ),
+                React.createElement("div", { style: { fontFamily: "'DM Sans',sans-serif", fontWeight: 300, fontSize: 13, color: C.onHeaderDim }},
+                  immersion ? "Progression locale uniquement" : "Local progress only"
+                )
+              )
             )
-          ))
+          ),
+
+          // Sign out / Sign in button
+          user ? (
+            React.createElement("button", { onClick: onSignOut, style: {
+              background: "rgba(237,41,57,0.15)", border: "1px solid rgba(237,41,57,0.3)",
+              borderRadius: 8, padding: "7px 12px", cursor: "pointer",
+              fontFamily: "'DM Sans',sans-serif", fontSize: 12, fontWeight: 500,
+              color: C.red, flexShrink: 0,
+            }}, immersion ? "Déconnexion" : "Sign out")
+          ) : (
+            React.createElement("button", { onClick: onAccount, style: {
+              background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.2)",
+              borderRadius: 8, padding: "7px 12px", cursor: "pointer",
+              fontFamily: "'DM Sans',sans-serif", fontSize: 12, fontWeight: 500,
+              color: C.onHeader, flexShrink: 0,
+            }}, immersion ? "Connexion" : "Log in")
+          )
         )
-        , React.createElement('div', { style: { padding: "20px 22px" },}
+      ),
 
-        /* Progress bar */
-        , React.createElement('div', { style: { marginBottom: 28 },}
-          , React.createElement('div', { style: { display: "flex", justifyContent: "space-between", marginBottom: 6 },}
-            , React.createElement('div', { style: { fontFamily: "'DM Sans',sans-serif", fontWeight: 500, fontSize: 13, letterSpacing: 1.5, color: C.gray, textTransform: "uppercase" },}
-              , immersion ? "Progression" : "Progress"
-            )
-            , React.createElement('div', { style: { fontFamily: "'DM Sans',sans-serif", fontWeight: 300, fontSize: 13, color: C.gray },}
-              , totalStars, "/", maxStars, " ⭐"
+      // ── Stats ─────────────────────────────────────────────────────────────────
+      React.createElement("div", { style: { flex: 1, overflowY: "auto" }},
+        React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10, padding: "16px 16px 0" }},
+          ...[
+            { value: done,        label: immersion ? "Complétés" : "Done",     accent: C.blue  },
+            { value: totalStars,  label: immersion ? "Étoiles"   : "Stars",    accent: C.gold  },
+            { value: sessions,    label: immersion ? "Sessions"  : "Sessions", accent: C.green },
+          ].map((s, i) =>
+            React.createElement("div", { key: i, style: {
+              background: "white", borderRadius: 12, padding: "14px 10px",
+              textAlign: "center", boxShadow: `0 2px 8px ${C.shadow}`,
+              borderTop: `3px solid ${s.accent}`,
+            }},
+              React.createElement("div", { style: { fontFamily: "'DM Serif Display',serif", fontSize: 28, color: C.ink, lineHeight: 1 }}, s.value),
+              React.createElement("div", { style: { fontFamily: "'DM Sans',sans-serif", fontWeight: 300, fontSize: 10, color: C.gray, marginTop: 4 }}, s.label)
             )
           )
-          , React.createElement('div', { style: { height: 4, background: C.rule, borderRadius: 2 },}
-            , React.createElement('div', { style: { height: "100%", background: C.star, borderRadius: 2, width: `${(totalStars / maxStars) * 100}%`, transition: "width 0.5s" },} )
-          )
-          , React.createElement('div', { style: { fontFamily: "'DM Sans',sans-serif", fontWeight: 300, fontSize: 14, color: C.gray, marginTop: 6 },}
-            , immersion ? `Niveau actuel : ${effectiveLevel}` : `Current level: ${effectiveLevel}`
-          )
-        )
+        ),
 
-        )/* end padding */
-        /* Options */
-        , React.createElement('div', { style: { display: "flex", flexDirection: "column", gap: 1 },}
-          , React.createElement(ProfileRow, { label: immersion ? "📝 Mes exercices" : "📝 My exercises", onClick: onDiagnostics,} )
-          , React.createElement(ProfileRow, { label: t.toggleMode, onClick: onToggleMode,} )
-          , React.createElement(ProfileRow, { label: t.ttsLabel, onClick: onToggleTTS, badge: ttsEnabled ? "ON" : "OFF",} )
-          , React.createElement(ProfileRow, { label: t.retakeTest, onClick: onRetakeTest,} )
-          , React.createElement(ProfileRow, { label: t.reset, onClick: onReset, danger: true,} )
-        )
+        // ── Level + settings rows ───────────────────────────────────────────────
+        React.createElement("div", { style: { margin: "16px 0 0", background: "white", borderTop: `1px solid ${C.rule}`, borderBottom: `1px solid ${C.rule}` }},
+          React.createElement(ProfileRow, { label: (immersion ? "Niveau actuel : " : "Current level: ") + effectiveLevel, onClick: onRetakeTest, badge: immersion ? "Retester" : "Retake" }),
+          React.createElement(ProfileRow, { label: immersion ? "Mode immersion" : "Immersion mode", onClick: onToggleMode, badge: immersion ? "ON" : "OFF" }),
+          React.createElement(ProfileRow, { label: immersion ? "Synthèse vocale" : "Text to speech", onClick: onToggleTTS, badge: ttsEnabled ? "ON" : "OFF" }),
+        ),
+
+        React.createElement("div", { style: { margin: "12px 0 0", background: "white", borderTop: `1px solid ${C.rule}`, borderBottom: `1px solid ${C.rule}` }},
+          React.createElement(ProfileRow, { label: immersion ? "📝 Mes exercices" : "📝 My exercises", onClick: onDiagnostics }),
+        ),
+
+        // ── Danger zone ──────────────────────────────────────────────────────────
+        React.createElement("div", { style: { margin: "12px 0 0", background: "white", borderTop: `1px solid ${C.rule}`, borderBottom: `1px solid ${C.rule}` }},
+          !confirmReset
+            ? React.createElement(ProfileRow, { label: immersion ? "Réinitialiser la progression" : "Reset progress", onClick: () => setConfirmReset(true), danger: true })
+            : React.createElement("div", { style: { padding: "16px 20px" }},
+                React.createElement("div", { style: { fontFamily: "'DM Sans',sans-serif", fontSize: 14, color: C.red, marginBottom: 12 }},
+                  immersion ? "Confirmer la réinitialisation ?" : "Confirm reset?"
+                ),
+                React.createElement("div", { style: { display: "flex", gap: 10 }},
+                  React.createElement("button", { onClick: () => { onReset(); setConfirmReset(false); }, style: {
+                    flex: 1, padding: "10px", background: C.red, color: "white",
+                    border: "none", borderRadius: 8, cursor: "pointer",
+                    fontFamily: "'DM Sans',sans-serif", fontWeight: 500, fontSize: 14,
+                  }}, immersion ? "Oui, réinitialiser" : "Yes, reset"),
+                  React.createElement("button", { onClick: () => setConfirmReset(false), style: {
+                    flex: 1, padding: "10px", background: C.bgCard, color: C.ink,
+                    border: `1px solid ${C.rule}`, borderRadius: 8, cursor: "pointer",
+                    fontFamily: "'DM Sans',sans-serif", fontSize: 14,
+                  }}, immersion ? "Annuler" : "Cancel")
+                )
+              )
+        ),
+
+        React.createElement("div", { style: { height: 32 }})
       )
     )
   );
 }
 
-function ProfileRow({ label, onClick, badge, danger, accent }) {
-  return (
-    React.createElement('button', { onClick: onClick, style: {
-      display: "flex", alignItems: "center", justifyContent: "space-between",
-      padding: "17px 20px", background: "white",
-      border: "none", borderBottom: `1px solid ${C.rule}`,
-      cursor: "pointer", width: "100%", textAlign: "left",
-    },}
-      , React.createElement('span', { style: { fontFamily: "'DM Sans',sans-serif", fontWeight: 300, fontSize: 16, color: danger ? C.red : C.ink },}
-        , label
-      )
-      , badge && (
-        React.createElement('span', { style: {
-          fontFamily: "'DM Sans',sans-serif", fontWeight: 600, fontSize: 11,
-          letterSpacing: 1.5, color: "white",
-          background: badge === "ON" ? C.blue : C.gray,
-          padding: "3px 8px", borderRadius: 4,
-        },}
-          , badge
-        )
-      )
-      , !badge && React.createElement('span', { style: { color: C.grayLight, fontSize: 18 },}, "›")
-    )
-  );
-}
 
-// ─────────────────────────────────────────────────────────────────────────────
-// SHARED BUTTON STYLES
-// ─────────────────────────────────────────────────────────────────────────────
-
-const primaryBtn = {
-  width: "100%", padding: "17px",
-  background: C.ink, color: "white",
-  border: "none", cursor: "pointer",
-  fontFamily: "'DM Sans', sans-serif", fontWeight: 600, fontSize: 15,
-  letterSpacing: 1.5, textTransform: "uppercase",
-  borderRadius: 3,
-  boxShadow: "0 2px 12px rgba(20,22,32,0.18)",
-};
-
-const ghostBtn = {
-  width: "100%", padding: "15px",
-  background: "none", color: C.gray,
-  border: `1.5px solid ${C.rule}`, cursor: "pointer",
-  fontFamily: "'DM Sans', sans-serif", fontWeight: 300, fontSize: 16,
-  borderRadius: 3,
-};
-
-// ─────────────────────────────────────────────────────────────────────────────
-// APP — root component + routing
-// ─────────────────────────────────────────────────────────────────────────────
-
-
-// ─────────────────────────────────────────────────────────────────────────────
-// SUPABASE — auth + cloud sync
-// ─────────────────────────────────────────────────────────────────────────────
-
-const SB_URL = "https://pdxpggaerjdnaalgevwn.supabase.co";
-const SB_KEY = "sb_publishable_-9Ph7Az-UKSsaINwpv52fw_L-VcN4f3";
-
-// ─── SUPABASE ─────────────────────────────────────────────────────────────────
-const sb = supabase.createClient("https://pdxpggaerjdnaalgevwn.supabase.co", "sb_publishable_-9Ph7Az-UKSsaINwpv52fw_L-VcN4f3");
-
-async function signUp(email, password) {
-  const r = await sb.auth.signUp({ email, password });
-  if (r.error) throw r.error;
-  return r.data.user;
-}
-async function signIn(email, password) {
-  const r = await sb.auth.signInWithPassword({ email, password });
-  if (r.error) throw r.error;
-  return r.data.user;
-}
-async function signOut() { await sb.auth.signOut(); }
-async function signInWithGoogle() {
-  const r = await sb.auth.signInWithOAuth({ provider: "google", options: { redirectTo: "https://veget44.github.io/MFT/" } });
-  if (r.error) throw r.error;
-}
-async function cloudSaveProgress(uid, prog) {
-  const rows = Object.entries(prog).map(([id, v]) => ({ user_id: uid, scenario_id: parseInt(id), stars: v?.stars || 0, visits: v?.visits || 0, updated_at: new Date().toISOString() }));
-  if (!rows.length) return;
-  await sb.from("user_progress").upsert(rows, { onConflict: "user_id,scenario_id" });
-}
-async function cloudLoadProgress(uid) {
-  const { data } = await sb.from("user_progress").select("*").eq("user_id", uid);
-  const out = {};
-  if (data) data.forEach(r => { out[r.scenario_id] = { stars: r.stars, visits: r.visits }; });
-  return out;
-}
-async function cloudSaveDiag(uid, diag) {
-  const rows = Object.entries(diag).map(([id, v]) => ({ user_id: uid, scenario_id: parseInt(id), data: v, updated_at: new Date().toISOString() }));
-  if (!rows.length) return;
-  await sb.from("user_diagnostics").upsert(rows, { onConflict: "user_id,scenario_id" });
-}
-async function cloudLoadDiag(uid) {
-  const { data } = await sb.from("user_diagnostics").select("*").eq("user_id", uid);
-  const out = {};
-  if (data) data.forEach(r => { out[r.scenario_id] = r.data; });
-  return out;
-}
-async function cloudSaveProfile(uid, level, immersion) {
-  await sb.from("profiles").upsert({ id: uid, level, immersion }, { onConflict: "id" });
-}
-async function cloudLoadProfile(uid) {
-  const { data } = await sb.from("profiles").select("*").eq("id", uid).single();
-  return data;
-}
-async function cloudSaveUsername(uid, username, number) {
-  await sb.from("profiles").upsert({ id: uid, username, username_number: number }, { onConflict: "id" });
-}
-async function isUsernameAvailable(username) {
-  const { data } = await sb.from("profiles").select("id").eq("username", username.trim());
-  return !data || data.length === 0;
-}
-
-// ─── AUTH SCREEN ─────────────────────────────────────────────────────────────
 function AuthScreen({ immersion, onAuth, onGuest }) {
   const [mode,     setMode]     = useState("choice");
   const [email,    setEmail]    = useState("");
@@ -2785,7 +2743,10 @@ function App() {
     });
   }, []);
 
-  function handleGuest() { setUser(null); go("splash"); }
+  function handleGuest() {
+    setUser(null); setUsername(null); setUserNum(null);
+    go(ls("mft_level", null) ? "home" : "splash");
+  }
 
   function saveProgress(p) {
     setProgress(p); lsSet("mft_progress", p);
@@ -2839,11 +2800,11 @@ function App() {
         onComplete: (id, stars) => { saveProgress({ ...progress, [id]: { stars: Math.max(getStars(progress[id]), stars || 1), visits: ((progress[id]?.visits) || 0) + 1 }}); go("home"); },
         onDiag: saveDiag, onBack: () => go("home") }),
       screen === "profile"     && React.createElement(ProfileScreen,     { progress, immersion, userLevel, sessions: thisWeek, ttsEnabled,
-        user, accountLabel,
+        user, accountLabel, username, userNum,
         onBack: () => go("home"), onReset: () => { saveProgress({}); setDiag({}); lsSet("mft_diag", {}); go("home"); },
         onToggleMode: toggleImmersion, onToggleTTS: () => setTtsEnabled(v => !v),
         onRetakeTest: () => go("leveltest"), onDiagnostics: () => go("diagnostics"),
-        onSignOut: async () => { await signOut(); setUser(null); go("auth"); },
+        onSignOut: async () => { await signOut(); setUser(null); setUsername(null); setUserNum(null); go("auth"); },
         onAccount: () => go("auth") }),
       screen === "diagnostics" && React.createElement(DiagnosticsScreen, { diag, progress, immersion, onBack: () => go("home") })
     )
