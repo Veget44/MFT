@@ -2686,6 +2686,300 @@ function UsernameScreen({ immersion, user, onDone }) {
   );
 }
 
+// ─── SUPABASE ─────────────────────────────────────────────────────────────────
+const sb = supabase.createClient("https://pdxpggaerjdnaalgevwn.supabase.co", "sb_publishable_-9Ph7Az-UKSsaINwpv52fw_L-VcN4f3");
+
+async function sbSignUp(email, pw)   { const r = await sb.auth.signUp({email, password:pw}); if(r.error) throw r.error; return r.data.user; }
+async function sbSignIn(email, pw)   { const r = await sb.auth.signInWithPassword({email, password:pw}); if(r.error) throw r.error; return r.data.user; }
+async function sbSignOut()           { await sb.auth.signOut(); }
+async function sbGoogle()            { const r = await sb.auth.signInWithOAuth({provider:"google", options:{redirectTo:"https://veget44.github.io/MFT/"}}); if(r.error) throw r.error; }
+async function sbGetSession()        { const r = await sb.auth.getSession(); return r.data?.session; }
+
+async function sbSaveProg(uid, prog) {
+  const rows = Object.entries(prog).map(([id,v]) => ({user_id:uid, scenario_id:parseInt(id), stars:v?.stars||0, visits:v?.visits||0, updated_at:new Date().toISOString()}));
+  if (rows.length) await sb.from("user_progress").upsert(rows, {onConflict:"user_id,scenario_id"});
+}
+async function sbLoadProg(uid) {
+  const {data} = await sb.from("user_progress").select("*").eq("user_id",uid);
+  const out={};
+  (data||[]).forEach(r => { out[r.scenario_id]={stars:r.stars,visits:r.visits}; });
+  return out;
+}
+async function sbSaveDiag(uid, diag) {
+  const rows = Object.entries(diag).map(([id,v]) => ({user_id:uid, scenario_id:parseInt(id), data:v, updated_at:new Date().toISOString()}));
+  if (rows.length) await sb.from("user_diagnostics").upsert(rows, {onConflict:"user_id,scenario_id"});
+}
+async function sbLoadDiag(uid) {
+  const {data} = await sb.from("user_diagnostics").select("*").eq("user_id",uid);
+  const out={};
+  (data||[]).forEach(r => { out[r.scenario_id]=r.data; });
+  return out;
+}
+async function sbSaveProfile(uid, level, immersion, username, userNum) {
+  await sb.from("profiles").upsert({id:uid, level, immersion, username, username_number:userNum}, {onConflict:"id"});
+}
+async function sbLoadProfile(uid) {
+  const {data} = await sb.from("profiles").select("*").eq("id",uid).single();
+  return data;
+}
+
+// ─── AUTH SCREEN ─────────────────────────────────────────────────────────────
+function AuthScreen({ immersion, onAuth, onGuest }) {
+  const [mode,setMode]         = useState("choice");
+  const [email,setEmail]       = useState("");
+  const [pw,setPw]             = useState("");
+  const [loading,setLoading]   = useState(false);
+  const [err,setErr]           = useState(null);
+  const PHOTO = "data:image/jpeg;base64,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";
+
+  async function doGoogle() {
+    setLoading(true); setErr(null);
+    try { await sbGoogle(); } catch(e) { setErr("Google error — try again."); setLoading(false); }
+  }
+  async function doSignUp() {
+    if (!email.trim() || pw.length < 6) { setErr(immersion ? "Email invalide ou mot de passe trop court." : "Invalid email or password too short (6 chars)."); return; }
+    setLoading(true); setErr(null);
+    try { onAuth(await sbSignUp(email.trim(), pw)); } catch(e) { setErr(e.message||"Error"); setLoading(false); }
+  }
+  async function doSignIn() {
+    setLoading(true); setErr(null);
+    try { onAuth(await sbSignIn(email.trim(), pw)); } catch(e) { setErr(immersion ? "Email ou mot de passe incorrect." : "Wrong email or password."); setLoading(false); }
+  }
+
+  const wrap  = { height:"100%", display:"flex", flexDirection:"column", position:"relative", overflow:"hidden", background:"#080C1A" };
+  const grad  = { position:"absolute", inset:0, background:"linear-gradient(to bottom, rgba(6,9,26,.72) 0%, rgba(6,9,26,.35) 45%, rgba(6,9,26,.92) 100%)" };
+  const Bg    = () => React.createElement("div", {style:{position:"absolute",inset:0,zIndex:0}},
+    PHOTO && React.createElement("img",{src:PHOTO,style:{width:"100%",height:"100%",objectFit:"cover",objectPosition:"center 40%"}}),
+    React.createElement("div",{style:grad})
+  );
+  const GIcon = () => React.createElement("svg",{width:18,height:18,viewBox:"0 0 18 18"},
+    React.createElement("path",{d:"M17.64 9.205c0-.639-.057-1.252-.164-1.841H9v3.481h4.844a4.14 4.14 0 01-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z",fill:"#4285F4"}),
+    React.createElement("path",{d:"M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 009 18z",fill:"#34A853"}),
+    React.createElement("path",{d:"M3.964 10.71A5.41 5.41 0 013.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 000 9c0 1.452.348 2.827.957 4.042l3.007-2.332z",fill:"#FBBC05"}),
+    React.createElement("path",{d:"M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 00.957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z",fill:"#EA4335"})
+  );
+
+  if (mode === "choice") return (
+    React.createElement("div",{style:wrap},
+      React.createElement("style",null,CSS),
+      React.createElement(Bg),
+      React.createElement("div",{style:{position:"relative",zIndex:1,height:"100%",display:"flex",flexDirection:"column",justifyContent:"space-between",padding:"52px 28px 48px"}},
+        React.createElement("div",{style:{display:"flex",alignItems:"center",gap:12}},
+          React.createElement(Flag,{h:18,w:32}),
+          React.createElement("div",{style:{height:1,flex:1,background:"rgba(255,255,255,0.15)"}})
+        ),
+        React.createElement("div",null,
+          React.createElement("div",{style:{fontFamily:"'DM Serif Display',serif",fontStyle:"italic",fontSize:52,lineHeight:0.95,color:"white",textShadow:"0 2px 20px rgba(0,0,0,0.6)",marginBottom:16}},
+            "My French",React.createElement("br"),"Teacher"
+          ),
+          React.createElement("div",{style:{height:1,background:"rgba(255,255,255,0.18)",marginBottom:12}}),
+          React.createElement("div",{style:{fontFamily:"'DM Sans',sans-serif",fontWeight:300,fontSize:15,color:"rgba(255,255,255,0.58)",lineHeight:1.65}},
+            immersion ? "Sauvegardez votre progression sur tous vos appareils." : "Save your progress across all your devices."
+          )
+        ),
+        React.createElement("div",{style:{display:"flex",flexDirection:"column",gap:10}},
+          React.createElement("div",{style:{display:"flex",height:3,borderRadius:2,overflow:"hidden",marginBottom:4}},
+            React.createElement("div",{style:{flex:1,background:C.blue}}),
+            React.createElement("div",{style:{flex:1,background:"white"}}),
+            React.createElement("div",{style:{flex:1,background:C.red}})
+          ),
+          React.createElement("button",{onClick:doGoogle,disabled:loading,style:{width:"100%",padding:"15px 20px",background:"white",color:"#333",border:"none",borderRadius:4,cursor:"pointer",fontFamily:"'DM Sans',sans-serif",fontWeight:500,fontSize:15,display:"flex",alignItems:"center",justifyContent:"center",gap:10,boxShadow:"0 2px 14px rgba(0,0,0,0.35)"}},
+            React.createElement(GIcon),
+            loading ? "…" : (immersion ? "Continuer avec Google" : "Continue with Google")
+          ),
+          React.createElement("button",{onClick:()=>setMode("signup"),style:{width:"100%",padding:"14px",background:"rgba(255,255,255,0.1)",color:"white",border:"1px solid rgba(255,255,255,0.22)",borderRadius:4,cursor:"pointer",fontFamily:"'DM Sans',sans-serif",fontWeight:400,fontSize:15}},
+            immersion ? "Continuer avec email" : "Continue with email"
+          ),
+          React.createElement("button",{onClick:()=>setMode("signin"),style:{background:"none",border:"none",cursor:"pointer",padding:"4px 0",fontFamily:"'DM Sans',sans-serif",fontWeight:300,fontSize:14,color:"rgba(255,255,255,0.42)"}},
+            immersion ? "Déjà un compte ? Se connecter" : "Already have an account? Log in"
+          ),
+          React.createElement("button",{onClick:onGuest,style:{background:"none",border:"none",cursor:"pointer",fontFamily:"'DM Sans',sans-serif",fontWeight:300,fontSize:13,color:"rgba(255,255,255,0.28)"}},
+            immersion ? "Continuer sans compte →" : "Continue without account →"
+          )
+        )
+      )
+    )
+  );
+
+  const isUp = mode === "signup";
+  return (
+    React.createElement("div",{style:wrap},
+      React.createElement("style",null,CSS),
+      React.createElement(Bg),
+      React.createElement("div",{style:{position:"relative",zIndex:1,height:"100%",display:"flex",flexDirection:"column"}},
+        React.createElement("div",{style:{padding:"48px 28px 0"}},
+          React.createElement("div",{style:{display:"flex",alignItems:"center",gap:12,marginBottom:24}},
+            React.createElement("button",{onClick:()=>{setMode("choice");setErr(null);},style:{background:"none",border:"none",cursor:"pointer",color:"rgba(255,255,255,0.6)",fontSize:22,padding:"4px 8px 4px 0"}}, "←"),
+            React.createElement("div",{style:{height:1,flex:1,background:"rgba(255,255,255,0.12)"}})
+          ),
+          React.createElement("div",{style:{fontFamily:"'DM Serif Display',serif",fontSize:30,color:"white",textShadow:"0 2px 12px rgba(0,0,0,0.5)"}},
+            isUp ? (immersion?"Créer un compte":"Create an account") : (immersion?"Se connecter":"Log in")
+          )
+        ),
+        React.createElement("div",{style:{flex:1,display:"flex",flexDirection:"column",justifyContent:"flex-end",padding:"0 24px 48px"}},
+          React.createElement("div",{style:{background:"rgba(8,12,26,0.78)",backdropFilter:"blur(16px)",borderRadius:16,padding:"24px 20px",border:"1px solid rgba(255,255,255,0.1)",display:"flex",flexDirection:"column",gap:12}},
+            React.createElement("input",{type:"email",value:email,onChange:e=>setEmail(e.target.value),placeholder:"Email",style:{border:"1px solid rgba(255,255,255,0.15)",borderRadius:8,padding:"13px 16px",fontSize:15,fontFamily:"'DM Sans',sans-serif",color:"white",background:"rgba(255,255,255,0.07)",outline:"none"}}),
+            React.createElement("input",{type:"password",value:pw,onChange:e=>setPw(e.target.value),onKeyDown:e=>{if(e.key==="Enter") isUp?doSignUp():doSignIn();},placeholder:immersion?"Mot de passe":"Password",style:{border:"1px solid rgba(255,255,255,0.15)",borderRadius:8,padding:"13px 16px",fontSize:15,fontFamily:"'DM Sans',sans-serif",color:"white",background:"rgba(255,255,255,0.07)",outline:"none"}}),
+            err && React.createElement("div",{style:{fontFamily:"'DM Sans',sans-serif",fontSize:13,color:"#FF7070",lineHeight:1.5}},err),
+            React.createElement("button",{onClick:isUp?doSignUp:doSignIn,disabled:loading,style:{width:"100%",padding:"14px",background:"white",color:C.ink,border:"none",borderRadius:4,cursor:"pointer",fontFamily:"'DM Sans',sans-serif",fontWeight:600,fontSize:15,opacity:loading?0.7:1}},
+              loading?"…":(isUp?(immersion?"Créer →":"Create →"):(immersion?"Se connecter →":"Log in →"))
+            ),
+            React.createElement("button",{onClick:onGuest,style:{background:"none",border:"none",cursor:"pointer",fontFamily:"'DM Sans',sans-serif",fontWeight:300,fontSize:13,color:"rgba(255,255,255,0.38)",marginTop:2}},
+              immersion?"Continuer sans compte":"Continue without account"
+            )
+          )
+        )
+      )
+    )
+  );
+}
+
+// ─── USERNAME SCREEN ─────────────────────────────────────────────────────────
+function UsernameScreen({ immersion, user, onDone }) {
+  const [name,setName]       = useState((user?.user_metadata?.full_name||user?.email?.split("@")[0]||"").split(" ")[0]);
+  const [loading,setLoading] = useState(false);
+  const [err,setErr]         = useState(null);
+
+  async function confirm() {
+    const clean = name.trim().replace(/[^a-zA-Z0-9_\-àâäéèêëîïôùûüç ]/g,"").trim();
+    if (!clean||clean.length<2) { setErr(immersion?"Au moins 2 caractères.":"At least 2 characters."); return; }
+    setLoading(true); setErr(null);
+    const num = Math.floor(1000+Math.random()*9000);
+    try { await sbSaveProfile(user.id, null, null, clean, num); onDone(clean, num); }
+    catch(e) { setErr(immersion?"Erreur — réessayez.":"Error — try again."); }
+    setLoading(false);
+  }
+
+  return React.createElement("div",{style:{height:"100%",display:"flex",flexDirection:"column",background:C.header}},
+    React.createElement("style",null,CSS),
+    React.createElement("div",{style:{padding:"52px 28px 28px"}},
+      React.createElement("div",{style:{display:"flex",alignItems:"center",gap:12,marginBottom:28}},
+        React.createElement(Flag,{h:16,w:28}),
+        React.createElement("div",{style:{height:1,flex:1,background:"rgba(255,255,255,0.1)"}})
+      ),
+      React.createElement("div",{style:{fontFamily:"'DM Serif Display',serif",fontStyle:"italic",fontSize:30,color:C.onHeader,lineHeight:1.2,marginBottom:8}},
+        immersion?"Choisissez votre pseudo":"Choose your username"
+      ),
+      React.createElement("div",{style:{fontFamily:"'DM Sans',sans-serif",fontWeight:300,fontSize:14,color:C.onHeaderDim,lineHeight:1.6}},
+        immersion?"Un numéro unique sera ajouté — ex. Pierre#4821":"A unique number will be added — e.g. Pierre#4821"
+      )
+    ),
+    React.createElement("div",{style:{flex:1,background:C.bg,borderRadius:"20px 20px 0 0",padding:"28px 24px 40px",display:"flex",flexDirection:"column",gap:16}},
+      React.createElement("input",{value:name,maxLength:20,autoFocus:true,
+        onChange:e=>{setName(e.target.value);setErr(null);},
+        onKeyDown:e=>{if(e.key==="Enter")confirm();},
+        placeholder:immersion?"Pierre, Marie, Alex...":"Your name...",
+        style:{border:`1.5px solid ${err?C.red:name.trim()?C.ink:C.rule}`,borderRadius:10,padding:"14px 16px",fontSize:17,fontFamily:"'DM Serif Text',serif",color:C.ink,background:"white",outline:"none",width:"100%",boxSizing:"border-box"}
+      }),
+      err&&React.createElement("div",{style:{fontFamily:"'DM Sans',sans-serif",fontSize:13,color:C.red}},err),
+      React.createElement("div",{style:{background:C.bgCard,borderRadius:10,padding:"14px 16px",display:"flex",alignItems:"center",gap:12}},
+        React.createElement("div",{style:{fontFamily:"'DM Serif Display',serif",fontSize:22,color:C.ink}},(name.trim()||"You")+"#????"),
+        React.createElement("div",{style:{fontFamily:"'DM Sans',sans-serif",fontWeight:300,fontSize:12,color:C.gray}},immersion?"Votre identifiant unique.":"Your unique identifier.")
+      ),
+      React.createElement("button",{onClick:confirm,disabled:loading||!name.trim(),
+        style:{...primaryBtn,marginTop:8,opacity:(!name.trim()||loading)?0.5:1,cursor:(!name.trim()||loading)?"default":"pointer"}},
+        loading?"…":(immersion?"Confirmer →":"Confirm →")
+      )
+    )
+  );
+}
+
+// ─── PROFILE SCREEN ──────────────────────────────────────────────────────────
+function ProfileScreen({ progress, immersion, userLevel, sessions, onBack, onReset,
+    onToggleMode, onRetakeTest, ttsEnabled, onToggleTTS, onDiagnostics,
+    user, username, userNum, onSignOut, onAccount }) {
+
+  const t            = T(immersion);
+  const done         = Object.values(progress).filter(p=>(p?.stars||0)>0).length;
+  const totalStars   = Object.values(progress).reduce((s,p)=>s+(p?.stars||0),0);
+  const effectiveLevel = userLevel || "A1";
+  const [confirmReset,setConfirmReset] = useState(false);
+
+  const avatar      = username?username[0].toUpperCase():(user?.email?.[0]?.toUpperCase()||"?");
+  const displayName = username?`${username}#${userNum||"????"}`:null;
+
+  return React.createElement("div",{style:{height:"100%",display:"flex",flexDirection:"column",background:C.bg}},
+    React.createElement("style",null,CSS),
+
+    // Header
+    React.createElement("div",{style:{background:C.header,flexShrink:0}},
+      React.createElement(Tricolor,{height:3}),
+      React.createElement("div",{style:{padding:"16px 20px 20px",display:"flex",alignItems:"center",gap:14}},
+        React.createElement(BackBtn,{onClick:onBack}),
+        React.createElement("div",{style:{fontFamily:"'DM Serif Text',serif",fontSize:18,color:C.onHeader}},
+          immersion?"Mon profil":"My profile"
+        )
+      ),
+
+      // User card
+      React.createElement("div",{style:{margin:"0 20px 20px",background:"rgba(255,255,255,0.06)",border:"1px solid rgba(255,255,255,0.1)",borderRadius:14,padding:"16px 18px",display:"flex",alignItems:"center",gap:14}},
+        // Avatar
+        React.createElement("div",{style:{width:48,height:48,borderRadius:"50%",flexShrink:0,background:user?C.blue:"rgba(255,255,255,0.12)",display:"flex",alignItems:"center",justifyContent:"center",fontFamily:"'DM Serif Display',serif",fontSize:20,color:"white",border:user?"2px solid rgba(255,255,255,0.3)":"2px solid rgba(255,255,255,0.1)"}},avatar),
+        // Info
+        React.createElement("div",{style:{flex:1,minWidth:0}},
+          user ? React.createElement("div",null,
+            displayName&&React.createElement("div",{style:{fontFamily:"'DM Serif Text',serif",fontSize:17,color:C.onHeader,marginBottom:2}},displayName),
+            React.createElement("div",{style:{fontFamily:"'DM Sans',sans-serif",fontWeight:300,fontSize:13,color:C.onHeaderDim,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}},user.email)
+          ) : React.createElement("div",null,
+            React.createElement("div",{style:{fontFamily:"'DM Serif Text',serif",fontSize:16,color:C.onHeader,marginBottom:2}},immersion?"Invité":"Guest"),
+            React.createElement("div",{style:{fontFamily:"'DM Sans',sans-serif",fontWeight:300,fontSize:13,color:C.onHeaderDim}},immersion?"Progression locale uniquement":"Local progress only")
+          )
+        ),
+        // Sign out / in button
+        user ? React.createElement("button",{onClick:onSignOut,style:{background:"rgba(237,41,57,0.15)",border:"1px solid rgba(237,41,57,0.3)",borderRadius:8,padding:"7px 12px",cursor:"pointer",fontFamily:"'DM Sans',sans-serif",fontSize:12,fontWeight:500,color:C.red,flexShrink:0}},
+          immersion?"Déconnexion":"Sign out"
+        ) : React.createElement("button",{onClick:onAccount,style:{background:"rgba(255,255,255,0.1)",border:"1px solid rgba(255,255,255,0.2)",borderRadius:8,padding:"7px 12px",cursor:"pointer",fontFamily:"'DM Sans',sans-serif",fontSize:12,fontWeight:500,color:C.onHeader,flexShrink:0}},
+          immersion?"Connexion":"Log in"
+        )
+      )
+    ),
+
+    // Scrollable content
+    React.createElement("div",{style:{flex:1,overflowY:"auto"}},
+
+      // Stats
+      React.createElement("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:10,padding:"16px 16px 0"}},
+        ...[
+          {value:done,       label:immersion?"Complétés":"Done",    accent:C.blue },
+          {value:totalStars, label:immersion?"Étoiles":"Stars",     accent:C.gold },
+          {value:sessions,   label:immersion?"Sessions":"Sessions", accent:C.green},
+        ].map((s,i)=>React.createElement("div",{key:i,style:{background:"white",borderRadius:12,padding:"14px 10px",textAlign:"center",boxShadow:`0 2px 8px ${C.shadow}`,borderTop:`3px solid ${s.accent}`}},
+          React.createElement("div",{style:{fontFamily:"'DM Serif Display',serif",fontSize:28,color:C.ink,lineHeight:1}},s.value),
+          React.createElement("div",{style:{fontFamily:"'DM Sans',sans-serif",fontWeight:300,fontSize:10,color:C.gray,marginTop:4}},s.label)
+        ))
+      ),
+
+      // Settings
+      React.createElement("div",{style:{margin:"16px 0 0",background:"white",borderTop:`1px solid ${C.rule}`,borderBottom:`1px solid ${C.rule}`}},
+        React.createElement(ProfileRow,{label:(immersion?"Niveau actuel : ":"Current level: ")+effectiveLevel, onClick:onRetakeTest, badge:immersion?"Retester":"Retake"}),
+        React.createElement(ProfileRow,{label:immersion?"Mode immersion":"Immersion mode", onClick:onToggleMode, badge:immersion?"ON":"OFF"}),
+        React.createElement(ProfileRow,{label:immersion?"Synthèse vocale":"Text to speech", onClick:onToggleTTS, badge:ttsEnabled?"ON":"OFF"})
+      ),
+
+      React.createElement("div",{style:{margin:"12px 0 0",background:"white",borderTop:`1px solid ${C.rule}`,borderBottom:`1px solid ${C.rule}`}},
+        React.createElement(ProfileRow,{label:immersion?"📝 Mes exercices":"📝 My exercises", onClick:onDiagnostics})
+      ),
+
+      // Reset
+      React.createElement("div",{style:{margin:"12px 0 0",background:"white",borderTop:`1px solid ${C.rule}`,borderBottom:`1px solid ${C.rule}`}},
+        !confirmReset
+          ? React.createElement(ProfileRow,{label:immersion?"Réinitialiser la progression":"Reset progress", onClick:()=>setConfirmReset(true), danger:true})
+          : React.createElement("div",{style:{padding:"16px 20px"}},
+              React.createElement("div",{style:{fontFamily:"'DM Sans',sans-serif",fontSize:14,color:C.red,marginBottom:12}},
+                immersion?"Confirmer la réinitialisation ?":"Confirm reset?"
+              ),
+              React.createElement("div",{style:{display:"flex",gap:10}},
+                React.createElement("button",{onClick:()=>{onReset();setConfirmReset(false);},style:{flex:1,padding:"10px",background:C.red,color:"white",border:"none",borderRadius:8,cursor:"pointer",fontFamily:"'DM Sans',sans-serif",fontWeight:500,fontSize:14}},immersion?"Oui, réinitialiser":"Yes, reset"),
+                React.createElement("button",{onClick:()=>setConfirmReset(false),style:{flex:1,padding:"10px",background:C.bgCard,color:C.ink,border:`1px solid ${C.rule}`,borderRadius:8,cursor:"pointer",fontFamily:"'DM Sans',sans-serif",fontSize:14}},immersion?"Annuler":"Cancel")
+              )
+            )
+      ),
+
+      React.createElement("div",{style:{height:32}})
+    )
+  );
+}
+
 // ─── APP ─────────────────────────────────────────────────────────────────────
 function App() {
   const [screen,     setScreen]     = useState("auth");
@@ -2696,8 +2990,8 @@ function App() {
   const [userLevel,  setUserLevel]  = useState(() => ls("mft_level",     null));
   const [ttsEnabled, setTtsEnabled] = useState(false);
   const [user,       setUser]       = useState(null);
-  const [username,   setUsername]  = useState(() => ls("mft_username", null));
-  const [userNum,    setUserNum]   = useState(() => ls("mft_usernum",  null));
+  const [username,   setUsername]   = useState(() => ls("mft_username",  null));
+  const [userNum,    setUserNum]    = useState(() => ls("mft_usernum",   null));
 
   const { thisWeek, recordSession } = useSessionTracker();
   const go = s => setScreen(s);
@@ -2706,13 +3000,13 @@ function App() {
     if (!u) return;
     try {
       const [prog, diagData, profile] = await Promise.all([
-        cloudLoadProgress(u.id), cloudLoadDiag(u.id), cloudLoadProfile(u.id)
+        sbLoadProg(u.id), sbLoadDiag(u.id), sbLoadProfile(u.id)
       ]);
       if (Object.keys(prog).length)     { setProgress(prog);             lsSet("mft_progress",  prog); }
       if (Object.keys(diagData).length) { setDiag(diagData);             lsSet("mft_diag",      diagData); }
       if (profile?.level)               { setUserLevel(profile.level);   lsSet("mft_level",     profile.level); }
       if (profile?.immersion != null)   { setImmersion(profile.immersion); lsSet("mft_immersion", profile.immersion); }
-      if (profile?.username)            { setUsername(profile.username);   lsSet("mft_username",  profile.username); }
+      if (profile?.username)            { setUsername(profile.username);  lsSet("mft_username",  profile.username); }
       if (profile?.username_number)     { setUserNum(profile.username_number); lsSet("mft_usernum", profile.username_number); }
     } catch(e) { console.warn("Sync:", e); }
   }
@@ -2722,25 +3016,20 @@ function App() {
     const localProg  = ls("mft_progress", {});
     const localLevel = ls("mft_level", null);
     const localImm   = ls("mft_immersion", false);
-    if (Object.keys(localProg).length) await cloudSaveProgress(u.id, localProg).catch(() => {});
-    if (localLevel) await cloudSaveProfile(u.id, localLevel, localImm).catch(() => {});
+    if (Object.keys(localProg).length) await sbSaveProg(u.id, localProg).catch(()=>{});
+    if (localLevel) await sbSaveProfile(u.id, localLevel, localImm, null, null).catch(()=>{});
     await syncDown(u);
-    // Check if username already set
-    const prof = await cloudLoadProfile(u.id).catch(() => null);
-    if (prof?.username) {
-      setUsername(prof.username); lsSet("mft_username", prof.username);
-      setUserNum(prof.username_number); lsSet("mft_usernum", prof.username_number);
-      go(ls("mft_level", null) ? "home" : "splash");
-    } else {
-      go("username");
-    }
+    // Route: need username? → username screen; has level? → home; else → splash
+    const prof = await sbLoadProfile(u.id).catch(()=>null);
+    if (!prof?.username) { go("username"); return; }
+    go(ls("mft_level", null) ? "home" : "splash");
   }
 
   // Handle Google OAuth redirect
   useEffect(() => {
-    sb.auth.getSession().then(({ data }) => {
-      if (data?.session?.user) handleAuth(data.session.user);
-    });
+    sbGetSession().then(session => {
+      if (session?.user) handleAuth(session.user);
+    }).catch(()=>{});
   }, []);
 
   function handleGuest() {
@@ -2750,14 +3039,14 @@ function App() {
 
   function saveProgress(p) {
     setProgress(p); lsSet("mft_progress", p);
-    if (user) cloudSaveProgress(user.id, p).catch(() => {});
+    if (user) sbSaveProg(user.id, p).catch(()=>{});
   }
 
   function saveDiag(scenId, d) {
     setDiag(prev => {
-      const updated = { ...prev, [scenId]: [...(prev[scenId] || []), d].slice(-10) };
+      const updated = { ...prev, [scenId]: [...(prev[scenId]||[]), d].slice(-10) };
       lsSet("mft_diag", updated);
-      if (user) cloudSaveDiag(user.id, updated).catch(() => {});
+      if (user) sbSaveDiag(user.id, updated).catch(()=>{});
       return updated;
     });
   }
@@ -2765,48 +3054,42 @@ function App() {
   function toggleImmersion() {
     setImmersion(v => {
       lsSet("mft_immersion", !v);
-      if (user) cloudSaveProfile(user.id, userLevel, !v).catch(() => {});
+      if (user) sbSaveProfile(user.id, userLevel, !v, username, userNum).catch(()=>{});
       return !v;
     });
   }
 
-  const displayName = username ? `${username}#${userNum}` : (user?.email?.split("@")[0] || "");
-  const accountLabel = user
-    ? (immersion ? "Compte · " + displayName : "Account · " + displayName)
-    : (immersion ? "Se connecter / Créer un compte" : "Log in / Create account");
-
-  return React.createElement("div", { style: { width: "100%", height: "100%", display: "flex", flexDirection: "column" }},
-    React.createElement("style", null, CSS),
-    React.createElement("div", { style: { flex: 1, overflow: "hidden" }},
-      screen === "auth"        && React.createElement(AuthScreen,        { immersion, onAuth: handleAuth, onGuest: handleGuest }),
-      screen === "splash"      && React.createElement(SplashScreen,      { immersion, onEnter: () => go("mode") }),
-      screen === "mode"        && React.createElement(ModeScreen,        { immersion, onSelect: isImm => { setImmersion(isImm); lsSet("mft_immersion", isImm); go("leveltest"); } }),
-      screen === "leveltest"   && React.createElement(LevelTestScreen,   { immersion,
-        onComplete: lvl => { setUserLevel(lvl); lsSet("mft_level", lvl); if (user) cloudSaveProfile(user.id, lvl, immersion).catch(() => {}); go("home"); },
-        onBack: () => go("mode") }),
-      screen === "username"    && React.createElement(UsernameScreen,    { immersion, user,
-        onDone: (name, num) => {
-          setUsername(name); lsSet("mft_username", name);
-          setUserNum(num);   lsSet("mft_usernum", num);
-          go(ls("mft_level", null) ? "home" : "splash");
-        }
-      }),
-      screen === "home"        && React.createElement(HomeScreen,        { progress, immersion, userLevel, sessions: thisWeek,
-        onSelect: s => { setScenario(s); recordSession(); go("scenario"); },
-        displayName: displayName, isLoggedIn: !!user,
-        onProfile: () => go("profile"), onToggleMode: toggleImmersion, onExercises: () => go("diagnostics") }),
-      screen === "scenario" && scenario && React.createElement(ScenarioScreen, { scenario, immersion, ttsEnabled, progress,
-        onExercises: () => go("diagnostics"),
-        onComplete: (id, stars) => { saveProgress({ ...progress, [id]: { stars: Math.max(getStars(progress[id]), stars || 1), visits: ((progress[id]?.visits) || 0) + 1 }}); go("home"); },
-        onDiag: saveDiag, onBack: () => go("home") }),
-      screen === "profile"     && React.createElement(ProfileScreen,     { progress, immersion, userLevel, sessions: thisWeek, ttsEnabled,
-        user, accountLabel, username, userNum,
-        onBack: () => go("home"), onReset: () => { saveProgress({}); setDiag({}); lsSet("mft_diag", {}); go("home"); },
-        onToggleMode: toggleImmersion, onToggleTTS: () => setTtsEnabled(v => !v),
-        onRetakeTest: () => go("leveltest"), onDiagnostics: () => go("diagnostics"),
-        onSignOut: async () => { await signOut(); setUser(null); setUsername(null); setUserNum(null); go("auth"); },
-        onAccount: () => go("auth") }),
-      screen === "diagnostics" && React.createElement(DiagnosticsScreen, { diag, progress, immersion, onBack: () => go("home") })
+  return React.createElement("div",{style:{width:"100%",height:"100%",display:"flex",flexDirection:"column"}},
+    React.createElement("style",null,CSS),
+    React.createElement("div",{style:{flex:1,overflow:"hidden"}},
+      screen==="auth"      && React.createElement(AuthScreen,{immersion,onAuth:handleAuth,onGuest:handleGuest}),
+      screen==="username"  && React.createElement(UsernameScreen,{immersion,user,onDone:(name,num)=>{
+        setUsername(name); lsSet("mft_username",name);
+        setUserNum(num);   lsSet("mft_usernum",num);
+        go(ls("mft_level",null)?"home":"splash");
+      }}),
+      screen==="splash"    && React.createElement(SplashScreen,{immersion,onEnter:()=>go("mode")}),
+      screen==="mode"      && React.createElement(ModeScreen,{immersion,onSelect:isImm=>{setImmersion(isImm);lsSet("mft_immersion",isImm);go("leveltest");}}),
+      screen==="leveltest" && React.createElement(LevelTestScreen,{immersion,
+        onComplete:lvl=>{setUserLevel(lvl);lsSet("mft_level",lvl);if(user)sbSaveProfile(user.id,lvl,immersion,username,userNum).catch(()=>{});go("home");},
+        onBack:()=>go("mode")}),
+      screen==="home"      && React.createElement(HomeScreen,{progress,immersion,userLevel,sessions:thisWeek,
+        displayName:username?`${username}#${userNum}`:null, isLoggedIn:!!user,
+        onSelect:s=>{setScenario(s);recordSession();go("scenario");},
+        onProfile:()=>go("profile"),onToggleMode:toggleImmersion,onExercises:()=>go("diagnostics")}),
+      screen==="scenario"&&scenario && React.createElement(ScenarioScreen,{scenario,immersion,ttsEnabled,progress,
+        onExercises:()=>go("diagnostics"),
+        onComplete:(id,stars)=>{saveProgress({...progress,[id]:{stars:Math.max(getStars(progress[id]),stars||1),visits:((progress[id]?.visits)||0)+1}});go("home");},
+        onDiag:saveDiag,onBack:()=>go("home")}),
+      screen==="profile"   && React.createElement(ProfileScreen,{progress,immersion,userLevel,sessions:thisWeek,ttsEnabled,
+        user,username,userNum,
+        onBack:()=>go("home"),
+        onReset:()=>{saveProgress({});setDiag({});lsSet("mft_diag",{});go("home");},
+        onToggleMode:toggleImmersion,onToggleTTS:()=>setTtsEnabled(v=>!v),
+        onRetakeTest:()=>go("leveltest"),onDiagnostics:()=>go("diagnostics"),
+        onSignOut:async()=>{await sbSignOut();setUser(null);setUsername(null);setUserNum(null);go("auth");},
+        onAccount:()=>go("auth")}),
+      screen==="diagnostics" && React.createElement(DiagnosticsScreen,{diag,progress,immersion,onBack:()=>go("home")})
     )
   );
 }
