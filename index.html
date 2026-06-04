@@ -2376,7 +2376,7 @@ Output ONLY JSON: {"correct": true|false, "feedback": "brief feedback in ${lang}
 
 function ProfileScreen({ progress, immersion, userLevel, sessions, onBack, onReset,
     onToggleMode, onRetakeTest, ttsEnabled, onToggleTTS, onDiagnostics,
-    user, accountLabel, onSignOut, onAccount, username, userNum }) {
+    user, accountLabel, onSignOut, onAccount, username, userNum, streak }) {
 
   const t = T(immersion);
   const done       = Object.values(progress).filter(p => (p?.stars||0) > 0).length;
