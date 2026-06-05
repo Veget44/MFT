@@ -3186,6 +3186,8 @@ function App() {
   }
 
   const displayName = username ? `${username}#${userNum}` : null;
+  const dailyChallenge = userLevel ? getDailyChallenge(userLevel) : null;
+  const dailyDone = !!(dailyChallenge && ls("mft_daily_done","") === getTodayStamp());
 
   return React.createElement("div", {style:{width:"100%",height:"100%",display:"flex",flexDirection:"column"}},
     React.createElement("style", null, CSS),
