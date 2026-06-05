@@ -496,6 +496,252 @@ const SCENARIOS = [
     culture_fr: "Le système judiciaire français est inquisitoire : la juge peut interroger directement les témoins.",
     culture_en: "The French judicial system is inquisitorial: the judge can question witnesses directly.",
   },
+
+  // ── Pre-A1 (nouveaux) ─────────────────────────────────────────
+  {
+    id: 104, cefrLevel: "0",
+    place: "Boulangerie · Paris",
+    title: "Une baguette !", titleEn: "A baguette!",
+    skills: ["shopping", "numbers", "politeness"],
+    scene_fr: "Vous entrez dans une boulangerie. La boulangere sourit et attend votre commande.",
+    scene_en: "You walk into a bakery. The baker smiles and waits for your order.",
+    goal_fr: "Acheter une baguette et payer.",
+    goal_en: "Buy a baguette and pay.",
+    hint_fr: "Commencez par bonjour, dites ce que vous voulez, demandez le prix.",
+    hint_en: "Start with bonjour, say what you want, ask the price.",
+    culture_fr: "La baguette tradition coute environ 1,20 euros. C'est un symbole national protege.",
+    culture_en: "A traditional baguette costs around 1.20 euros. It is a protected national symbol.",
+  },
+  {
+    id: 105, cefrLevel: "0",
+    place: "Hotel · Nice",
+    title: "Ma chambre !", titleEn: "My room!",
+    skills: ["hotel", "numbers", "requests"],
+    scene_fr: "Vous arrivez a l'hotel. Le receptionniste vous accueille.",
+    scene_en: "You arrive at the hotel. The receptionist welcomes you.",
+    goal_fr: "Demander votre chambre et recuperer la cle.",
+    goal_en: "Ask for your room and get the key.",
+    hint_fr: "Votre nom et le mot reservation suffiront pour commencer.",
+    hint_en: "Your name and the word reservation are enough to start.",
+    culture_fr: "En France, on dit bonjour avant toute demande. C'est une regle de politesse fondamentale.",
+    culture_en: "In France, bonjour before any request is a fundamental rule of politeness.",
+  },
+  {
+    id: 106, cefrLevel: "0",
+    place: "Supermarche · Lyon",
+    title: "La caisse !", titleEn: "The checkout!",
+    skills: ["shopping", "numbers", "courtesy"],
+    scene_fr: "Vous etes a la caisse. La caissiere scanne vos articles.",
+    scene_en: "You are at the checkout. The cashier scans your items.",
+    goal_fr: "Payer et dire au revoir poliment.",
+    goal_en: "Pay and say goodbye politely.",
+    hint_fr: "Preparez votre argent. On vous demandera si vous avez une carte de fidelite.",
+    hint_en: "Have your money ready. They may ask if you have a loyalty card.",
+    culture_fr: "Dire bonjour et au revoir a la caissiere est la norme en France.",
+    culture_en: "Saying bonjour and au revoir to the cashier is the norm in France.",
+  },
+  // ── A1 (nouveaux) ──────────────────────────────────────────────
+  {
+    id: 17, cefrLevel: "A1",
+    place: "Cabinet medical · Paris",
+    title: "J'ai mal !", titleEn: "It hurts!",
+    skills: ["body parts", "symptoms", "appointments"],
+    scene_fr: "Vous etes chez le medecin. Il vous demande ce qui ne va pas.",
+    scene_en: "You are at the doctor's office. He asks what is wrong.",
+    goal_fr: "Dire ou vous avez mal et depuis combien de temps.",
+    goal_en: "Say where it hurts and for how long.",
+    hint_fr: "Nommez la partie du corps, puis dites depuis quand : depuis deux jours.",
+    hint_en: "Name the body part, then say since when: depuis deux jours.",
+    culture_fr: "Le medecin traitant est votre medecin generaliste. La consultation coute 26,50 euros.",
+    culture_en: "The medecin traitant is your GP. A consultation costs 26.50 euros.",
+  },
+  {
+    id: 18, cefrLevel: "A1",
+    place: "Bureau de poste · Bordeaux",
+    title: "Un timbre !", titleEn: "A stamp!",
+    skills: ["postal service", "quantities", "destinations"],
+    scene_fr: "Vous etes a la poste avec une lettre a envoyer au Royaume-Uni.",
+    scene_en: "You are at the post office with a letter to send to the UK.",
+    goal_fr: "Acheter un timbre international et envoyer votre lettre.",
+    goal_en: "Buy an international stamp and send your letter.",
+    hint_fr: "Dites la destination et le type d'envoi : lettre ou colis.",
+    hint_en: "Say the destination and type: letter or parcel.",
+    culture_fr: "La Poste est reconnaissable a son logo jaune. Les bureaux ferment souvent a 18h.",
+    culture_en: "La Poste has a yellow logo. Branches often close at 6pm.",
+  },
+  {
+    id: 19, cefrLevel: "A1",
+    place: "Cafe · Montpellier",
+    title: "L'addition !", titleEn: "The bill!",
+    skills: ["numbers", "payments", "polite requests"],
+    scene_fr: "Vous avez fini votre cafe. Vous voulez payer et partir.",
+    scene_en: "You have finished your coffee. You want to pay and leave.",
+    goal_fr: "Appeler le serveur et demander l'addition.",
+    goal_en: "Call the waiter and ask for the bill.",
+    hint_fr: "Dites : Excusez-moi, l'addition s'il vous plait. Ne criez pas depuis votre table.",
+    hint_en: "Say: Excusez-moi, l'addition s'il vous plait. Do not shout from your table.",
+    culture_fr: "En France, le service est inclus dans le prix. Le pourboire est apprecie mais facultatif.",
+    culture_en: "In France, service is included in the price. A tip is appreciated but not required.",
+  },
+  // ── A2 (nouveaux) ──────────────────────────────────────────────
+  {
+    id: 20, cefrLevel: "A2",
+    place: "Colocation · Toulouse",
+    title: "Je cherche une chambre", titleEn: "Looking for a room",
+    skills: ["housing vocabulary", "asking questions", "describing needs"],
+    scene_fr: "Vous visitez une chambre en colocation. Votre futur colocataire vous fait visiter l'appartement.",
+    scene_en: "You are visiting a room in a shared flat. Your potential flatmate shows you around.",
+    goal_fr: "Poser des questions sur le loyer, les charges et les regles de la maison.",
+    goal_en: "Ask about rent, utilities and house rules.",
+    hint_fr: "Demandez le loyer, les charges, s'il y a Internet, et comment on se partage les taches.",
+    hint_en: "Ask about rent, utilities, WiFi, and how chores are shared.",
+    culture_fr: "En France, le proprietaire peut demander deux mois de caution et des garants.",
+    culture_en: "In France, landlords can ask for two months deposit and guarantors.",
+  },
+  {
+    id: 21, cefrLevel: "A2",
+    place: "Guichet SNCF · Gare de Lyon",
+    title: "Mon billet !", titleEn: "My ticket!",
+    skills: ["transport", "times", "reservations"],
+    scene_fr: "Vous avez manque votre train. Vous etes au guichet SNCF.",
+    scene_en: "You missed your train. You are at the SNCF counter.",
+    goal_fr: "Expliquer la situation et obtenir un nouveau billet.",
+    goal_en: "Explain the situation and get a new ticket.",
+    hint_fr: "Dites votre destination, le train rate, et demandez les options disponibles.",
+    hint_en: "Say your destination, the missed train, and ask what options are available.",
+    culture_fr: "Les billets Echangeables SNCF peuvent etre modifies gratuitement avant le depart.",
+    culture_en: "Exchangeable SNCF tickets can be changed for free before departure.",
+  },
+  {
+    id: 22, cefrLevel: "A2",
+    place: "Ecole de langue · Nantes",
+    title: "Mon inscription", titleEn: "My enrollment",
+    skills: ["administrative language", "personal information", "schedules"],
+    scene_fr: "Vous vous inscrivez dans une ecole de langue. La secretaire vous pose des questions.",
+    scene_en: "You are enrolling in a language school. The secretary asks you questions.",
+    goal_fr: "Donner vos informations et choisir le bon cours pour votre niveau.",
+    goal_en: "Give your information and choose the right course for your level.",
+    hint_fr: "Preparez votre nom, nationalite, niveau de francais, et vos disponibilites.",
+    hint_en: "Prepare your name, nationality, French level, and when you are available.",
+    culture_fr: "Les alliances francaises proposent des cours certifies DELF et DALF dans le monde entier.",
+    culture_en: "Alliance Francaise centres offer DELF and DALF certified courses worldwide.",
+  },
+  // ── B1 (nouveaux) ──────────────────────────────────────────────
+  {
+    id: 23, cefrLevel: "B1",
+    place: "Agence immobiliere · Marseille",
+    title: "L'etat des lieux", titleEn: "The property inspection",
+    skills: ["housing", "disputing claims", "tenant rights"],
+    scene_fr: "Vous quittez votre appartement. L'agent immobilier note plusieurs degats que vous contestez.",
+    scene_en: "You are leaving your flat. The estate agent notes several damages you dispute.",
+    goal_fr: "Contester les degats injustifies et proteger votre depot de garantie.",
+    goal_en: "Dispute unjustified damage claims and protect your security deposit.",
+    hint_fr: "Comparez avec l'etat des lieux d'entree. Dites : ce n'etait pas note a l'entree.",
+    hint_en: "Compare with the entry inspection. Say: this was not noted on entry.",
+    culture_fr: "En France, le depot de garantie doit etre rendu dans un mois si aucun degat n'est constate.",
+    culture_en: "In France, the deposit must be returned within one month if there is no damage.",
+  },
+  {
+    id: 24, cefrLevel: "B1",
+    place: "Mairie · Strasbourg",
+    title: "Un probleme de papiers", titleEn: "A paperwork problem",
+    skills: ["administrative French", "explaining situations", "problem solving"],
+    scene_fr: "Vous venez renouveler un document administratif. L'employe dit qu'il manque une piece justificative.",
+    scene_en: "You are renewing an administrative document. The clerk says a supporting document is missing.",
+    goal_fr: "Comprendre ce qui manque et proposer une solution alternative.",
+    goal_en: "Understand what is missing and propose an alternative solution.",
+    hint_fr: "Demandez exactement quel document manque et si un equivalent peut etre accepte.",
+    hint_en: "Ask exactly which document is missing and whether an equivalent can be accepted.",
+    culture_fr: "En France, la mairie gere l'etat civil, les cartes d'identite et les permis de conduire.",
+    culture_en: "In France, the mairie handles civil registry, ID cards and driving licences.",
+  },
+  {
+    id: 25, cefrLevel: "B1",
+    place: "Salle de sport · Rennes",
+    title: "Resilier mon abonnement", titleEn: "Cancelling my membership",
+    skills: ["negotiation", "consumer rights", "assertiveness"],
+    scene_fr: "Vous voulez resilier votre abonnement. Le responsable essaie de vous convaincre de rester.",
+    scene_en: "You want to cancel your gym membership. The manager tries to convince you to stay.",
+    goal_fr: "Resilier votre contrat poliment mais fermement en invoquant vos droits.",
+    goal_en: "Cancel your contract politely but firmly by invoking your rights.",
+    hint_fr: "La loi vous donne le droit de resilier. Demandez la procedure officielle par ecrit.",
+    hint_en: "The law gives you the right to cancel. Ask for the official procedure in writing.",
+    culture_fr: "La loi Chatel oblige les salles a informer les clients de leur date limite de resiliation.",
+    culture_en: "The Chatel law requires gyms to inform clients of their cancellation deadline.",
+  },
+  // ── B2 (nouveaux) ──────────────────────────────────────────────
+  {
+    id: 26, cefrLevel: "B2",
+    place: "Bureau des RH · Paris La Defense",
+    title: "La negociation salariale", titleEn: "Salary negotiation",
+    skills: ["professional register", "argumentation", "persuasion"],
+    scene_fr: "Vous venez d'obtenir une offre d'emploi. Le DRH vous propose un salaire inferieur a vos attentes.",
+    scene_en: "You have just received a job offer. The HR director proposes a salary below your expectations.",
+    goal_fr: "Negocier un meilleur salaire ou des avantages supplementaires.",
+    goal_en: "Negotiate a better salary or additional benefits.",
+    hint_fr: "Appuyez-vous sur votre experience, le marche, et proposez un chiffre precis.",
+    hint_en: "Use your experience, market rates, and propose a specific figure with arguments.",
+    culture_fr: "En France, discuter du salaire est moins tabou qu'au Royaume-Uni. La negociation est attendue.",
+    culture_en: "In France, discussing salary is less taboo than in the UK. Negotiation is expected.",
+  },
+  {
+    id: 27, cefrLevel: "B2",
+    place: "Service apres-vente · Paris",
+    title: "Le produit defectueux", titleEn: "The faulty product",
+    skills: ["consumer rights", "formal complaints", "legal vocabulary"],
+    scene_fr: "Votre lave-vaisselle achete il y a 14 mois est tombe en panne. Le service client refuse la garantie.",
+    scene_en: "Your dishwasher bought 14 months ago has broken down. Customer service refuses the warranty.",
+    goal_fr: "Faire valoir la garantie legale de conformite de deux ans.",
+    goal_en: "Assert your two-year statutory conformity guarantee and obtain repair or refund.",
+    hint_fr: "La garantie legale dure deux ans en France. Elle est distincte de la garantie commerciale.",
+    hint_en: "The statutory guarantee lasts two years in France. It is separate from the commercial warranty.",
+    culture_fr: "L'article L217-4 du Code de la consommation protege les acheteurs pendant deux ans.",
+    culture_en: "Article L217-4 of the Consumer Code protects buyers for two years after purchase.",
+  },
+  {
+    id: 28, cefrLevel: "B2",
+    place: "Universite · Grenoble",
+    title: "La soutenance de memoire", titleEn: "The thesis defence",
+    skills: ["academic French", "defending arguments", "handling criticism"],
+    scene_fr: "Vous soutenez votre memoire de master. Un membre du jury remet en question votre methodologie.",
+    scene_en: "You are defending your master thesis. A jury member questions your methodology.",
+    goal_fr: "Defendre vos choix methodologiques avec precision et sang-froid.",
+    goal_en: "Defend your methodological choices with precision and composure.",
+    hint_fr: "Ne paniquez pas. Reformulez la critique, reconnaissez les limites, puis definez votre approche.",
+    hint_en: "Do not panic. Restate the critique, acknowledge limits, then defend your approach.",
+    culture_fr: "Les soutenances francaises sont publiques. Le jury delibere ensuite a huis clos.",
+    culture_en: "French thesis defences are public. The jury then deliberates behind closed doors.",
+  },
+  // ── C1 (nouveaux) ──────────────────────────────────────────────
+  {
+    id: 29, cefrLevel: "C1",
+    place: "Studio radio · Bruxelles",
+    title: "L'interview politique", titleEn: "The political interview",
+    skills: ["political register", "rhetoric", "handling pressure"],
+    scene_fr: "Vous etes un elu local interviewe en direct. Le journaliste vous presse sur une controverse concernant votre budget.",
+    scene_en: "You are a local official being interviewed live. The journalist presses you on a controversy about your budget.",
+    goal_fr: "Repondre aux questions sans vous compromettre tout en restant credible.",
+    goal_en: "Answer questions without compromising yourself while remaining credible.",
+    hint_fr: "Reformulez la question a votre avantage. Restez factuel et redirigez vers vos realisations.",
+    hint_en: "Reframe the question to your advantage. Stay factual and redirect to your achievements.",
+    culture_fr: "L'interview politique francaise est souvent adversariale. Les journalistes ne lachent pas.",
+    culture_en: "French political interviews are often adversarial. Journalists are trained not to let go.",
+  },
+  {
+    id: 30, cefrLevel: "C1",
+    place: "Sciences Po · Paris",
+    title: "Le grand oral", titleEn: "The oral examination",
+    skills: ["academic rhetoric", "structured argumentation", "synthesis"],
+    scene_fr: "Vous passez un grand oral de concours. Le jury vous demande de developper une these sur le numerique et la democratie.",
+    scene_en: "You are taking a competitive oral exam. The jury asks you to develop a thesis on digital technology and democracy.",
+    goal_fr: "Construire un argumentaire structure, nuance et convaincant.",
+    goal_en: "Build a structured, nuanced and convincing argument.",
+    hint_fr: "These, antithese, synthese. Citez des exemples concrets. Anticipez les contre-arguments.",
+    hint_en: "Thesis, antithesis, synthesis. Use concrete examples. Anticipate counter-arguments.",
+    culture_fr: "Le grand oral est une tradition des grandes ecoles. La forme compte autant que le fond.",
+    culture_en: "The grand oral is a grandes ecoles tradition. Form matters as much as content.",
+  },
+
 ];
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -691,6 +937,25 @@ function getWeekKey() {
   const week = Math.ceil(((d - jan1) / 86400000 + jan1.getDay() + 1) / 7);
   return `${d.getFullYear()}-W${week}`;
 }
+
+function getDailyChallenge(userLevel) {
+  var levelMap = {
+    "Pre-A1":["0"], "A1":["0","A1"], "A2":["0","A1","A2"],
+    "B1":["0","A1","A2","B1"], "B2":["0","A1","A2","B1","B2"],
+    "C1":["0","A1","A2","B1","B2","C1"]
+  };
+  var allowed = levelMap[userLevel] || ["A1"];
+  var pool = SCENARIOS.filter(function(sc){ return allowed.indexOf(sc.cefrLevel) !== -1; });
+  if (!pool.length) return null;
+  var d = new Date();
+  var seed = d.getFullYear()*10000+(d.getMonth()+1)*100+d.getDate();
+  return pool[seed % pool.length];
+}
+function getTodayStamp() {
+  var d=new Date();
+  return d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getDate();
+}
+
 
 // ─────────────────────────────────────────────────────────────────────────────
 // SCENARIO IMAGES  (injected at build time)
@@ -1471,7 +1736,7 @@ function LevelTestScreen({ immersion, onComplete, onBack }) {
   return null;
 }
 
-function HomeScreen({ progress, immersion, userLevel, sessions, onSelect, onProfile, onToggleMode, onExercises, displayName, isLoggedIn, streak }) {
+function HomeScreen({ progress, immersion, userLevel, sessions, onSelect, onProfile, onToggleMode, onExercises, displayName, isLoggedIn, streak, dailyChallenge, dailyDone }) {
   const t = T(immersion);
   const effectiveLevel = getUnlockedLevel(progress, userLevel);
 
@@ -1517,6 +1782,39 @@ function HomeScreen({ progress, immersion, userLevel, sessions, onSelect, onProf
 
       /* Scenario list */
       , React.createElement('div', { style: { flex: 1, overflowY: "auto" },}
+      /* Daily challenge card */
+      , dailyChallenge && React.createElement("div", {style:{margin:"12px 12px 0"}},
+          React.createElement("div", {style:{fontFamily:"'DM Sans',sans-serif",fontWeight:500,fontSize:10,
+            letterSpacing:1,textTransform:"uppercase",color:C.gray,marginBottom:8}},
+            immersion?"Défi du jour":"Daily challenge"
+          ),
+          React.createElement("button", {onClick:function(){onSelect(dailyChallenge);}, style:{
+            width:"100%",background:"white",border:"none",cursor:"pointer",textAlign:"left",
+            display:"flex",alignItems:"center",gap:12,padding:"13px 14px",
+            borderRadius:12,borderLeft:"4px solid #FF8C00",
+            boxShadow:"0 2px 8px "+C.shadow
+          }},
+            React.createElement("div", {style:{width:48,height:48,borderRadius:8,overflow:"hidden",
+              flexShrink:0,background:C.bgCard,display:"flex",alignItems:"center",justifyContent:"center",fontSize:22}},
+              dailyChallenge.emoji||"⭐"
+            ),
+            React.createElement("div", {style:{flex:1,minWidth:0}},
+              React.createElement("div", {style:{fontFamily:"'DM Serif Text',serif",fontSize:16,color:C.ink,marginBottom:2}},
+                immersion?dailyChallenge.titleFr:dailyChallenge.titleEn
+              ),
+              React.createElement("div", {style:{fontFamily:"'DM Sans',sans-serif",fontWeight:300,fontSize:12,color:C.gray}},
+                (immersion?dailyChallenge.locationFr:dailyChallenge.locationEn)+" · "+dailyChallenge.cefrLevel
+              )
+            ),
+            dailyDone
+              ? React.createElement("div", {style:{fontFamily:"'DM Sans',sans-serif",fontSize:10,fontWeight:600,
+                  color:"#0D6B3A",background:"rgba(13,107,58,0.1)",padding:"4px 10px",borderRadius:20,flexShrink:0}},
+                  immersion?"✓ Relevé":"✓ Done")
+              : React.createElement("div", {style:{fontFamily:"'DM Sans',sans-serif",fontSize:10,fontWeight:600,
+                  color:"#FF8C00",background:"rgba(255,140,0,0.1)",padding:"4px 10px",borderRadius:20,flexShrink:0}},
+                  "⭐")
+          )
+        )
         , groups.map(({ lvl, scenarios }) => {
           const unlocked = CEFR_RANK[lvl] <= CEFR_RANK[effectiveLevel];
           return (
@@ -1636,38 +1934,35 @@ function AssistantBubble({ content, immersion }) {
   const teacherNote = _optionalChain([parts, 'access', _16 => _16[1], 'optionalAccess', _17 => _17.trim, 'call', _18 => _18()]);
 
   return (
-    React.createElement('div', { style: { maxWidth: "88%", display: "flex", flexDirection: "column", gap: 6, animation: "slideUp 0.2s both" },}
-      /* In-character French response */
+    React.createElement('div', { style: { maxWidth: "90%", display: "flex", flexDirection: "column", gap: 8, animation: "slideUp 0.2s both" },}
       , React.createElement('div', { style: {
-        background: "#FDFCFA",
-        borderRadius: "16px 16px 16px 4px",
-        padding: "14px 18px",
-        fontFamily: "'DM Serif Text', serif",
+        background: "#FDFCFA", borderRadius: "16px 16px 16px 4px",
+        padding: "14px 18px", fontFamily: "'DM Serif Text', serif",
         fontSize: 17, lineHeight: 1.8, color: C.ink,
-        boxShadow: "0 2px 8px rgba(20,22,32,0.08)",
-        whiteSpace: "pre-wrap",
-      },}
-        , roleplay || content
-      )
-
-      /* Teacher correction — only shown if separator present */
-      , teacherNote && (
-        React.createElement('div', { style: {
-          background: "#E8EEF9",
-          borderLeft: `3px solid #002395`,
-          borderRadius: "0 8px 8px 0",
-          padding: "10px 14px",
-          display: "flex", gap: 8, alignItems: "flex-start",
-        },}
-          , React.createElement('span', { style: { fontSize: 16, flexShrink: 0, marginTop: 1 },}, "✏️")
-          , React.createElement('div', { style: {
-            fontFamily: "'DM Sans', sans-serif",
-            fontWeight: 300, fontSize: 16, color: C.inkMid, lineHeight: 1.65,
-          },}
-            , teacherNote
+        boxShadow: "0 2px 8px rgba(20,22,32,0.08)", whiteSpace: "pre-wrap",
+      },}, roleplay || content)
+      , teacherNote && React.createElement('div', { style: {
+          background: "#F0F4FF", border: "1px solid #C8D5F5",
+          borderRadius: 12, padding: "12px 16px",
+          display: "flex", gap: 10, alignItems: "flex-start",
+        }},
+          React.createElement('div', { style: {
+            width: 28, height: 28, borderRadius: "50%", flexShrink: 0,
+            background: C.blue, display: "flex", alignItems: "center",
+            justifyContent: "center", fontSize: 13, marginTop: 1,
+          }}, "✏️"),
+          React.createElement('div', null,
+            React.createElement('div', { style: {
+              fontFamily: "'DM Sans',sans-serif", fontWeight: 600,
+              fontSize: 10, letterSpacing: 1, textTransform: "uppercase",
+              color: C.blue, marginBottom: 4,
+            }}, immersion ? "Note du professeur" : "Teacher note"),
+            React.createElement('div', { style: {
+              fontFamily: "'DM Sans',sans-serif", fontWeight: 300,
+              fontSize: 15, color: C.ink, lineHeight: 1.65,
+            }}, teacherNote)
           )
         )
-      )
     )
   );
 }
@@ -1693,6 +1988,7 @@ function ScenarioScreen({ scenario: s, immersion, ttsEnabled, progress, onComple
   const [earnedStars, setEarnedStars] = useState(currentStars);
   const [failCount,   setFailCount]   = useState(0);
   const [showHint,    setShowHint]    = useState(false);
+  const [showStarter, setShowStarter] = useState(false);
   const [micError,    setMicError]    = useState(false);
   const [choices,     setChoices]     = useState(null); // Pre-A1 multiple choice options
 
@@ -1925,9 +2221,49 @@ function ScenarioScreen({ scenario: s, immersion, ttsEnabled, progress, onComple
                , goal
             )
           )
+          /* Beginner starter — Pre-A1 and A1 only */
+          , (s.cefrLevel === "0" || s.cefrLevel === "A1") && messages.length === 0 && (
+              !showStarter
+                ? React.createElement('button', {
+                    onClick: () => setShowStarter(true),
+                    style: {
+                      background: "none", border: "1px solid "+C.rule, borderRadius: 20,
+                      padding: "5px 12px", cursor: "pointer",
+                      fontFamily: "'DM Sans',sans-serif", fontWeight: 300, fontSize: 12, color: C.gray,
+                    }
+                  }, "💡 " + (immersion ? "Comment commencer ?" : "How do I start?"))
+                : React.createElement('div', {
+                    style: {
+                      background: "#F0F4FF", border: "1px solid #C8D5F5",
+                      borderRadius: 12, padding: "10px 12px",
+                    }
+                  },
+                    React.createElement('div', { style: {
+                      fontFamily: "'DM Sans',sans-serif", fontWeight: 600,
+                      fontSize: 10, letterSpacing: 1, color: C.blue,
+                      textTransform: "uppercase", marginBottom: 5,
+                    }}, immersion ? "Pour commencer..." : "To get started..."),
+                    React.createElement('div', { style: {
+                      fontFamily: "'DM Serif Text',serif", fontSize: 13,
+                      color: C.ink, lineHeight: 1.65, marginBottom: 8,
+                    }},
+                      s.cefrLevel === "0"
+                        ? (immersion ? "Tapez A, B ou C pour choisir votre reponse." : "Type A, B or C to choose your answer.")
+                        : (immersion ? "Commencez par : Bonjour !" : "Start with: Bonjour !")
+                    ),
+                    React.createElement('button', {
+                      onClick: () => { setInput(s.cefrLevel === "0" ? "" : "Bonjour ! "); setShowStarter(false); },
+                      style: {
+                        background: C.blue, color: "white", border: "none",
+                        borderRadius: 8, padding: "5px 10px", cursor: "pointer",
+                        fontFamily: "'DM Sans',sans-serif", fontWeight: 500, fontSize: 11,
+                      }
+                    }, immersion ? "Utiliser cette phrase" : "Use this phrase")
+                  )
+            )
           /* Hint button */
           , React.createElement('button', { onClick: () => setShowHint(v => !v), style: {
-            background: showHint ? C.red : "rgba(255,255,255,0.1)",
+            background: showHint ? C.blue : "rgba(255,255,255,0.1)",
             border: showHint ? "none" : "1px solid rgba(255,255,255,0.2)",
             borderRadius: 6, cursor: "pointer", flexShrink: 0,
             fontFamily: "'DM Sans',sans-serif", fontSize: 14, fontWeight: 500,
@@ -2228,6 +2564,14 @@ Output ONLY JSON: {"correct": true|false, "feedback": "brief feedback in ${lang}
         , React.createElement(BackBtn, { onClick: exercise ? () => { setExercise(null); setFeedback(null); } : onBack,} )
         , React.createElement('div', { style: { fontFamily: "'DM Serif Text',serif", fontSize: 20, color: C.onHeader },}
           , immersion ? "Mes exercices" : "My exercises"
+          , React.createElement('div', { style: { fontFamily: "'DM Sans',sans-serif", fontWeight: 300, fontSize: 12, color: C.gray, marginTop: 2 }},
+            (function(){
+              var total = Object.values(diag).reduce(function(n,arr){ return n+(arr?arr.length:0); }, 0);
+              return total > 0
+                ? (immersion ? ('Base sur vos ' + total + ' erreur' + (total>1?'s':'') + ' enregistrees') : ('Based on your ' + total + ' recorded mistake' + (total>1?'s':'')))
+                : (immersion ? 'Completez des scenarios pour generer vos exercices' : 'Complete scenarios to generate your exercises');
+            })()
+          )
         )
       )
 
@@ -2376,7 +2720,7 @@ Output ONLY JSON: {"correct": true|false, "feedback": "brief feedback in ${lang}
 
 function ProfileScreen({ progress, immersion, userLevel, sessions, onBack, onReset,
     onToggleMode, onRetakeTest, ttsEnabled, onToggleTTS, onDiagnostics,
-    user, accountLabel, onSignOut, onAccount, username, userNum, streak }) {
+    user, username, userNum, onSignOut, onAccount, streak }) {
 
   const t = T(immersion);
   const done       = Object.values(progress).filter(p => (p?.stars||0) > 0).length;
@@ -2855,12 +3199,14 @@ function App() {
         onComplete:lvl=>{setUserLevel(lvl);lsSet("mft_level",lvl);if(user)sbSaveProfile(user.id,lvl,immersion,username,userNum).catch(()=>{});go("home");},
         onBack:()=>go("mode")}),
       screen==="home"      && React.createElement(HomeScreen,     {progress,immersion,userLevel,sessions:thisWeek,
-        displayName, isLoggedIn:!!user, streak,
+        displayName, isLoggedIn:!!user, streak, dailyChallenge, dailyDone,
         onSelect:s=>{setScenario(s);recordSession();go("scenario");},
         onProfile:()=>go("profile"), onToggleMode:toggleImmersion, onExercises:()=>go("diagnostics")}),
       screen==="scenario"&&scenario && React.createElement(ScenarioScreen,{scenario,immersion,ttsEnabled,progress,
         onExercises:()=>go("diagnostics"),
-        onComplete:(id,stars)=>{saveProgress({...progress,[id]:{stars:Math.max(getStars(progress[id]),stars||1),visits:((progress[id]?.visits)||0)+1}});go("home");},
+        onComplete:(id,stars)=>{saveProgress({...progress,[id]:{stars:Math.max(getStars(progress[id]),stars||1),visits:((progress[id]?.visits)||0)+1}});
+          if(dailyChallenge&&id===dailyChallenge.id){lsSet("mft_daily_done",getTodayStamp());}
+          go("home");},
         onDiag:saveDiag, onBack:()=>go("home")}),
       screen==="profile"   && React.createElement(ProfileScreen,  {progress,immersion,userLevel,sessions:thisWeek,ttsEnabled,
         user, username, userNum, streak,
