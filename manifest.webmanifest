@@ -1,0 +1,9 @@
+{
+  "name": "My French Teacher",
+  "short_name": "MyFrenchTeacher",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#080C1A",
+  "theme_color": "#080C1A"
+}
